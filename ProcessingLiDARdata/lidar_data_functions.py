@@ -77,7 +77,7 @@ def discretize_pointcloud(trimmed_point_cloud, spatial_resolution):
         layer 3 = minimum evaluation
     '''
 
-    discretized_pointcloud = np.zeros([4, 3,3])
+    discretized_pointcloud = np.zeros([4, 600, 600])
 
     if len(trimmed_point_cloud) is 0:
 
@@ -91,7 +91,7 @@ def discretize_pointcloud(trimmed_point_cloud, spatial_resolution):
         # sort the point cloud by x in increasing order
         x_sorted_point_cloud = np.asarray(sorted(trimmed_point_cloud, key=lambda row: row[0]))
 
-        for x_cell in range(3):
+        for x_cell in range(600):
 
             # get the x-values in the spatial resolution interval
             x_interval = list(map(lambda x: (spatial_resolution * x_cell) < x <= (x_cell + 1) * spatial_resolution, x_sorted_point_cloud[:, 0]))
@@ -101,7 +101,7 @@ def discretize_pointcloud(trimmed_point_cloud, spatial_resolution):
             x_sorted_by_y = np.asarray(sorted(x_interval, key=lambda row: row[1]))
 
             # loop through the y coordinates in the current x_interval and store values in the output_channel
-            for y_cell in range(3):
+            for y_cell in range(600):
 
                 # if len(sorted_y) is 0:
                 if len(x_sorted_by_y) is 0:
