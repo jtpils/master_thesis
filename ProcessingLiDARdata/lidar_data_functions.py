@@ -32,6 +32,17 @@ def load_data(path_to_ply, path_to_csv):
     return point_cloud, global_lidar_coordinates
 
 
+def rotate_translate_pointcloud(pointcloud, global_coordinates):
+    '''
+    Rotate and translate pointcloud before trimming it.
+    :param pointcloud:
+    :param global_coordinates:
+    :return: pointcloud
+    '''
+    
+    return pointcloud
+
+
 def trim_pointcloud(point_cloud, range=15, roof=10, floor=3): # the hard coded numbers are not absolute.
     '''
     Trim pointcloud to a range given by range_of_interest. Trim detections that are more than (roof) meters above LiDAR,
@@ -136,3 +147,5 @@ def array_to_png(discretized_pointcloud):
         discretized_pointcloud:
     :return:
     '''
+
+
