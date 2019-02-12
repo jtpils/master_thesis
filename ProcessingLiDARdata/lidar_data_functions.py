@@ -1,4 +1,8 @@
 import numpy as np
+from PIL import Image
+import os
+import matplotlib.pyplot as plt
+from pathlib import Path
 
 
 def load_data(path_to_ply, path_to_csv):
@@ -90,9 +94,9 @@ def discretize_pointcloud(trimmed_point_cloud, spatial_resolution=0.05):
     if len(trimmed_point_cloud) is 0:
 
         discretized_pointcloud[0, :, :] = 0
-        discretized_pointcloud[1, :, :] = 'NaN'
-        discretized_pointcloud[2, :, :] = 'NaN'
-        discretized_pointcloud[3, :, :] = 'NaN'
+        #discretized_pointcloud[1, :, :] = 'NaN'
+        #discretized_pointcloud[2, :, :] = 'NaN'
+        #discretized_pointcloud[3, :, :] = 'NaN'
 
     else:
 
@@ -102,9 +106,6 @@ def discretize_pointcloud(trimmed_point_cloud, spatial_resolution=0.05):
         for x_cell in range(600):
 
             # get the x-values in the spatial resolution interval
-            #x_interval = list(map(lambda x: (spatial_resolution * x_cell) < x <= (x_cell + 1) * spatial_resolution, x_sorted_point_cloud[:, 0]))
-
-            # Annika's proposal:
             lower_bound = spatial_resolution * x_cell - 15
             upper_bound = (x_cell + 1) * spatial_resolution - 15
             x_interval = list(map(lambda x: lower_bound < x <= upper_bound, x_sorted_point_cloud[:, 0]))
@@ -121,16 +122,13 @@ def discretize_pointcloud(trimmed_point_cloud, spatial_resolution=0.05):
                 # if len(sorted_y) is 0:
                 if len(x_sorted_by_y) is 0:
                     discretized_pointcloud[0, x_cell, y_cell] = 0
-                    discretized_pointcloud[1, x_cell, y_cell] = 'NaN'
-                    discretized_pointcloud[2, x_cell, y_cell] = 'NaN'
-                    discretized_pointcloud[3, x_cell, y_cell] = 'NaN'
+                    #discretized_pointcloud[1, x_cell, y_cell] = 'NaN'
+                    #discretized_pointcloud[2, x_cell, y_cell] = 'NaN'
+                    #discretized_pointcloud[3, x_cell, y_cell] = 'NaN'
                 else:
-                    # y_interval = np.asarray(x_sorted_by_y[list(map(lambda x: spatial_resolution * y_cell < x <= (y_cell + 1) * spatial_resolution, x_sorted_by_y[:, 1]))])
-                    # Annika's proposal:
                     lower_bound = spatial_resolution * y_cell - 15
                     upper_bound = (y_cell + 1) * spatial_resolution - 15
                     y_interval = np.asarray(x_sorted_by_y[list(map(lambda x: lower_bound < x <= upper_bound, x_sorted_by_y[:, 1]))])
-
 
 
                     # if there are detections save these in right channel
@@ -143,10 +141,9 @@ def discretize_pointcloud(trimmed_point_cloud, spatial_resolution=0.05):
                     # if there are not any detections
                     else:
                         discretized_pointcloud[0, x_cell, y_cell] = 0
-                        discretized_pointcloud[1, x_cell, y_cell] = 'NaN'
-                        discretized_pointcloud[2, x_cell, y_cell] = 'NaN'
-                        discretized_pointcloud[3, x_cell, y_cell] = 'NaN'
-
+                        #discretized_pointcloud[1, x_cell, y_cell] = 'NaN'
+                        #discretized_pointcloud[2, x_cell, y_cell] = 'NaN'
+                        #discretized_pointcloud[3, x_cell, y_cell] = 'NaN'
 
     # we should normalise the intensity
     # we should convert all nan-values to something else, either here or declare everything as zeros in the beginning
@@ -157,10 +154,40 @@ def discretize_pointcloud(trimmed_point_cloud, spatial_resolution=0.05):
 
 def array_to_png(discretized_pointcloud):
     '''
-    Create a png-image of a discretized pointcloud. Create one image per layer. This is mostly for visualizing purposes. (?)
+    Create a png-image of a discretized pointcloud. Create one image per layer. This is mostly for visualizing purposes.
     :param
         discretized_pointcloud:
     :return:
     '''
 
+    # Ask what the png files should be named and create a folder where to save them
+    input_folder_name = input('Type name of folder to store png files in: "png_date_number" :')
 
+    # create a folder name
+    folder_name = '/_out_' + input_folder_name
+
+    # creates folder to store the png files
+    current_path = os.getcwd()
+    folder_path = current_path + folder_name
+
+    try:
+        os.mkdir(folder_path)
+    except OSError:
+        print('Failed to create new directory.')
+    else:
+        print('Successfully created new directory with path: ', folder_path)
+
+    # NORMALIZE THE BEV IMAGE
+    for channel in range(np.shape(discretized_pointcloud)[0]):
+        max_value = np.max(discretized_pointcloud[channel, :, :])
+        # print('Max max_value: ', max_value)
+        scale = 255/max_value
+        discretized_pointcloud[channel, :, :] = discretized_pointcloud[channel, :, :] * scale
+        print('Largest pixel value (should be 255) : ', np.max(discretized_pointcloud[channel, :, :]))
+        # create the png_path
+        png_path = folder_path + '/_channel' + str(channel)+'.png'
+
+    # Save images
+        img = Image.fromarray(discretized_pointcloud[channel, :, :])
+        new_img = img.convert("L")
+        new_img.save(png_path)
