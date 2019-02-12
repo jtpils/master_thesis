@@ -2,6 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="11ce7f4b-d52e-4d70-b606-25e769bf5683" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/_out_png_190212_1/_channel0.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/_out_png_190212_1/_channel1.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/_out_png_190212_1/_channel2.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/_out_png_190212_1/_channel3.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lidar_data_functions.py" beforeDir="false" afterPath="$PROJECT_DIR$/lidar_data_functions.py" afterDir="false" />
@@ -27,8 +31,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/lidar_data_functions.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="450">
-              <caret line="190" column="67" selection-start-line="190" selection-start-column="67" selection-end-line="190" selection-end-column="67" />
+            <state relative-caret-position="105">
+              <caret line="159" column="12" selection-start-line="159" selection-start-column="12" selection-end-line="159" selection-end-column="12" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
               </folding>
@@ -153,7 +157,6 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="67" y="25" width="1613" height="1025" extended-state="6" />
-    <editor active="true" />
     <layout>
       <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.24748111" />
       <window_info id="Structure" order="1" weight="0.25" />
@@ -195,8 +198,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/lidar_data_functions.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="450">
-          <caret line="190" column="67" selection-start-line="190" selection-start-column="67" selection-end-line="190" selection-end-column="67" />
+        <state relative-caret-position="105">
+          <caret line="159" column="12" selection-start-line="159" selection-start-column="12" selection-end-line="159" selection-end-column="12" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
           </folding>
