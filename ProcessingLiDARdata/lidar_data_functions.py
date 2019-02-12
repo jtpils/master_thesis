@@ -203,3 +203,22 @@ def array_to_png(discretized_pointcloud):
         img = Image.fromarray(discretized_pointcloud[channel, :, :])
         new_img = img.convert("L")
         new_img.save(png_path)
+
+
+def random_rigid_transformation(bound_translation_meter, bound_rotation_degrees):
+    '''
+    This functions return an array with values for translation and rotation from ground truth. The values are drawn from
+    a distribution given by the user. This rotation/translation should be used to transform the LiDAR sweep to create a
+    training sample. Yields equally probable values around 0, both negative and positive up to the given bound.
+    Should be used before discretizing the sweep.
+    :param bound_translation_meter: scalar, the largest translation value that is acceptable in meters
+    :param bound_rotation_degrees: scalar, the largest rotation value that is acceptable in degrees
+    :return: rigid_transformation: an array with 3 elements [x, y, angle_degrees]
+    '''
+
+    translation = np.random.uniform(-bound_translation_meter, bound_translation_meter, 2)
+    rotation = np.random.uniform(-bound_rotation_degrees, bound_rotation_degrees, 1)
+
+    rigid_transformation = np.concatenate((translation, rotation))
+
+    return rigid_transformation
