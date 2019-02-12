@@ -41,7 +41,7 @@ def load_data(path_to_ply, path_to_csv):
     return point_cloud, global_lidar_coordinates
 
 
-def rotate_pointcloud(pointcloud, global_coordinates):
+def rotate_pointcloud_to_global(pointcloud, global_coordinates):
     '''
     Rotate pointcloud (before trimming it).
     :param pointcloud: input raw point cloud shape (N, 3)
@@ -51,7 +51,7 @@ def rotate_pointcloud(pointcloud, global_coordinates):
 
     number_of_points = len(pointcloud)  # number of points in the pointcloud
 
-    yaw = np.deg2rad(global_coordinates[2])  # convert yaw in degrees to radians
+    yaw = np.deg2rad(global_coordinates[0, 3])  # convert yaw in degrees to radians
     c, s = np.cos(yaw), np.sin(yaw)
     Rz = np.array(((c, -s, 0), (s, c, 0), (0, 0, 1))) # Rotation matrix
 
@@ -59,6 +59,20 @@ def rotate_pointcloud(pointcloud, global_coordinates):
     rotated_pointcloud = np.transpose(np.reshape(rotated_pointcloud, (3, number_of_points)))  # reshape and transpose back
 
     return rotated_pointcloud
+
+
+def translate_pointcloud_to_global(pointcloud, global_coordinates):
+    '''
+    Translates all the points in the pointcloud to the global coordinates. This should be done after rotating and then
+    trimming the pointcloud.
+    :param pointcloud:
+    :param global_coordinates:
+    :return: global_pointcloud
+    '''
+
+    global_pointcloud = pointcloud + global_coordinates[0, :3]  #only add xyz (not yaw)
+
+    return global_pointcloud
 
 
 def trim_pointcloud(point_cloud, range=15, roof=10, floor=-3): # the hard coded numbers are not absolute.
