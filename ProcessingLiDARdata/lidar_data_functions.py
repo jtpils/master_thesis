@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from pathlib import Path
 
 
+# Annika is giting
 def load_data(path_to_ply, path_to_csv):
     '''
     Load the data from a .ply-file, toghether with the global coordinates for this fram from a csv-file.
