@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 y = pc[:, 1]
 plt.plot(x, y, 'ro')
 plt.title('Raw point cloud')
-plt.show()'''
+plt.show()
 
 # Test array:
 pc = np.array([[-10,-10, 0], [-15, 3, 3], [26, 2, 3], [1, 2, 3], [10, 28, 9], [4, 1, -4], [4, 1, 5], [11, 9, 1], [12, 1, 10],[4, 8, 10], [1, 2, 3], [5, 7, 9], [25, 9, 1], [23, 3, 10]])
@@ -38,11 +38,11 @@ x = trimmed_pc[:, 0]
 y = trimmed_pc[:, 1]
 
 # PLOT TRIMMED POINTCLOUD:
-'''x = trimmed_pc[:, 0]
+x = trimmed_pc[:, 0]
 y = trimmed_pc[:, 1]
 plt.plot(x, y, 'ro')
 plt.title('Trimmed pointcloud')
-plt.show()'''
+plt.show()
 
 global_coordinates = [0, 0, 5]
 rotated_pc = rotate_pointcloud(trimmed_pc, global_coordinates)
@@ -52,4 +52,7 @@ y_rot = rotated_pc[:, 1]
 plt.plot(x_rot, y_rot, 'ro', x, y, 'bo')
 #plt.axis([-2, 2, -2, 2])
 plt.title('raw: blue, rotated: red')
-plt.show()
+plt.show()'''
+
+rigid_trans = random_rigid_transformation(1, 10)
+print(rigid_trans)
