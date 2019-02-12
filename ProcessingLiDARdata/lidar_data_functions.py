@@ -56,6 +56,22 @@ def rotate_pointcloud(pointcloud, global_coordinates):
     return rotated_pointcloud
 
 
+def translate_pointcloud_to_global(pointcloud, global_coordinates):
+    '''
+    Translates all the points in the pointcloud to the global coordinates. This should be done after rotating and then
+    trimming the pointcloud.
+    :param pointcloud:
+    :param global_coordinates:
+    :return: global_pointcloud
+    '''
+
+    print('shape pointcloud: ', np.shape(pointcloud))
+    print('shape global_coordinates: ', np.shape(global_coordinates))
+    global_pointcloud = pointcloud + global_coordinates
+
+    return global_pointcloud
+
+
 def trim_pointcloud(point_cloud, range=15, roof=10, floor=-3): # the hard coded numbers are not absolute.
     '''
     Trim pointcloud to a range given by range_of_interest. Trim detections that are more than (roof) meters above LiDAR,

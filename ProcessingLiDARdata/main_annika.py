@@ -15,23 +15,23 @@ import matplotlib.pyplot as plt
 y = pc[:, 1]
 plt.plot(x, y, 'ro')
 plt.title('Raw point cloud')
-plt.show()
+plt.show()'''
 
 # Test array:
 pc = np.array([[-10,-10, 0], [-15, 3, 3], [26, 2, 3], [1, 2, 3], [10, 28, 9], [4, 1, -4], [4, 1, 5], [11, 9, 1], [12, 1, 10],[4, 8, 10], [1, 2, 3], [5, 7, 9], [25, 9, 1], [23, 3, 10]])
 #print('Shape of test array: ', np.shape(pc))
 #print(pc[0,:])
 #pc = np.array([[-1,-1, 0], [1, 1, 0]])
-x = pc[:, 0]
-y = pc[:, 1]
+#x = pc[:, 0]
+#y = pc[:, 1]
 #plt.plot(x, y, 'ro')
 #plt.title('Raw point cloud')
 #plt.show()
 
-print('Shape of raw pointcloud: ',np.shape(pc))
+print('Shape of raw pointcloud: ', np.shape(pc))
 
 
-# Trim point cloud:
+''''# Trim point cloud:
 trimmed_pc = trim_pointcloud(pc)
 print('Shape of trimmed pointcloud: ', np.shape(trimmed_pc))
 x = trimmed_pc[:, 0]
@@ -54,5 +54,7 @@ plt.plot(x_rot, y_rot, 'ro', x, y, 'bo')
 plt.title('raw: blue, rotated: red')
 plt.show()'''
 
-rigid_trans = random_rigid_transformation(1, 10)
-print(rigid_trans)
+#rigid_trans = random_rigid_transformation(1, 10)
+#print(rigid_trans)
+
+translate_pointcloud_to_global(pc, global_coordinates)
