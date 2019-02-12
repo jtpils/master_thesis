@@ -1,8 +1,7 @@
 import numpy as np
 from PIL import Image
 import os
-import matplotlib.pyplot as plt
-from pathlib import Path
+import warnings
 
 
 def load_data(path_to_ply, path_to_csv):
@@ -21,16 +20,20 @@ def load_data(path_to_ply, path_to_csv):
 
     # load pointcloud
     point_cloud = np.loadtxt(path_to_ply, skiprows=7)
+    print(np.shape(point_cloud))
+
+    if np.shape(point_cloud)[0] == 0:
+        print("file empty")
 
     # extract frame_number from filename
-    file_name = path_to_ply.split('/')[-1] # keep the last part of the path, i.e. the file name
-    frame_number = int(file_name[:-4]) # remove the part '.ply' and convert to int
+    file_name = path_to_ply.split('/')[-1]  # keep the last part of the path, i.e. the file name
+    frame_number = int(file_name[:-4])  # remove the part '.ply' and convert to int
 
     # load csv-file with global coordinates
     global_coordinates = np.loadtxt(path_to_csv, skiprows=1, delimiter=',')
 
     # extract information from csv at given frame_number
-    row = np.where(global_coordinates==frame_number)[0]  # returns which row the frame number is located on
+    row = np.where(global_coordinates == frame_number)[0]  # returns which row the frame number is located on
     global_lidar_coordinates = global_coordinates[row, 1:5]
 
     return point_cloud, global_lidar_coordinates
