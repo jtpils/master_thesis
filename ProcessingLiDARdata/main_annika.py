@@ -3,22 +3,24 @@ from lidar_data_functions import *
 from PIL import Image
 import matplotlib.pyplot as plt
 
-#path_to_ply = '/home/master04/Desktop/_out/_out_Town02_190208_1/pc/004179.ply'
-#path_to_csv = '/home/master04/Desktop/_out/_out_Town02_190208_1/Town02_190208_1.csv'
+path_to_ply = '/Users/annikal/Documents/master_thesis/ProcessingLiDARdata/_out_Town03_190207_18/pc/173504.ply'
+path_to_csv = '/Users/annikal/Documents/master_thesis/ProcessingLiDARdata/_out_Town03_190207_18/Town03_190207_18.csv'
 
 # Load data:
-#pc, global_lidar_coordinates = load_data(path_to_ply, path_to_csv)
-#print('Shape of raw pointcloud: ',np.shape(pc))
+pc, global_lidar_coordinates = load_data(path_to_ply, path_to_csv)
+print('Shape of raw pointcloud: ', np.shape(pc))
+print('global lidar coordinates: ', global_lidar_coordinates)
 
 # PLOT RAW POINT CLOUD:
-'''x = pc[:, 0]
+x = pc[:, 0]
 y = pc[:, 1]
-plt.plot(x, y, 'ro')
+plt.plot(x, y, 'r.')
+plt.axis('equal')
 plt.title('Raw point cloud')
-plt.show()'''
+plt.show()
 
 # Test array:
-pc = np.array([[-10,-10, 0], [-15, 3, 3], [26, 2, 3], [1, 2, 3], [10, 28, 9], [4, 1, -4], [4, 1, 5], [11, 9, 1], [12, 1, 10],[4, 8, 10], [1, 2, 3], [5, 7, 9], [25, 9, 1], [23, 3, 10]])
+#pc = np.array([[-10,-10, 0], [-15, 3, 3], [26, 2, 3], [1, 2, 3], [10, 28, 9], [4, 1, -4], [4, 1, 5], [11, 9, 1], [12, 1, 10],[4, 8, 10], [1, 2, 3], [5, 7, 9], [25, 9, 1], [23, 3, 10]])
 #print('Shape of test array: ', np.shape(pc))
 #print(pc[0,:])
 #pc = np.array([[-1,-1, 0], [1, 1, 0]])
@@ -27,34 +29,35 @@ pc = np.array([[-10,-10, 0], [-15, 3, 3], [26, 2, 3], [1, 2, 3], [10, 28, 9], [4
 #plt.plot(x, y, 'ro')
 #plt.title('Raw point cloud')
 #plt.show()
+#print('Shape of raw pointcloud: ', np.shape(pc))
 
-print('Shape of raw pointcloud: ', np.shape(pc))
 
-
-''''# Trim point cloud:
 trimmed_pc = trim_pointcloud(pc)
 print('Shape of trimmed pointcloud: ', np.shape(trimmed_pc))
-x = trimmed_pc[:, 0]
-y = trimmed_pc[:, 1]
-
 # PLOT TRIMMED POINTCLOUD:
 x = trimmed_pc[:, 0]
 y = trimmed_pc[:, 1]
-plt.plot(x, y, 'ro')
+plt.plot(x, y, 'r.')
+plt.axis('equal')
 plt.title('Trimmed pointcloud')
 plt.show()
 
-global_coordinates = [0, 0, 5]
-rotated_pc = rotate_pointcloud(trimmed_pc, global_coordinates)
-print('shape of rotated pointcloud: ', np.shape(rotated_pc))
+
+rotated_pc = rotate_pointcloud_to_global(trimmed_pc, global_lidar_coordinates)
 x_rot = rotated_pc[:, 0]
 y_rot = rotated_pc[:, 1]
-plt.plot(x_rot, y_rot, 'ro', x, y, 'bo')
-#plt.axis([-2, 2, -2, 2])
+plt.plot(x_rot, y_rot, 'r.', x, y, 'b.')
+plt.axis('equal')
 plt.title('raw: blue, rotated: red')
-plt.show()'''
+plt.show()
 
-#rigid_trans = random_rigid_transformation(1, 10)
-#print(rigid_trans)
 
-translate_pointcloud_to_global(pc, global_coordinates)
+translated_pc = translate_pointcloud_to_global(rotated_pc, global_lidar_coordinates)
+x_trans = translated_pc[:, 0]
+y_trans = translated_pc[:, 1]
+plt.plot(x_trans, y_trans, 'r.', x, y, 'b.')
+plt.axis('equal')
+plt.title('translated: red, raw: blue')
+plt.show()
+
+print(global_lidar_coordinates)
