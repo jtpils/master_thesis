@@ -1,6 +1,7 @@
 import numpy as np
 from PIL import Image
 import os
+import sys
 import warnings
 
 
@@ -20,10 +21,11 @@ def load_data(path_to_ply, path_to_csv):
 
     # load pointcloud
     point_cloud = np.loadtxt(path_to_ply, skiprows=7)
-    print(np.shape(point_cloud))
 
+    # check if ply file is empty. Stop execution if it is.
     if np.shape(point_cloud)[0] == 0:
-        print("file empty")
+        print("ply file with point cloud is empty")
+        sys.exit()
 
     # extract frame_number from filename
     file_name = path_to_ply.split('/')[-1]  # keep the last part of the path, i.e. the file name
