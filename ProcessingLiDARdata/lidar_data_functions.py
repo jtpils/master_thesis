@@ -1,4 +1,8 @@
 import numpy as np
+from PIL import Image
+import os
+import matplotlib.pyplot as plt
+from pathlib import Path
 
 
 def load_data(path_to_ply, path_to_csv):
@@ -32,7 +36,27 @@ def load_data(path_to_ply, path_to_csv):
     return point_cloud, global_lidar_coordinates
 
 
-def trim_pointcloud(point_cloud, range=15, roof=10, floor=3): # the hard coded numbers are not absolute.
+def rotate_pointcloud(pointcloud, global_coordinates):
+    '''
+    Rotate pointcloud (before trimming it).
+    :param pointcloud: input raw point cloud shape (N, 3)
+    :param global_coordinates: global coordinates for LiDAR, which cintains yaw angle
+    :return: rotated_pointcloud: rotated pointcloud, but coordinates are stil relative to LiDAR (not global)
+    '''
+
+    number_of_points = len(pointcloud)  # number of points in the pointcloud
+
+    yaw = np.deg2rad(global_coordinates[2])  # convert yaw in degrees to radians
+    c, s = np.cos(yaw), np.sin(yaw)
+    Rz = np.array(((c, -s, 0), (s, c, 0), (0, 0, 1))) # Rotation matrix
+
+    rotated_pointcloud = Rz @ np.transpose(pointcloud) # rotate each vector with coordinates, transpose to get dimensions correctly
+    rotated_pointcloud = np.transpose(np.reshape(rotated_pointcloud, (3, number_of_points)))  # reshape and transpose back
+
+    return rotated_pointcloud
+
+
+def trim_pointcloud(point_cloud, range=15, roof=10, floor=-3): # the hard coded numbers are not absolute.
     '''
     Trim pointcloud to a range given by range_of_interest. Trim detections that are more than (roof) meters above LiDAR,
     and more than (floor) meters below LiDAR. After this, remove z.
@@ -46,22 +70,19 @@ def trim_pointcloud(point_cloud, range=15, roof=10, floor=3): # the hard coded n
     '''
 
     # remove points outside the range of interest
-
-    points_in_range = list(map(lambda x: -range <= x <= range, np.max(np.absolute(point_cloud), axis=1)))
-    # points_in_range = np.max(np.absolute(point_cloud), axis=1) < range
+    points_in_range = np.max(np.absolute(point_cloud), axis=1) <= range  # this takes care of both x, y,and z
     point_cloud = point_cloud[points_in_range]
 
     # Remove points that are more then roof meters above and floor meters below LiDAR
 
     z_coordinates = point_cloud[:, -1]
     coordinate_rows = list(map(lambda x: floor <= x <= roof, z_coordinates))
-
     point_cloud = point_cloud[coordinate_rows]
 
     return point_cloud
 
 
-def discretize_pointcloud(trimmed_point_cloud, spatial_resolution):
+def discretize_pointcloud(trimmed_point_cloud, spatial_resolution=0.05):
     '''
     Discretize into a grid structure with different channels.
     Create layers:
@@ -77,40 +98,47 @@ def discretize_pointcloud(trimmed_point_cloud, spatial_resolution):
         layer 3 = minimum evaluation
     '''
 
-    discretized_pointcloud = np.zeros([4, 3,3])
+    discretized_pointcloud = np.zeros([4, 600, 600])
 
     if len(trimmed_point_cloud) is 0:
 
         discretized_pointcloud[0, :, :] = 0
-        discretized_pointcloud[1, :, :] = 'NaN'
-        discretized_pointcloud[2, :, :] = 'NaN'
-        discretized_pointcloud[3, :, :] = 'NaN'
+        #discretized_pointcloud[1, :, :] = 'NaN'
+        #discretized_pointcloud[2, :, :] = 'NaN'
+        #discretized_pointcloud[3, :, :] = 'NaN'
 
     else:
 
         # sort the point cloud by x in increasing order
         x_sorted_point_cloud = np.asarray(sorted(trimmed_point_cloud, key=lambda row: row[0]))
 
-        for x_cell in range(3):
+        for x_cell in range(600):
 
             # get the x-values in the spatial resolution interval
-            x_interval = list(map(lambda x: (spatial_resolution * x_cell) < x <= (x_cell + 1) * spatial_resolution, x_sorted_point_cloud[:, 0]))
+            lower_bound = spatial_resolution * x_cell - 15
+            upper_bound = (x_cell + 1) * spatial_resolution - 15
+            x_interval = list(map(lambda x: lower_bound < x <= upper_bound, x_sorted_point_cloud[:, 0]))
+
+
             x_interval = x_sorted_point_cloud[x_interval]
 
             # sort the x-interval by increasing y
             x_sorted_by_y = np.asarray(sorted(x_interval, key=lambda row: row[1]))
 
             # loop through the y coordinates in the current x_interval and store values in the output_channel
-            for y_cell in range(3):
+            for y_cell in range(600):
 
                 # if len(sorted_y) is 0:
                 if len(x_sorted_by_y) is 0:
                     discretized_pointcloud[0, x_cell, y_cell] = 0
-                    discretized_pointcloud[1, x_cell, y_cell] = 'NaN'
-                    discretized_pointcloud[2, x_cell, y_cell] = 'NaN'
-                    discretized_pointcloud[3, x_cell, y_cell] = 'NaN'
+                    #discretized_pointcloud[1, x_cell, y_cell] = 'NaN'
+                    #discretized_pointcloud[2, x_cell, y_cell] = 'NaN'
+                    #discretized_pointcloud[3, x_cell, y_cell] = 'NaN'
                 else:
-                    y_interval = np.asarray(x_sorted_by_y[list(map(lambda x: spatial_resolution * y_cell  < x <= (y_cell + 1) * spatial_resolution, x_sorted_by_y[:, 1]))])
+                    lower_bound = spatial_resolution * y_cell - 15
+                    upper_bound = (y_cell + 1) * spatial_resolution - 15
+                    y_interval = np.asarray(x_sorted_by_y[list(map(lambda x: lower_bound < x <= upper_bound, x_sorted_by_y[:, 1]))])
+
 
                     # if there are detections save these in right channel
                     if np.shape(y_interval)[0] is not 0:
@@ -122,17 +150,53 @@ def discretize_pointcloud(trimmed_point_cloud, spatial_resolution):
                     # if there are not any detections
                     else:
                         discretized_pointcloud[0, x_cell, y_cell] = 0
-                        discretized_pointcloud[1, x_cell, y_cell] = 'NaN'
-                        discretized_pointcloud[2, x_cell, y_cell] = 'NaN'
-                        discretized_pointcloud[3, x_cell, y_cell] = 'NaN'
+                        #discretized_pointcloud[1, x_cell, y_cell] = 'NaN'
+                        #discretized_pointcloud[2, x_cell, y_cell] = 'NaN'
+                        #discretized_pointcloud[3, x_cell, y_cell] = 'NaN'
+
+    # we should normalise the intensity
+    # we should convert all nan-values to something else, either here or declare everything as zeros in the beginning
+
 
     return discretized_pointcloud
 
 
 def array_to_png(discretized_pointcloud):
     '''
-    Create a png-image of a discretized pointcloud. Create one image per layer. This is mostly for visualizing purposes. (?)
+    Create a png-image of a discretized pointcloud. Create one image per layer. This is mostly for visualizing purposes.
     :param
         discretized_pointcloud:
     :return:
     '''
+
+    # Ask what the png files should be named and create a folder where to save them
+    input_folder_name = input('Type name of folder to store png files in: "png_date_number" :')
+
+    # create a folder name
+    folder_name = '/_out_' + input_folder_name
+
+    # creates folder to store the png files
+    current_path = os.getcwd()
+    folder_path = current_path + folder_name
+
+    try:
+        os.mkdir(folder_path)
+    except OSError:
+        print('Failed to create new directory.')
+    else:
+        print('Successfully created new directory with path: ', folder_path)
+
+    # NORMALIZE THE BEV IMAGE
+    for channel in range(np.shape(discretized_pointcloud)[0]):
+        max_value = np.max(discretized_pointcloud[channel, :, :])
+        # print('Max max_value: ', max_value)
+        scale = 255/max_value
+        discretized_pointcloud[channel, :, :] = discretized_pointcloud[channel, :, :] * scale
+        print('Largest pixel value (should be 255) : ', np.max(discretized_pointcloud[channel, :, :]))
+        # create the png_path
+        png_path = folder_path + '/_channel' + str(channel)+'.png'
+
+    # Save images
+        img = Image.fromarray(discretized_pointcloud[channel, :, :])
+        new_img = img.convert("L")
+        new_img.save(png_path)
