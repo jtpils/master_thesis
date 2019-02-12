@@ -39,7 +39,7 @@ def rotate_translate_pointcloud(pointcloud, global_coordinates):
     :param global_coordinates:
     :return: pointcloud
     '''
-    
+
     return pointcloud
 
 
