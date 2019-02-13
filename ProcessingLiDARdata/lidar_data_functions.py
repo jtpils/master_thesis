@@ -251,9 +251,8 @@ def training_sample_rotation_translation(pointcloud, rigid_transformation):
     :return: training_pointcloud
     '''
     number_of_points = len(pointcloud)  # number of points in the pointcloud
-    translation = np.append(rigid_transformation[:2], 0)
-    print(translation)
-    rotation = rigid_transformation[-1]
+    translation = np.append(rigid_transformation[:2], 0) # add a zero for z, since we do not want to translate the height
+    rotation = np.deg2rad(rigid_transformation[-1])
 
     # rotate:
     c, s = np.cos(rotation), np.sin(rotation)
@@ -263,7 +262,7 @@ def training_sample_rotation_translation(pointcloud, rigid_transformation):
     rotated_pointcloud = np.transpose(np.reshape(rotated_pointcloud, (3, number_of_points)))  # reshape and transpose back
 
     # translate:
-    training_pointcloud = rotated_pointcloud + translation
+    training_pointcloud = rotated_pointcloud + translation # add translation to every coordinate vector
 
     return training_pointcloud
 
