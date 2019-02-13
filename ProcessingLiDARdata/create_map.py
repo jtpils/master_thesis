@@ -4,8 +4,6 @@ from map_functions import *
 from PIL import Image
 import matplotlib.pyplot as plt
 
-
-
 path_to_csv = '/home/master04/Desktop/_out/_out_Town03_190207_18/Town03_190207_18.csv'
 path_to_ply_folder = '/home/master04/Desktop/_out/_out_Town03_190207_18/pc/'
 
@@ -31,8 +29,6 @@ for file in files_in_ply_folder[:1]:
     trimmed_pc = trim_pointcloud(point_cloud, range=50, roof=10, floor=-3)
     rotated_pc = rotate_pointcloud_to_global(trimmed_pc, global_coordinates)
     rotated_and_translated_pc = translate_pointcloud_to_global(rotated_pc, global_coordinates)
-
-
 
     # save the trimmed pc into a dictionary
     pc_dict["pc{0}".format(i)] = rotated_and_translated_pc
