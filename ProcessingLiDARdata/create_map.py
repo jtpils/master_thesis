@@ -15,6 +15,7 @@ max_x_val = float("-inf")
 max_y_val = float("-inf")
 min_x_val = float("inf")
 min_y_val = float("inf")
+
 i = 0
 
 channel_matrix = np.zeros([4, 600, 600])
