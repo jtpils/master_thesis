@@ -12,12 +12,12 @@ print('Shape of raw pointcloud: ', np.shape(pc))
 print('global lidar coordinates: ', global_lidar_coordinates)
 
 # PLOT RAW POINT CLOUD:
-x = pc[:, 0]
+'''x = pc[:, 0]
 y = pc[:, 1]
 plt.plot(x, y, 'r.')
 plt.axis('equal')
 plt.title('Raw point cloud')
-plt.show()
+plt.show()'''
 
 # Test array:
 #pc = np.array([[-10,-10, 0], [-15, 3, 3], [26, 2, 3], [1, 2, 3], [10, 28, 9], [4, 1, -4], [4, 1, 5], [11, 9, 1], [12, 1, 10],[4, 8, 10], [1, 2, 3], [5, 7, 9], [25, 9, 1], [23, 3, 10]])
@@ -43,7 +43,19 @@ plt.title('Trimmed pointcloud')
 plt.show()
 
 
-rotated_pc = rotate_pointcloud_to_global(trimmed_pc, global_lidar_coordinates)
+rigid_trans = random_rigid_transformation(10, 10)
+print('rigid trans: ', rigid_trans)
+train_pc = training_sample_rotation_translation(trimmed_pc, rigid_trans)
+
+x_train = train_pc[:, 0]
+y_train = train_pc[:, 1]
+plt.plot(x, y, 'r.', x_train, y_train, 'b.')
+plt.axis('equal')
+plt.show()
+
+
+
+'''rotated_pc = rotate_pointcloud_to_global(trimmed_pc, global_lidar_coordinates)
 x_rot = rotated_pc[:, 0]
 y_rot = rotated_pc[:, 1]
 plt.plot(x_rot, y_rot, 'r.', x, y, 'b.')
@@ -60,4 +72,4 @@ plt.axis('equal')
 plt.title('translated: red, raw: blue')
 plt.show()
 
-print(global_lidar_coordinates)
+print(global_lidar_coordinates)'''
