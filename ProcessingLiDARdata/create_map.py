@@ -5,7 +5,6 @@ from PIL import Image
 import matplotlib.pyplot as plt
 
 
-# get global coordinates
 
 path_to_csv = '/home/master04/Desktop/_out/_out_Town03_190207_18/Town03_190207_18.csv'
 path_to_ply_folder = '/home/master04/Desktop/_out/_out_Town03_190207_18/pc/'
@@ -19,6 +18,7 @@ max_x_val = float("-inf")
 max_y_val = float("-inf")
 min_x_val = float("inf")
 min_y_val = float("inf")
+
 i = 0
 
 channel_matrix = np.zeros([4, 600, 600])
@@ -30,6 +30,9 @@ for file in files_in_ply_folder[:1]:
     # rotate, translate the point cloud to global coordinates and trim the point cloud
     rotated_pc = rotate_pointcloud_to_global(point_cloud, global_coordinates)
     rotated_and_translated_pc = translate_pointcloud_to_global(rotated_pc, global_coordinates)
+
+    # trimming should be done before translating the pointcloud, since trim-functions operates on values relatively to the lidar position in the origin.
+    # Ok to move? /A
     trimmed_pc = trim_pointcloud(rotated_and_translated_pc, range=150, roof=10, floor=-3)
 
     # save the trimmed pc into a dictionary

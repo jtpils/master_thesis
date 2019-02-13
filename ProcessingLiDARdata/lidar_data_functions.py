@@ -225,3 +225,32 @@ def random_rigid_transformation(bound_translation_meter, bound_rotation_degrees)
     rigid_transformation = np.concatenate((translation, rotation))
 
     return rigid_transformation
+
+
+def training_sample_rotation_translation(pointcloud, rigid_transformation):
+    '''
+    Rotate and translate a pointcloud according to the random rigid transform. Use this when creating training samples.
+    :param pointcloud: a lidar sweep that is to be rotated/translated in order to create training sample.
+
+    Do this BEFORE trimming the sweep!
+
+    :param rigid_transformation: get a random transformation with function random_rigid_transformation
+    :return: training_pointcloud
+    '''
+    number_of_points = len(pointcloud)  # number of points in the pointcloud
+    translation = np.append(rigid_transformation[:2], 0) # add a zero for z, since we do not want to translate the height
+    rotation = np.deg2rad(rigid_transformation[-1])
+
+    # rotate:
+    c, s = np.cos(rotation), np.sin(rotation)
+    Rz = np.array(((c, -s, 0), (s, c, 0), (0, 0, 1))) # Rotation matrix
+
+    rotated_pointcloud = Rz @ np.transpose(pointcloud) # rotate each vector with coordinates, transpose to get dimensions correctly
+    rotated_pointcloud = np.transpose(np.reshape(rotated_pointcloud, (3, number_of_points)))  # reshape and transpose back
+
+    # translate:
+    training_pointcloud = rotated_pointcloud + translation # add translation to every coordinate vector
+
+    return training_pointcloud
+
+
