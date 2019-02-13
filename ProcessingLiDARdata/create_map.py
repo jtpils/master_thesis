@@ -11,12 +11,10 @@ path_to_ply_folder = '/home/master04/Desktop/_out/_out_Town03_190207_18/pc/'
 files_in_ply_folder = os.listdir(path_to_ply_folder)
 
 pc_dict = {}
-
 max_x_val = float("-inf")
 max_y_val = float("-inf")
 min_x_val = float("inf")
 min_y_val = float("inf")
-
 i = 0
 
 channel_matrix = np.zeros([4, 600, 600])
