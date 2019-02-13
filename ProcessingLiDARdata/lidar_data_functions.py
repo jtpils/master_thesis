@@ -2,7 +2,6 @@ import numpy as np
 from PIL import Image
 import os
 import sys
-import warnings
 
 
 def load_data(path_to_ply, path_to_csv):
@@ -122,9 +121,6 @@ def discretize_pointcloud(trimmed_point_cloud, spatial_resolution=0.05):
     if len(trimmed_point_cloud) is 0:
 
         discretized_pointcloud[0, :, :] = 0
-        #discretized_pointcloud[1, :, :] = 'NaN'
-        #discretized_pointcloud[2, :, :] = 'NaN'
-        #discretized_pointcloud[3, :, :] = 'NaN'
 
     else:
 
@@ -138,7 +134,6 @@ def discretize_pointcloud(trimmed_point_cloud, spatial_resolution=0.05):
             upper_bound = (x_cell + 1) * spatial_resolution - 15
             x_interval = list(map(lambda x: lower_bound < x <= upper_bound, x_sorted_point_cloud[:, 0]))
 
-
             x_interval = x_sorted_point_cloud[x_interval]
 
             # sort the x-interval by increasing y
@@ -150,14 +145,10 @@ def discretize_pointcloud(trimmed_point_cloud, spatial_resolution=0.05):
                 # if len(sorted_y) is 0:
                 if len(x_sorted_by_y) is 0:
                     discretized_pointcloud[0, x_cell, y_cell] = 0
-                    #discretized_pointcloud[1, x_cell, y_cell] = 'NaN'
-                    #discretized_pointcloud[2, x_cell, y_cell] = 'NaN'
-                    #discretized_pointcloud[3, x_cell, y_cell] = 'NaN'
                 else:
                     lower_bound = spatial_resolution * y_cell - 15
                     upper_bound = (y_cell + 1) * spatial_resolution - 15
                     y_interval = np.asarray(x_sorted_by_y[list(map(lambda x: lower_bound < x <= upper_bound, x_sorted_by_y[:, 1]))])
-
 
                     # if there are detections save these in right channel
                     if np.shape(y_interval)[0] is not 0:
@@ -169,13 +160,9 @@ def discretize_pointcloud(trimmed_point_cloud, spatial_resolution=0.05):
                     # if there are not any detections
                     else:
                         discretized_pointcloud[0, x_cell, y_cell] = 0
-                        #discretized_pointcloud[1, x_cell, y_cell] = 'NaN'
-                        #discretized_pointcloud[2, x_cell, y_cell] = 'NaN'
-                        #discretized_pointcloud[3, x_cell, y_cell] = 'NaN'
 
     # we should normalise the intensity
     # we should convert all nan-values to something else, either here or declare everything as zeros in the beginning
-
 
     return discretized_pointcloud
 
