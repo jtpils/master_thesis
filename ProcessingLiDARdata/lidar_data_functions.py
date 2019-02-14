@@ -86,7 +86,6 @@ def trim_pointcloud(point_cloud, range=15, roof=10, floor=-3): # the hard coded 
     :return:
         2D_pointcloud: nd-array with xy-coordinates, with shape (N, 2)
     '''
-
     # remove points outside the range of interest
     points_in_range = np.max(np.absolute(point_cloud), axis=1) <= range  # this takes care of both x, y,and z
     point_cloud = point_cloud[points_in_range]
@@ -178,6 +177,7 @@ def array_to_png(discretized_pointcloud):
     # Ask what the png files should be named and create a folder where to save them
     input_folder_name = input('Type name of folder to store png files in: "png_date_number" :')
 
+
     # create a folder name
     folder_name = '/_out_' + input_folder_name
 
@@ -195,7 +195,12 @@ def array_to_png(discretized_pointcloud):
     # NORMALIZE THE BEV IMAGE
     for channel in range(np.shape(discretized_pointcloud)[0]):
         max_value = np.max(discretized_pointcloud[channel, :, :])
-        # print('Max max_value: ', max_value)
+        print('Max max_value inarray_to_png: ', max_value)
+
+        # avoid division with 0
+        if max_value == 0:
+            max_value = 1
+
         scale = 255/max_value
         discretized_pointcloud[channel, :, :] = discretized_pointcloud[channel, :, :] * scale
         print('Largest pixel value (should be 255) : ', np.max(discretized_pointcloud[channel, :, :]))
