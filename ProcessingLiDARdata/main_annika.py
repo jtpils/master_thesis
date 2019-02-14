@@ -4,9 +4,9 @@ from PIL import Image
 import matplotlib.pyplot as plt
 
 
-#####################################################################################################
-A FIRST SKETCH ON HOW TO CREATE FAKE TRAINING SAMPLES (of one single sweep) WITHOUT A NEED FOR A MAP
-#####################################################################################################
+########################################################################################################
+# A FIRST SKETCH ON HOW TO CREATE FAKE TRAINING SAMPLES (of one single sweep) WITHOUT A NEED FOR A MAP #
+########################################################################################################
 
 #path_to_ply = '/Users/annikal/Documents/master_thesis/ProcessingLiDARdata/_out_Town03_190207_18/pc/173504.ply'
 path_to_csv = '/Users/annikal/Documents/master_thesis/ProcessingLiDARdata/_out_Town03_190207_18/Town03_190207_18.csv'
