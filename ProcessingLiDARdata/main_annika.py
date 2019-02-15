@@ -33,13 +33,13 @@ plt.show()'''
 
 
 trimmed_pc = trim_pointcloud(pc)
-print('Shape of trimmed pointcloud: ', np.shape(trimmed_pc))
+print('Shape of trimmed point cloud: ', np.shape(trimmed_pc))
 # PLOT TRIMMED POINTCLOUD:
 x = trimmed_pc[:, 0]
 y = trimmed_pc[:, 1]
 plt.plot(x, y, 'r.')
 plt.axis('equal')
-plt.title('Trimmed pointcloud')
+plt.title('Trimmed point cloud')
 plt.show()
 
 
