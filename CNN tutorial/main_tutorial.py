@@ -1,4 +1,4 @@
-from TwoInputsNet import TwoInputsNet
+from SimpleCNN import SimpleCNN
 from functions import *
 import numpy as np
 import torch
@@ -8,7 +8,7 @@ from torch.utils.data.sampler import SubsetRandomSampler
 
 
 # TUTORIAL: https://blog.algorithmia.com/convolutional-neural-nets-in-pytorch/
-'''
+
 seed = 42
 np.random.seed(seed)
 torch.manual_seed(seed)
@@ -37,18 +37,11 @@ test_sampler = SubsetRandomSampler(np.arange(n_test_samples, dtype=np.int64))
 # Test and validation loaders have constant batch sizes, so we can define them directly
 test_loader = torch.utils.data.DataLoader(test_set, batch_size=4, sampler=test_sampler, num_workers=2)
 val_loader = torch.utils.data.DataLoader(train_set, batch_size=128, sampler=val_sampler, num_workers=2)
-'''
 
-CNN = TwoInputsNet()
-#trainNet(CNN, train_set, train_sampler, val_loader, batch_size=32, n_epochs=5, learning_rate=0.001)
 
-sweep = np.load('/home/master04/Documents/master_thesis/ProcessingLiDARdata/data_test/sweeps/173504.npy')
-cutout = np.load('/home/master04/Documents/master_thesis/ProcessingLiDARdata/data_test/cutouts/173504.npy')
+CNN = SimpleCNN()
+trainNet(CNN, train_set, train_sampler, val_loader, batch_size=32, n_epochs=5, learning_rate=0.001)
 
-# convert to tensors first!
-sweep = torch.from_numpy(sweep)
-cutout = torch.from_numpy(cutout)
 
-CNN.forward(sweep, cutout)
 
 
