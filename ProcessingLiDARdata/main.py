@@ -11,6 +11,7 @@ path_to_csv = '/home/master04/Desktop/_out/_out_Town02_190208_1/Town02_190208_1.
 pc, global_lidar_coordinates = load_data(path_to_ply, path_to_csv)
 print('Shape of raw pointcloud: ',np.shape(pc))
 
+
 # PLOT RAW POINT CLOUD:
 '''x = pc[:, 0]
 y = pc[:, 1]
@@ -44,9 +45,11 @@ pc_image[1, :, :] = pc_image[1, :, :] * scale
 print('Largest pixel value (should be 255) : ', np.max(pc_image[1, :, :]))
 
 
-array_to_png(pc_image)
-# PLOT THE BEV IMAGE
-#img = Image.fromarray(pc_image[1, :, :])
-#img.show()
 
+# PLOT THE MAX EVALUATION BEV IMAGE
+img = Image.fromarray(pc_image[1, :, :])
+img.show()
+
+# Save the channels in pc_image as png files in a folder
+# array_to_png(pc_image)
 
