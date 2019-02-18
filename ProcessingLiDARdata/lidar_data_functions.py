@@ -99,7 +99,7 @@ def trim_pointcloud(point_cloud, range=15, roof=10, floor=-3): # the hard coded 
     return point_cloud
 
 
-def discretize_pointcloud(trimmed_point_cloud, spatial_resolution=0.05):
+def discretize_pointcloud(trimmed_point_cloud, array_size=600, trim_range=15, spatial_resolution=0.05):
     '''
     Discretize into a grid structure with different channels.
     Create layers:
@@ -114,8 +114,8 @@ def discretize_pointcloud(trimmed_point_cloud, spatial_resolution=0.05):
         layer 2 = maximum evaluation
         layer 3 = minimum evaluation
     '''
-
-    discretized_pointcloud = np.zeros([4, 600, 600])
+    array_size = int(array_size)
+    discretized_pointcloud = np.zeros([4, array_size, array_size])
 
     if len(trimmed_point_cloud) is 0:
 
@@ -126,11 +126,11 @@ def discretize_pointcloud(trimmed_point_cloud, spatial_resolution=0.05):
         # sort the point cloud by x in increasing order
         x_sorted_point_cloud = np.asarray(sorted(trimmed_point_cloud, key=lambda row: row[0]))
 
-        for x_cell in range(600):
+        for x_cell in range(array_size):
 
             # get the x-values in the spatial resolution interval
-            lower_bound = spatial_resolution * x_cell - 15
-            upper_bound = (x_cell + 1) * spatial_resolution - 15
+            lower_bound = spatial_resolution * x_cell - trim_range
+            upper_bound = (x_cell + 1) * spatial_resolution - trim_range
             x_interval = list(map(lambda x: lower_bound < x <= upper_bound, x_sorted_point_cloud[:, 0]))
 
             x_interval = x_sorted_point_cloud[x_interval]
@@ -139,14 +139,14 @@ def discretize_pointcloud(trimmed_point_cloud, spatial_resolution=0.05):
             x_sorted_by_y = np.asarray(sorted(x_interval, key=lambda row: row[1]))
 
             # loop through the y coordinates in the current x_interval and store values in the output_channel
-            for y_cell in range(600):
+            for y_cell in range(array_size):
 
                 # if len(sorted_y) is 0:
                 if len(x_sorted_by_y) is 0:
                     discretized_pointcloud[0, x_cell, y_cell] = 0
                 else:
-                    lower_bound = spatial_resolution * y_cell - 15
-                    upper_bound = (y_cell + 1) * spatial_resolution - 15
+                    lower_bound = spatial_resolution * y_cell - trim_range
+                    upper_bound = (y_cell + 1) * spatial_resolution - trim_range
                     y_interval = np.asarray(x_sorted_by_y[list(map(lambda x: lower_bound < x <= upper_bound, x_sorted_by_y[:, 1]))])
 
                     # if there are detections save these in right channel

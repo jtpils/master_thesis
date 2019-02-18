@@ -46,9 +46,9 @@ print('Largest pixel value (should be 255) : ', np.max(pc_image[1, :, :]))
 
 
 
-# PLOT THE BEV IMAGE
-#img = Image.fromarray(pc_image[1, :, :])
-#img.show()
+# PLOT THE MAX EVALUATION BEV IMAGE
+img = Image.fromarray(pc_image[1, :, :])
+img.show()
 
 # Save the channels in pc_image as png files in a folder
 # array_to_png(pc_image)
