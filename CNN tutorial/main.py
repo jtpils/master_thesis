@@ -46,9 +46,9 @@ sweep = np.load('/home/master04/Documents/master_thesis/ProcessingLiDARdata/data
 cutout = np.load('/home/master04/Documents/master_thesis/ProcessingLiDARdata/data_test/cutouts/173504.npy')
 
 # convert to tensors first!
-sweep = torch.from_numpy(sweep)
-cutout = torch.from_numpy(cutout)
+sweep, cutout = torch.from_numpy(sweep).float(), torch.from_numpy(cutout).float()
+sweep, cutout = np.reshape(sweep, [1, 4, 600, 600]),  np.reshape(cutout, [1, 4, 900, 900])
+# sweep, cutout = sweep.type(torch.DoubleTensor), cutout.type(torch.DoubleTensor)
 
 CNN.forward(sweep, cutout)
-
 
