@@ -47,7 +47,7 @@ val_loader = torch.utils.data.DataLoader(train_set, batch_size=1, sampler=val_sa
 
 # def trainNet(net, train_loader, val_loader, n_epochs, learning_rate):
 # batchsize is not used in the training loop
-def trainNet(net, train_loader, val_loader, batch_size, n_epochs, learning_rate):
+def trainNet(net, train_loader, val_loader, n_epochs, learning_rate):
     # Print all of the hyperparameters of the training iteration:
     print("===== HYPERPARAMETERS =====")
     #print("batch_size=", batch_size)
