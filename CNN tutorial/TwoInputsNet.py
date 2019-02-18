@@ -29,19 +29,19 @@ class TwoInputsNet(torch.nn.Module):
 
     def forward(self, input_sweep, input_cutout):
         # propagate the map and the sweep trhough their networks (different networks since they have different sizes)
-        cutout = self.conv_cutout(input_cutout)  # output size (1, 300, 300) (?)
+        cutout = F.relu(self.conv_cutout(input_cutout))  # output size (1, 300, 300) (?)
         cutout = self.pool(cutout)  # output size (1, 150, 150) (?)
-        cutout = self.conv_cutout2(cutout)  # output size (1, 50, 50) (?)
+        cutout = F.relu(self.conv_cutout2(cutout))  # output size (1, 50, 50) (?)
 
-        sweep = self.conv_sweep(input_sweep)  # output size (1, 200, 200) (?)
+        sweep = F.relu(self.conv_sweep(input_sweep))  # output size (1, 200, 200) (?)
         sweep = self.pool(sweep)   # output size (1, 100, 100) (?)
-        sweep = self.conv_sweep2(sweep)  # output size (1, 50, 50) (?)
+        sweep = F.relu(self.conv_sweep2(sweep))  # output size (1, 50, 50) (?)
 
         # concatenate the outputs, make sure they have the same size
 
         sweep_and_map = torch.cat((sweep, cutout), dim=1)
         # propagate the concatenated inputs and get output with 3 neurons
-        sweep_and_map = self.conv(sweep_and_map)
+        sweep_and_map = F.relu(self.conv(sweep_and_map))
         sweep_and_map = sweep_and_map.view(-1, 1 * 25 * 25)
         sweep_and_map = self.fc1(sweep_and_map)
         out = self.fc2(sweep_and_map)
