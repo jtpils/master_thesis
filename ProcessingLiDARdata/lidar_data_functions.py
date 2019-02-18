@@ -37,7 +37,7 @@ def load_data(path_to_ply, path_to_csv):
     row = np.where(global_coordinates == frame_number)[0]  # returns which row the frame number is located on
     global_lidar_coordinates = global_coordinates[row, 1:5]
 
-    return point_cloud, global_lidar_coordinates, frame_number
+    return point_cloud, global_lidar_coordinates #, frame_number
 
 
 def rotate_pointcloud_to_global(pointcloud, global_coordinates):
@@ -94,6 +94,7 @@ def trim_pointcloud(point_cloud, range=15, roof=10, floor=-3): # the hard coded 
 
     z_coordinates = point_cloud[:, -1]
     coordinate_rows = list(map(lambda x: floor <= x <= roof, z_coordinates))
+
     point_cloud = point_cloud[coordinate_rows]
 
     return point_cloud

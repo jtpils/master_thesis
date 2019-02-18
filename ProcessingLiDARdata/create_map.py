@@ -8,7 +8,7 @@ path_to_csv = '/home/master04/Desktop/_out/_out_Town02_190208_1/Town02_190208_1.
 # get list of all ply files in the ply_folder.
 files_in_ply_folder = os.listdir(path_to_ply_folder)
 
-pc_dict = {}
+# pc_dict = {}
 pc_super_array = np.zeros((1, 3))
 print(np.shape(pc_super_array))
 max_x_val = float("-inf")
@@ -26,8 +26,8 @@ for file in files_in_ply_folder[0:500:5]:  # the last number is how large steps 
     point_cloud, global_coordinates = load_data(path_to_ply, path_to_csv)
 
     # rotate, translate the point cloud to global coordinates and trim the point cloud
-    trimmed_pc = trim_pointcloud(point_cloud, range=10, roof=10, floor=-3)
-    rotated_pc = rotate_pointcloud_to_global(point_cloud, global_coordinates)
+    trimmed_pc = trim_pointcloud(point_cloud, range=100, roof=1.5, floor=-20)
+    rotated_pc = rotate_pointcloud_to_global(trimmed_pc, global_coordinates)
     rotated_and_translated_pc = translate_pointcloud_to_global(rotated_pc, global_coordinates)
 
     # concatenate the rotated and translated array into a super array
