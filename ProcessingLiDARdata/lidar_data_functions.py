@@ -91,7 +91,6 @@ def trim_pointcloud(point_cloud, range=15, roof=10, floor=-3): # the hard coded 
     point_cloud = point_cloud[points_in_range]
 
     # Remove points that are more then roof meters above and floor meters below LiDAR
-
     z_coordinates = point_cloud[:, -1]
     coordinate_rows = list(map(lambda x: floor <= x <= roof, z_coordinates))
 
