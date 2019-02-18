@@ -37,14 +37,14 @@ def load_data(path_to_ply, path_to_csv):
     row = np.where(global_coordinates == frame_number)[0]  # returns which row the frame number is located on
     global_lidar_coordinates = global_coordinates[row, 1:5]
 
-    return point_cloud, global_lidar_coordinates
+    return point_cloud, global_lidar_coordinates, frame_number
 
 
 def rotate_pointcloud_to_global(pointcloud, global_coordinates):
     '''
     Rotate pointcloud (before trimming it).
     :param pointcloud: input raw point cloud shape (N, 3)
-    :param global_coordinates: global coordinates for LiDAR, which cintains yaw angle
+    :param global_coordinates: global coordinates for LiDAR, which contains yaw angle
     :return: rotated_pointcloud: rotated pointcloud, but coordinates are stil relative to LiDAR (not global)
     '''
 
@@ -257,5 +257,3 @@ def training_sample_rotation_translation(pointcloud, rigid_transformation):
     training_pointcloud = rotated_pointcloud + translation # add translation to every coordinate vector
 
     return training_pointcloud
-
-
