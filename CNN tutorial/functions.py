@@ -18,7 +18,8 @@ def get_train_loader(batch_size, train_set, train_sampler): ########
 
 def createLossAndOptimizer(net, learning_rate=0.001):
     # Loss function
-    loss = torch.nn.CrossEntropyLoss()
+    #loss = torch.nn.CrossEntropyLoss()
+    loss = torch.nn.MSELoss()
 
     # Optimizer
     optimizer = optim.Adam(net.parameters(), lr=learning_rate)
