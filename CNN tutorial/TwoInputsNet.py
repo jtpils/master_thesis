@@ -2,10 +2,10 @@ from torch.autograd import Variable
 import torch.nn.functional as F
 import torch
 import numpy as np
+from functions import *
 
 
 class TwoInputsNet(torch.nn.Module):
-
 
     def __init__(self):
         super(TwoInputsNet, self).__init__()
@@ -23,26 +23,26 @@ class TwoInputsNet(torch.nn.Module):
 
         # layers for concatenated sweep+cutout
         self.conv = torch.nn.Conv2d(2, 1, kernel_size=5, stride=2, padding=2)
-        self.fc1 = torch.nn.Linear(25*25, 3)
-        self.fc2 = torch.nn.Linear(3, 3)
 
+        self.fc1 = torch.nn.Linear(1 * 25 * 25, 64)
+        self.fc2 = torch.nn.Linear(64, 3)
 
     def forward(self, input_sweep, input_cutout):
         # propagate the map and the sweep trhough their networks (different networks since they have different sizes)
-        cutout = self.conv_cutout(input_cutout)  # output size (1, 300, 300) (?)
+        cutout = F.relu(self.conv_cutout(input_cutout))  # output size (1, 300, 300) (?)
         cutout = self.pool(cutout)  # output size (1, 150, 150) (?)
-        cutout = self.conv_cutout2(cutout)  # output size (1, 50, 50) (?)
+        cutout = F.relu(self.conv_cutout2(cutout))  # output size (1, 50, 50) (?)
 
-        sweep = self.conv_sweep(input_sweep)  # output size (1, 200, 200) (?)
+        sweep = F.relu(self.conv_sweep(input_sweep))  # output size (1, 200, 200) (?)
         sweep = self.pool(sweep)   # output size (1, 100, 100) (?)
-        sweep = self.conv_sweep2(sweep)  # output size (1, 50, 50) (?)
+        sweep = F.relu(self.conv_sweep2(sweep))  # output size (1, 50, 50) (?)
 
         # concatenate the outputs, make sure they have the same size
-        #sweep_and_map = torch.cat((sweep.view(sweep.size(0), -1), cutout.view(cutout.size(0), -1)), dim=0)
-        sweep_and_map = torch.cat((sweep, cutout), dim=1)
-        sweep_and_map = self.conv(sweep_and_map)
 
-        sweep_and_map = sweep_and_map.view(-1, 1*25*25)
+        sweep_and_map = torch.cat((sweep, cutout), dim=1)
+        # propagate the concatenated inputs and get output with 3 neurons
+        sweep_and_map = F.relu(self.conv(sweep_and_map))
+        sweep_and_map = sweep_and_map.view(-1, 1 * 25 * 25)
         sweep_and_map = self.fc1(sweep_and_map)
         out = self.fc2(sweep_and_map)
 

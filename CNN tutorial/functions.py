@@ -20,6 +20,7 @@ def createLossAndOptimizer(net, learning_rate=0.001):
     # Loss function
     #loss = torch.nn.CrossEntropyLoss()
     loss = torch.nn.MSELoss()
+
     # Optimizer
     optimizer = optim.Adam(net.parameters(), lr=learning_rate)
 

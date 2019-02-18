@@ -2,7 +2,6 @@ from torch.autograd import Variable
 import torch.nn.functional as F
 import torch
 
-
 class SimpleCNN(torch.nn.Module):
 
     # Our batch shape for input x is (3, 32, 32)

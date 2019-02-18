@@ -44,7 +44,10 @@ val_loader = torch.utils.data.DataLoader(train_set, batch_size=1, sampler=val_sa
 '''
 
 
-def trainNet(net, train_loader, val_loader, n_epochs, learning_rate):
+
+# def trainNet(net, train_loader, val_loader, n_epochs, learning_rate):
+# batchsize is not used in the training loop
+def trainNet(net, train_loader, val_loader, batch_size, n_epochs, learning_rate):
     # Print all of the hyperparameters of the training iteration:
     print("===== HYPERPARAMETERS =====")
     #print("batch_size=", batch_size)
@@ -66,7 +69,7 @@ def trainNet(net, train_loader, val_loader, n_epochs, learning_rate):
     for epoch in range(n_epochs):
 
         running_loss = 0.0
-        print_every = 1
+        print_every = 1 # n_batches // 9
         start_time = time.time()
         total_train_loss = 0
 
@@ -84,7 +87,6 @@ def trainNet(net, train_loader, val_loader, n_epochs, learning_rate):
 
             # Forward pass, backward pass, optimize
             outputs = net.forward(sweep, cutout)
-
             loss_size = loss(outputs, labels.float())
             loss_size.backward()
             optimizer.step()
@@ -101,6 +103,7 @@ def trainNet(net, train_loader, val_loader, n_epochs, learning_rate):
                 running_loss = 0.0
                 start_time = time.time()
 
+
         # At the end of the epoch, do a pass on the validation set
         total_val_loss = 0
         for data in val_loader:
@@ -109,10 +112,12 @@ def trainNet(net, train_loader, val_loader, n_epochs, learning_rate):
             labels = data['labels']
 
             # Wrap them in a Variable object
+            #inputs, labels = Variable(inputs), Variable(labels)
             sweep, cutout, labels = Variable(sweep), Variable(cutout), Variable(labels)
 
             # Forward pass
-            val_outputs = net(sweep, cutout)
+            val_outputs = net.forward(sweep, cutout)
+
             val_loss_size = loss(val_outputs, labels.float())
             total_val_loss += val_loss_size.item()
 
@@ -120,18 +125,30 @@ def trainNet(net, train_loader, val_loader, n_epochs, learning_rate):
 
     print("Training finished, took {:.2f}s".format(time.time() - training_start_time))
 
-csv_file = '/Users/annikal/Documents/master_thesis/ProcessingLiDARdata/data_test/labels.csv'
-sweeps_dir = '/Users/annikal/Documents/master_thesis/ProcessingLiDARdata/data_test/sweeps/'
-cutouts_dir = '/Users/annikal/Documents/master_thesis/ProcessingLiDARdata/data_test/cutouts/'
+
+# csv_file = '/Users/annikal/Documents/master_thesis/ProcessingLiDARdata/data_test/labels.csv'
+# sweeps_dir = '/Users/annikal/Documents/master_thesis/ProcessingLiDARdata/data_test/sweeps/'
+# cutouts_dir = '/Users/annikal/Documents/master_thesis/ProcessingLiDARdata/data_test/cutouts/'
+
+csv_file = '/home/master04/Documents/master_thesis/ProcessingLiDARdata/data_test/labels.csv'
+sweeps_dir = '/home/master04/Documents/master_thesis/ProcessingLiDARdata/data_test/sweeps/'
+cutouts_dir = '/home/master04/Documents/master_thesis/ProcessingLiDARdata/data_test/cutouts/'
+
 lidar_data_set = Lidar_data_set(csv_file, sweeps_dir, cutouts_dir)
 
-n_training_samples = 5
-train_sampler = SubsetRandomSampler(np.arange(1, n_training_samples, dtype=np.int64))
-train_loader = torch.utils.data.DataLoader(lidar_data_set, batch_size=4, sampler=train_sampler, num_workers=2)
 
-n_val_samples = 4
+# Training
+n_training_samples = 7
+train_sampler = SubsetRandomSampler(np.arange(1,n_training_samples, dtype=np.int64))
+train_loader = torch.utils.data.DataLoader(lidar_data_set, batch_size=1, sampler=train_sampler, num_workers=2)
+
+# Validation
+n_val_samples = 2
 val_sampler = SubsetRandomSampler(np.arange(n_training_samples, n_training_samples + n_val_samples, dtype=np.int64))
-val_loader = torch.utils.data.DataLoader(lidar_data_set, batch_size=4, sampler=val_sampler, num_workers=2)
+val_loader = torch.utils.data.DataLoader(lidar_data_set, batch_size=1, sampler=val_sampler, num_workers=2)
+
+
 
 CNN = TwoInputsNet()
 trainNet(CNN, train_loader, val_loader, n_epochs=5, learning_rate=0.001)
+
