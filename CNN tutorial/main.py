@@ -58,6 +58,7 @@ def trainNet(net, train_loader, val_loader, n_epochs, learning_rate):
     # Get training data
     #train_loader = get_train_loader(batch_size, train_set, train_sampler)
     n_batches = len(train_loader)
+    print(n_batches)
 
     # Create our loss and optimizer functions
     loss, optimizer = createLossAndOptimizer(net, learning_rate)
@@ -69,7 +70,7 @@ def trainNet(net, train_loader, val_loader, n_epochs, learning_rate):
     for epoch in range(n_epochs):
 
         running_loss = 0.0
-        print_every = 1 # n_batches // 9
+        print_every = n_batches // 1
         start_time = time.time()
         total_train_loss = 0
 
@@ -96,9 +97,9 @@ def trainNet(net, train_loader, val_loader, n_epochs, learning_rate):
             total_train_loss += loss_size.item()
 
             # Print every 10th batch of an epoch
-            if (i + 1) % (print_every + 1) == 0:
+            if i % (print_every + 1) == 0:
                 print("Epoch {}, {:d}% \t train_loss: {:.2f} took: {:.2f}s".format(
-                    epoch + 1, int(100 * (i + 1) / n_batches), running_loss / print_every, time.time() - start_time))
+                    epoch + 1, int(100 * i / n_batches), running_loss / print_every, time.time() - start_time))
                 # Reset running loss and time
                 running_loss = 0.0
                 start_time = time.time()
@@ -140,12 +141,12 @@ lidar_data_set = Lidar_data_set(csv_file, sweeps_dir, cutouts_dir)
 # Training
 n_training_samples = 7
 train_sampler = SubsetRandomSampler(np.arange(1,n_training_samples, dtype=np.int64))
-train_loader = torch.utils.data.DataLoader(lidar_data_set, batch_size=1, sampler=train_sampler, num_workers=2)
+train_loader = torch.utils.data.DataLoader(lidar_data_set, batch_size=4, sampler=train_sampler, num_workers=2)
 
 # Validation
 n_val_samples = 2
 val_sampler = SubsetRandomSampler(np.arange(n_training_samples, n_training_samples + n_val_samples, dtype=np.int64))
-val_loader = torch.utils.data.DataLoader(lidar_data_set, batch_size=1, sampler=val_sampler, num_workers=2)
+val_loader = torch.utils.data.DataLoader(lidar_data_set, batch_size=2, sampler=val_sampler, num_workers=2)
 
 
 
