@@ -38,7 +38,6 @@ test_sampler = SubsetRandomSampler(np.arange(n_test_samples, dtype=np.int64))
 test_loader = torch.utils.data.DataLoader(test_set, batch_size=4, sampler=test_sampler, num_workers=2)
 val_loader = torch.utils.data.DataLoader(train_set, batch_size=128, sampler=val_sampler, num_workers=2)
 
-
 CNN = SimpleCNN()
 trainNet(CNN, train_set, train_sampler, val_loader, batch_size=32, n_epochs=5, learning_rate=0.001)
 
