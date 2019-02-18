@@ -126,13 +126,13 @@ def trainNet(net, train_loader, val_loader, batch_size, n_epochs, learning_rate)
     print("Training finished, took {:.2f}s".format(time.time() - training_start_time))
 
 
-# csv_file = '/Users/annikal/Documents/master_thesis/ProcessingLiDARdata/data_test/labels.csv'
-# sweeps_dir = '/Users/annikal/Documents/master_thesis/ProcessingLiDARdata/data_test/sweeps/'
-# cutouts_dir = '/Users/annikal/Documents/master_thesis/ProcessingLiDARdata/data_test/cutouts/'
+csv_file = '/Users/annikal/Documents/master_thesis/ProcessingLiDARdata/data_test/labels.csv'
+sweeps_dir = '/Users/annikal/Documents/master_thesis/ProcessingLiDARdata/data_test/sweeps/'
+cutouts_dir = '/Users/annikal/Documents/master_thesis/ProcessingLiDARdata/data_test/cutouts/'
 
-csv_file = '/home/master04/Documents/master_thesis/ProcessingLiDARdata/data_test/labels.csv'
-sweeps_dir = '/home/master04/Documents/master_thesis/ProcessingLiDARdata/data_test/sweeps/'
-cutouts_dir = '/home/master04/Documents/master_thesis/ProcessingLiDARdata/data_test/cutouts/'
+#csv_file = '/home/master04/Documents/master_thesis/ProcessingLiDARdata/data_test/labels.csv'
+#sweeps_dir = '/home/master04/Documents/master_thesis/ProcessingLiDARdata/data_test/sweeps/'
+#cutouts_dir = '/home/master04/Documents/master_thesis/ProcessingLiDARdata/data_test/cutouts/'
 
 lidar_data_set = Lidar_data_set(csv_file, sweeps_dir, cutouts_dir)
 
@@ -150,5 +150,5 @@ val_loader = torch.utils.data.DataLoader(lidar_data_set, batch_size=1, sampler=v
 
 
 CNN = TwoInputsNet()
-trainNet(CNN, train_loader, val_loader, n_epochs=5, learning_rate=0.001)
+trainNet(CNN, train_loader, val_loader, n_epochs=5, learning_rate=0.01)
 
