@@ -44,11 +44,14 @@ i=0
 for file_name in ply_files[0::10]:
     i = i+1
     print('Creating training sample ', i, ' of ', int(len(ply_files)/10))
-    #print(file_name)
 
     # Load data:
-    path_to_ply = path_to_pc + file_name
-    pc, global_lidar_coordinates = load_data(path_to_ply, path_to_csv)
+    try:
+        path_to_ply = path_to_pc + file_name
+        pc, global_lidar_coordinates = load_data(path_to_ply, path_to_csv)
+    except:
+        print('Failed to load file ', file_name, '. Moving on to next file.')
+        continue
 
     # create the sweep, transform a bit to create training sample
     #print('creating sweep...')
