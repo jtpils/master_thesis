@@ -107,6 +107,7 @@ def trim_pointcloud(point_cloud, range=15, roof=10, floor=-3): # the hard coded 
 
     z_coordinates_shifted = -point_cloud[:, -1]  # Changes the sign of the z-coordinate.
     coordinate_rows = list(map(lambda x: floor <= x <= roof, z_coordinates_shifted))
+
     point_cloud = point_cloud[coordinate_rows]
 
     return point_cloud
