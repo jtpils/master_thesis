@@ -27,8 +27,12 @@ else:
     print('Successfully created new directory with subdirectories, at ', folder_path)
 
 
-path_to_csv = '/home/master04/Desktop/_out/_out_Town02_190208_1/Town02_190208_1.csv'
-path_to_pc = '/home/master04/Desktop/_out/_out_Town02_190208_1/pc/'
+#path_to_csv = '/home/master04/Desktop/_out/_out_Town02_190208_1/Town02_190208_1.csv'
+#path_to_pc = '/home/master04/Desktop/_out/_out_Town02_190208_1/pc/'
+
+path_to_csv = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/_out_Town03_190207_18/Town03_190207_18.csv'
+path_to_pc = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/_out_Town03_190207_18/pc/'
+
 
 # create a list of all ply-files in a directory
 ply_files = os.listdir(path_to_pc)
@@ -41,9 +45,9 @@ with open(csv_path, mode='w') as csv_file:
     csv_writer.writerow(fieldnames)
 
 i=0
-for file_name in ply_files[0::10]:
+for file_name in ply_files[:2]:
     i = i+1
-    print('Creating training sample ', i, ' of ', int(len(ply_files)/10))
+    # print('Creating training sample ', i, ' of ', int(len(ply_files)/10))
 
     # Load data:
     try:
@@ -54,16 +58,22 @@ for file_name in ply_files[0::10]:
         continue
 
     # create the sweep, transform a bit to create training sample
-    #print('creating sweep...')
+    print('creating sweep...')
     rand_trans = random_rigid_transformation(1, 10)
     sweep = training_sample_rotation_translation(pc, rand_trans)
     sweep = trim_pointcloud(sweep)
     sweep_image = discretize_pointcloud(sweep)
+
+    # padd the sweep with zeros to get a 900x900 grid.
+
+    np.pad(sweep_image, ((150, 150), (150, 150)), 'constant')
+
+
     path = path_sweeps + '/' + str(i)
     np.save(path, sweep_image)
 
     # fake a map cutout
-    #print('creating cutout...')
+    print('creating cutout...')
     cutout = trim_pointcloud(pc, range=1.5*15)
     cutout_image = discretize_pointcloud(cutout, array_size=600*1.5, trim_range=1.5*15)
     path = path_cutouts + '/' + str(i)
