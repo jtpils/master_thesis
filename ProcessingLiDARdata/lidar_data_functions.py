@@ -44,7 +44,7 @@ def rotate_pointcloud_to_global(pointcloud, global_coordinates):
     '''
     Rotate pointcloud (before trimming it).
     :param pointcloud: input raw point cloud shape (N, 3)
-    :param global_coordinates: global coordinates for LiDAR, which cintains yaw angle
+    :param global_coordinates: global coordinates for LiDAR, which contains yaw angle
     :return: rotated_pointcloud: rotated pointcloud, but coordinates are stil relative to LiDAR (not global)
     '''
 
@@ -271,5 +271,3 @@ def training_sample_rotation_translation(pointcloud, rigid_transformation):
     training_pointcloud = rotated_pointcloud + translation # add translation to every coordinate vector
 
     return training_pointcloud
-
-
