@@ -90,7 +90,7 @@ def trim_pointcloud(point_cloud, range=15, roof=10, floor=-3): # the hard coded 
     :return:
         2D_pointcloud: nd-array with xy-coordinates, with shape (N, 2)
     '''
-    
+
     # remove points outside the range of interest
     points_in_range = np.max(np.absolute(point_cloud), axis=1) <= range  # this takes care of both x, y,and z
     point_cloud = point_cloud[points_in_range]
