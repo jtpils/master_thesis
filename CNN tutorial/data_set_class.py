@@ -24,7 +24,7 @@ class Lidar_data_set(Dataset):
         self.cutouts_dir = cutouts_dir
 
     def __len__(self):
-        return len(self.labels)
+        return len(self.csv_labels)
 
     def __getitem__(self, idx):
         sweep_name = os.path.join(self.sweeps_dir, str(idx))
@@ -36,13 +36,8 @@ class Lidar_data_set(Dataset):
         #cutout = np.reshape(cutout, (1, 4, 900, 900))
 
         labels = self.csv_labels.iloc[idx-1, 1:4]
-        #print('labels: ', labels.to_numpy())
-        #print('label type: ', type(labels.to_numpy()))
 
         sample = {'sweep': sweep, 'cutout': cutout, 'labels': labels.to_numpy()}
 
-        #print('idx: ', idx)
-        #print('labels: ', type(labels))
-        #print('sample: ', sample)
 
         return sample
