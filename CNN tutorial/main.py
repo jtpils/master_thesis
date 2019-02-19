@@ -2,10 +2,12 @@ from TwoInputsNet import TwoInputsNet
 from functions import *
 import numpy as np
 import torch
-import torchvision
-import torchvision.transforms as transforms
+#import torchvision
+#import torchvision.transforms as transforms
 from torch.utils.data.sampler import SubsetRandomSampler
 from data_set_class import Lidar_data_set
+#import os
+import matplotlib.pyplot as plt
 
 
 
@@ -49,10 +51,14 @@ val_loader = torch.utils.data.DataLoader(train_set, batch_size=1, sampler=val_sa
 def trainNet(net, train_loader, val_loader, n_epochs, learning_rate):
     # Print all of the hyperparameters of the training iteration:
     print("===== HYPERPARAMETERS =====")
-    #print("batch_size=", batch_size)
-    print("epochs=", n_epochs)
-    print("learning_rate=", learning_rate)
+    #print("batch_size =", batch_size)
+    print("epochs =", n_epochs)
+    print("learning_rate =", learning_rate)
     print("=" * 30)
+
+    # declare variables for storing validation and training loss
+    val_loss = []
+    train_loss = []
 
     # Get training data
     # train_loader = get_train_loader(batch_size, train_set, train_sampler)
@@ -69,7 +75,7 @@ def trainNet(net, train_loader, val_loader, n_epochs, learning_rate):
     for epoch in range(n_epochs):
 
         running_loss = 0.0
-        print_every = n_batches // 2
+        print_every = n_batches // 10
         start_time = time.time()
         total_train_loss = 0
 
@@ -103,6 +109,8 @@ def trainNet(net, train_loader, val_loader, n_epochs, learning_rate):
                 running_loss = 0.0
                 start_time = time.time()
 
+
+
         # At the end of the epoch, do a pass on the validation set
         total_val_loss = 0
         for data in val_loader:
@@ -122,12 +130,19 @@ def trainNet(net, train_loader, val_loader, n_epochs, learning_rate):
 
         print("Validation loss = {:.2f}".format(total_val_loss / len(val_loader)))
 
+        # save the loss for each epoch
+        train_loss.append(total_train_loss)
+        val_loss.append(total_val_loss)
+
     print("Training finished, took {:.2f}s".format(time.time() - training_start_time))
+    return train_loss, val_loss
 
 
-csv_file = '/home/master04/Desktop/fake_training_data_nightrun_18feb/labels.csv'
-sweeps_dir = '//home/master04/Desktop/fake_training_data_nightrun_18feb/sweeps/'
-cutouts_dir = '/home/master04/Desktop/fake_training_data_nightrun_18feb/cutouts/'
+path_training_data = '/home/master04/Desktop/fake_training_data_19feb'
+
+csv_file = path_training_data + '/labels.csv'
+sweeps_dir = path_training_data + '/sweeps/'
+cutouts_dir = path_training_data + '/cutouts/'
 
 # csv_file = '/home/master04/Documents/master_thesis/ProcessingLiDARdata/data_test/labels.csv'
 # sweeps_dir = '/home/master04/Documents/master_thesis/ProcessingLiDARdata/data_test/sweeps/'
@@ -136,16 +151,24 @@ cutouts_dir = '/home/master04/Desktop/fake_training_data_nightrun_18feb/cutouts/
 lidar_data_set = Lidar_data_set(csv_file, sweeps_dir, cutouts_dir)
 
 # Training
-n_training_samples = np.ceil(0.7*len(lidar_data_set))
+n_training_samples = 30  # np.ceil(0.7*len(lidar_data_set))
+print('Number of training samples: ', n_training_samples)
 train_sampler = SubsetRandomSampler(np.arange(1, n_training_samples, dtype=np.int64))
-train_loader = torch.utils.data.DataLoader(lidar_data_set, batch_size=4, sampler=train_sampler, num_workers=2)
+train_loader = torch.utils.data.DataLoader(lidar_data_set, batch_size=2, sampler=train_sampler, num_workers=2)
 
 # Validation
-n_val_samples = np.floor(0.3*len(lidar_data_set))
+n_val_samples = 10  # np.floor(0.3*len(lidar_data_set))
+print('Number of validation samples: ', n_val_samples)
 val_sampler = SubsetRandomSampler(np.arange(n_training_samples, n_training_samples + n_val_samples, dtype=np.int64))
 val_loader = torch.utils.data.DataLoader(lidar_data_set, batch_size=2, sampler=val_sampler, num_workers=2)
 
 
 CNN = TwoInputsNet()
-trainNet(CNN, train_loader, val_loader, n_epochs=30, learning_rate=0.001)
+train_loss, val_loss = trainNet(CNN, train_loader, val_loader, n_epochs=5, learning_rate=0.01)
 
+# plot training and validation loss
+epoch_vec = np.arange(len(train_loss))
+plt.plot(epoch_vec, train_loss, epoch_vec, val_loss)
+plt.xlabel('Number of epochs')
+plt.ylabel('Loss')
+plt.show()
