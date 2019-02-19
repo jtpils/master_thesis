@@ -4,28 +4,27 @@ from PIL import Image
 import time
 import matplotlib.pyplot as plt
 
-path_to_ply = '/home/master04/Desktop/_out/_out_Town02_190208_1/pc/004179.ply'
-path_to_csv = '/home/master04/Desktop/_out/_out_Town02_190208_1/Town02_190208_1.csv'
+path_to_ply = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/_out_Town03_190207_18/pc/173504.ply'
+path_to_csv = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/_out_Town03_190207_18/Town03_190207_18.csv'
+
 
 # Load data:
 pc, global_lidar_coordinates = load_data(path_to_ply, path_to_csv)
 print('Shape of raw pointcloud: ',np.shape(pc))
 
 
+'''
+plt.figure(1)
 # PLOT RAW POINT CLOUD:
-'''x = pc[:, 0]
+x = pc[:, 0]
 y = pc[:, 1]
-plt.plot(x, y, 'ro')
+plt.plot(x, y, '.')
 plt.title('Raw point cloud')
-plt.show()'''
-
-# Test array:
-#pc = np.array([[-10,-10, 0], [-15, 3, 3], [26, 2, 3], [1, 2, 3], [10, 28, 9], [4, 1, -4], [4, 1, 5], [11, 9, 1], [12, 1, 10],[4, 8, 10], [1, 2, 3], [5, 7, 9], [25, 9, 1], [23, 3, 10]])
-#print('Shape of test array: ', np.shape(pc))
-#print(pc[0,:])
+plt.show()
+'''
 
 # Trim point cloud:
-trimmed_pc = trim_pointcloud(pc)
+trimmed_pc = trim_pointcloud(pc, range=30, roof=10, floor=0.1)
 print('Shape of trimmed pointcloud: ', np.shape(trimmed_pc))
 
 '''# PLOT TRIMMED POINTCLOUD:
@@ -35,6 +34,7 @@ plt.plot(x, y, 'r.')
 plt.title('Trimmed pointcloud')
 plt.show()'''
 
+'''
 pc_image = discretize_pointcloud(trimmed_pc)
 
 # NORMALIZE THE BEV IMAGE
@@ -52,4 +52,4 @@ img.show()
 
 # Save the channels in pc_image as png files in a folder
 # array_to_png(pc_image)
-
+'''
