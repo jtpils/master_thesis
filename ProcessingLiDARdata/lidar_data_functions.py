@@ -37,7 +37,7 @@ def load_data(path_to_ply, path_to_csv):
     row = np.where(global_coordinates == frame_number)[0]  # returns which row the frame number is located on
     global_lidar_coordinates = global_coordinates[row, 1:5]
 
-    return point_cloud, global_lidar_coordinates, frame_number
+    return point_cloud, global_lidar_coordinates #, frame_number
 
 
 def rotate_pointcloud_to_global(pointcloud, global_coordinates):
@@ -78,22 +78,35 @@ def trim_pointcloud(point_cloud, range=15, roof=10, floor=-3): # the hard coded 
     '''
     Trim pointcloud to a range given by range_of_interest. Trim detections that are more than (roof) meters above LiDAR,
     and more than (floor) meters below LiDAR. After this, remove z.
+
+    The floor and ground parameter represents the interval of points that should be kept. This means sending in floor=0
+    and roof=0 only the detectons from the ground will be kept.
+
     :param
         pointcloud: ndarray size (N, 3)
         region_of_interest: range
-        roof: meter
-        floor: meter
+        roof: meter above ground
+        floor: meter above ground
     :return:
         2D_pointcloud: nd-array with xy-coordinates, with shape (N, 2)
     '''
+    
     # remove points outside the range of interest
     points_in_range = np.max(np.absolute(point_cloud), axis=1) <= range  # this takes care of both x, y,and z
     point_cloud = point_cloud[points_in_range]
 
     # Remove points that are more then roof meters above and floor meters below LiDAR
-
     z_coordinates = point_cloud[:, -1]
-    coordinate_rows = list(map(lambda x: floor <= x <= roof, z_coordinates))
+
+    # calculate the floor variable
+    ground_coordinate = max(z_coordinates)
+    floor = -(ground_coordinate - floor)
+
+    # calculate the roof variable
+    roof = -ground_coordinate + roof
+
+    z_coordinates_shifted = -point_cloud[:, -1]  # Changes the sign of the z-coordinate.
+    coordinate_rows = list(map(lambda x: floor <= x <= roof, z_coordinates_shifted))
     point_cloud = point_cloud[coordinate_rows]
 
     return point_cloud
