@@ -26,6 +26,10 @@ except OSError:
 else:
     print('Successfully created new directory with subdirectories, at ', folder_path)
 
+# Sabina's computer
+# path_to_csv = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/_out_Town03_190207_18/Town03_190207_18.csv'
+# path_to_pc = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/_out_Town03_190207_18/pc/'
+
 
 path_to_csv = '/home/master04/Desktop/_out/_out_Town02_190208_1/Town02_190208_1.csv'
 path_to_pc = '/home/master04/Desktop/_out/_out_Town02_190208_1/pc/'
@@ -58,7 +62,9 @@ for file_name in ply_files[0::10]:
     rand_trans = random_rigid_transformation(1, 10)
     sweep = training_sample_rotation_translation(pc, rand_trans)
     sweep = trim_pointcloud(sweep)
-    sweep_image = discretize_pointcloud(sweep)
+    # discretize and pad sweep
+    sweep_image = discretize_pointcloud(sweep, array_size=600, trim_range=15, spatial_resolution=0.05, padding=True, pad_size=150)
+    
     path = path_sweeps + '/' + str(i)
     np.save(path, sweep_image)
 
