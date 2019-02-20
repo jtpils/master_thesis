@@ -113,14 +113,18 @@ def trim_pointcloud(point_cloud, range=15, roof=10, floor=-3): # the hard coded 
     return point_cloud
 
 
-def discretize_pointcloud(trimmed_point_cloud, array_size=600, trim_range=15, spatial_resolution=0.05):
+def discretize_pointcloud(trimmed_point_cloud, array_size=600, trim_range=15, spatial_resolution=0.05, padding=False, pad_size=150):
     '''
     Discretize into a grid structure with different channels.
     Create layers:
     1 layer with number of detections (normalise at the end), 1 layer with mean height, max height, min height. other layers?
     :param
-        pointcloud:
-        spatial_resolution: size of grid cell in m
+        trimmed_point_cloud: trimmed point cloud
+        array_size: number of cells in each channel in the discretized point cloud (default=600)
+        trim_range: move coordinate system such that it matches the range of the trimmed point cloud (default=15)
+        spatial_resolution: size of grid cell in m (default=0.05)
+        padding: True if padding should be performed False otherwise (default=false)
+        pad_size: size of padding (default=150)
     :return:
         discretized_pointcloud: 3d-array with multiple "layers"
         layer 0 = number of detections
@@ -174,8 +178,11 @@ def discretize_pointcloud(trimmed_point_cloud, array_size=600, trim_range=15, sp
                     else:
                         discretized_pointcloud[0, x_cell, y_cell] = 0
 
+    # pad the discretized point cloud
+    if padding:
+        discretized_pointcloud = np.pad(discretized_pointcloud, [(0, 0), (pad_size, pad_size), (pad_size, pad_size)], mode='constant')
+
     # we should normalise the intensity
-    # we should convert all nan-values to something else, either here or declare everything as zeros in the beginning
 
     return discretized_pointcloud
 
