@@ -181,7 +181,6 @@ def discretize_pointcloud(trimmed_point_cloud, array_size=600, trim_range=15, sp
     # pad the discretized point cloud
     if padding:
         discretized_pointcloud = np.pad(discretized_pointcloud, [(0, 0), (pad_size, pad_size), (pad_size, pad_size)], mode='constant')
-
     # Normalize the channels. The values should be between 0 and 1
     for channel in range(np.shape(discretized_pointcloud)[0]):
         max_value = np.max(discretized_pointcloud[channel, :, :])
