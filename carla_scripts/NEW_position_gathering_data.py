@@ -65,24 +65,24 @@ def main():
         actor_list.append(vehicle)
         print(' ')
         print('created %s' % vehicle.type_id)
-        #vehicle.set_autopilot(True)
-        #print('Auto pilot')
+        vehicle.set_autopilot(True)
+        print('Auto pilot')
         time.sleep(3) # let the car have some fun
         print(' ')
 
 
         ########################################## add sensors ##########################################
         # Add camera
-        # Find the blueprint of the sensor
-        camera_bp = blueprint_library.find('sensor.camera.rgb')
+        '''# Find the blueprint of the sensor
+        # camera_bp = blueprint_library.find('sensor.camera.rgb')
         # Modify attributes of the blueprint to set image resolution and field of view.
-        camera_bp.set_attribute('image_size_x', '1920')
+        # camera_bp.set_attribute('image_size_x', '1920')
         camera_bp.set_attribute('image_size_y', '1080')
         camera_bp.set_attribute('fov', '110')
         camera_transform = carla.Transform(carla.Location(x=0.8, z=1.7))
         camera = world.spawn_actor(camera_bp, camera_transform, attach_to=vehicle)
         actor_list.append(camera)
-        print('created %s' % camera.type_id)
+        print('created %s' % camera.type_id)'''
 
 
         # Add LiDAR
@@ -118,7 +118,7 @@ def main():
             current_position = np.array((data.transform.location.x, data.transform.location.y))
             moved_distance = np.linalg.norm(current_position - lidar_position)
         
-            if moved_distance > 0.5 and data.frame_number % 10 == 0:  # moved at least 0.5 m, and has passed 1 second (so that we don't save sweeps when the car is dropped)
+            if moved_distance > 1:# and data.frame_number % 10 == 0:  # moved at least 0.5 m, and has passed 1 second (so that we don't save sweeps when the car is dropped)
                 point_cloud_path = folder_path + '/pc/%06d'
                 data.save_to_disk( point_cloud_path % data.frame_number)
 
@@ -144,14 +144,14 @@ def main():
 
         # Create a list with the waypoints that exists
         map = world.get_map()
-        waypoint_list = map.generate_waypoints(1) 
+        waypoint_list = map.generate_waypoints(100)
         print('waypoint list length:', len(waypoint_list))
         print(' ')
 
         num_waypoints = 1
-        for waypoint in waypoint_list:  ###### CHANGED HERE
+        for waypoint in waypoint_list:
             vehicle.set_transform(waypoint.transform)
-            time.sleep(2) # seconds to move 
+            time.sleep(30) # seconds to move
 
             if num_waypoints%5 == 0:
                 text = 'number of waypoints visited: ' + str(num_waypoints) + ' of ' + str(len(waypoint_list))
