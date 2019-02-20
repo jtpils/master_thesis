@@ -182,7 +182,18 @@ def discretize_pointcloud(trimmed_point_cloud, array_size=600, trim_range=15, sp
     if padding:
         discretized_pointcloud = np.pad(discretized_pointcloud, [(0, 0), (pad_size, pad_size), (pad_size, pad_size)], mode='constant')
 
-    # we should normalise the intensity
+    # Normalize the channels. The values should be between 0 and 1
+    for channel in range(np.shape(discretized_pointcloud)[0]):
+        max_value = np.max(discretized_pointcloud[channel, :, :])
+        # print('Max max_value inarray_to_png: ', max_value)
+
+        # avoid division with 0
+        if max_value == 0:
+            max_value = 1
+
+        scale = 1/max_value
+        discretized_pointcloud[channel, :, :] = discretized_pointcloud[channel, :, :] * scale
+        # print('Largest pixel value (should be 1) : ', np.max(discretized_pointcloud[channel, :, :]))
 
     return discretized_pointcloud
 
