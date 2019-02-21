@@ -33,8 +33,8 @@ else:
 # path_to_pc = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/_out_Town03_190207_18/pc/'
 
 
-path_to_csv = '/home/master04/Desktop/_out/_out_Town02_190208_1/Town02_190208_1.csv'
-path_to_pc = '/home/master04/Desktop/_out/_out_Town02_190208_1/pc/'
+path_to_csv = '/Users/annikal/Desktop/drive-download-20190220T155133Z-001/_out_framenumber/framenumber.csv'
+path_to_pc = '/Users/annikal/Desktop/drive-download-20190220T155133Z-001/_out_framenumber/pc/'
 
 # create a list of all ply-files in a directory
 ply_files = os.listdir(path_to_pc)
@@ -47,20 +47,26 @@ with open(csv_labels_path, mode='w') as csv_file:
     csv_writer.writerow(fieldnames)
 
 i = 0
-for file_name in ply_files[0::10]:
+for file_name in ply_files[10:-1]:
     # Load data:
-    try:
+
+    '''try:
         path_to_ply = path_to_pc + file_name
         pc, global_lidar_coordinates = load_data(path_to_ply, path_to_csv)
         i = i + 1
         print('Creating training sample ', i, ' of ', int(len(ply_files)/10))
     except:
         print('Failed to load file ', file_name, '. Moving on to next file.')
-        continue
+        continue'''
+    path_to_ply = path_to_pc + file_name
+    pc, global_lidar_coordinates = load_data(path_to_ply, path_to_csv)
+    i = i + 1
+    print('Creating training sample ', i, ' of ', int(len(ply_files) / 10))
 
     # create the sweep, transform a bit to create training sample
     #print('creating sweep...')
-    rand_trans = random_rigid_transformation(1, 5)
+    rand_trans = random_rigid_transformation(1, 0) ##### ONLY TRANSLATION
+
     sweep = training_sample_rotation_translation(pc, rand_trans)
     sweep = trim_pointcloud(sweep)
     # discretize and pad sweep

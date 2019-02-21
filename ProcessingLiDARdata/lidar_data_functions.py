@@ -20,6 +20,8 @@ def load_data(path_to_ply, path_to_csv):
 
     # load pointcloud
     point_cloud = np.loadtxt(path_to_ply, skiprows=7)
+    point_cloud[:, 1] = -point_cloud[:, 1]
+    point_cloud[:, 2] = -point_cloud[:, 2]
 
     # check if ply file is empty. Stop execution if it is.
     if np.shape(point_cloud)[0] == 0:
@@ -37,6 +39,7 @@ def load_data(path_to_ply, path_to_csv):
     row = np.where(global_coordinates == frame_number)[0]  # returns which row the frame number is located on
     #print('row where to find frame number', row)
     global_lidar_coordinates = global_coordinates[row, 1:5]
+    global_lidar_coordinates[0][3] = global_lidar_coordinates[0][3] + 90
 
     # Change coordinate system
     #print('y: ',point_cloud[1:10,1])

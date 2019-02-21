@@ -1,6 +1,7 @@
 from functions import *
 import time
 from torch.autograd import Variable
+import numpy as np
 
 
 def train_network(net, train_loader, val_loader, n_epochs, learning_rate):
@@ -29,7 +30,7 @@ def train_network(net, train_loader, val_loader, n_epochs, learning_rate):
     for epoch in range(n_epochs):
 
         running_loss = 0.0
-        print_every = n_batches // 10
+        print_every = n_batches // 5
         start_time = time.time()
         total_train_loss = 0
 
