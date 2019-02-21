@@ -151,7 +151,7 @@ def main():
         num_waypoints = 1
         for waypoint in waypoint_list:
             vehicle.set_transform(waypoint.transform)
-            time.sleep(30) # seconds to move
+            time.sleep(20) # seconds to move
 
             if num_waypoints%5 == 0:
                 text = 'number of waypoints visited: ' + str(num_waypoints) + ' of ' + str(len(waypoint_list))
