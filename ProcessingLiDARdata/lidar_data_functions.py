@@ -29,13 +29,25 @@ def load_data(path_to_ply, path_to_csv):
     # extract frame_number from filename
     file_name = path_to_ply.split('/')[-1]  # keep the last part of the path, i.e. the file name
     frame_number = int(file_name[:-4])  # remove the part '.ply' and convert to int
-
+   #print('frame number', frame_number)
     # load csv-file with global coordinates
     global_coordinates = np.loadtxt(path_to_csv, skiprows=1, delimiter=',')
 
     # extract information from csv at given frame_number
     row = np.where(global_coordinates == frame_number)[0]  # returns which row the frame number is located on
+    #print('row where to find frame number', row)
     global_lidar_coordinates = global_coordinates[row, 1:5]
+
+    # Change coordinate system
+    #print('y: ',point_cloud[1:10,1])
+    #print('z: ', point_cloud[1:10,2])
+
+    point_cloud[:, 1] = point_cloud[:, 1]
+    point_cloud[:, 2] = -point_cloud[:, 2]
+    #
+
+    global_lidar_coordinates[0][3] = global_lidar_coordinates[0][3] + 90
+
 
     return point_cloud, global_lidar_coordinates #, frame_number
 
