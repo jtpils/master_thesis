@@ -9,7 +9,7 @@ import csv
 # A FIRST SKETCH ON HOW TO CREATE FAKE TRAINING SAMPLES (of one single sweep) WITHOUT A NEED FOR A MAP #
 ########################################################################################################
 
-
+'''
 input_folder_name = input('Type name of new folder:')
 
 folder_name = '/data_' + input_folder_name
@@ -19,37 +19,38 @@ path_sweeps = folder_path + '/sweeps'
 path_cutouts = folder_path + '/cutouts'
 
 try:
-   os.mkdir(folder_path)
-   os.mkdir(path_sweeps)
-   os.mkdir(path_cutouts)
+    os.mkdir(folder_path)
+    os.mkdir(path_sweeps)
+    os.mkdir(path_cutouts)
 except OSError:
-   print('Failed to create new directory.')
+    print('Failed to create new directory.')
 else:
-   print('Successfully created new directory with subdirectories. ')
+    print('Successfully created new directory with subdirectories. ')
+'''
 
-
-path_to_csv = '/home/master04/Documents/master_thesis/ProcessingLiDARdata/_out_Town03_190207_18/Town03_190207_18.csv'
-path_to_pc = '/home/master04/Documents/master_thesis/ProcessingLiDARdata/_out_Town03_190207_18/pc/'
+path_to_csv = '/Users/annikal/Desktop/drive-download-20190220T155133Z-001/_out_framenumber/framenumber.csv'
+path_to_pc = '/Users/annikal/Desktop/drive-download-20190220T155133Z-001/_out_framenumber/pc/'
 
 # create a list of all ply-files in a directory
 ply_files = os.listdir(path_to_pc)
-
+'''
 # create csv-file with header: frame_number, x, y, angle (i.e. the labels)
 csv_path = folder_path + '/labels.csv'
 with open(csv_path, mode='w') as csv_file:
     fieldnames = ['frame_number', 'x', 'y', 'angle']
     csv_writer = csv.writer(csv_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
     csv_writer.writerow(fieldnames)
-
+'''
 i=0
-for file_name in ply_files:
+for file_name in ply_files[:10]:
     i = i+1
     print('File ', i, ' of ', len(ply_files))
 
     # Load data:
     path_to_ply = path_to_pc + file_name
-    pc, global_lidar_coordinates, frame_number = load_data(path_to_ply, path_to_csv)
+    pc, global_lidar_coordinates = load_data(path_to_ply, path_to_csv)
 
+    '''
     # create the sweep, transform a bit to create training sample
     print('creating sweep...')
     rand_trans = random_rigid_transformation(1, 10)
@@ -69,10 +70,6 @@ for file_name in ply_files:
     # write frame_number in column 1, and the transformation in the next columns
     with open(csv_path , mode = 'a') as csv_file:
         csv_writer = csv.writer(csv_file, delimiter=',' , quotechar='"', quoting=csv.QUOTE_MINIMAL)
-        csv_writer.writerow([frame_number, rand_trans[0], rand_trans[1], rand_trans[2]])
+        csv_writer.writerow([frame_number, rand_trans[0], rand_trans[1], rand_trans[2]])'''
 
 
-'''s = np.load('/home/master04/Documents/master_thesis/ProcessingLiDARdata/data_test/sweeps/173506.npy')
-c = np.load('/home/master04/Documents/master_thesis/ProcessingLiDARdata/data_test/cutouts/173506.npy')
-array_to_png(s)
-array_to_png(c)'''
