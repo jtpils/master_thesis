@@ -20,8 +20,8 @@ def load_data(path_to_ply, path_to_csv):
 
     # load pointcloud
     point_cloud = np.loadtxt(path_to_ply, skiprows=7)
-    point_cloud[:, 1] = -point_cloud[:, 1]
-    point_cloud[:, 2] = -point_cloud[:, 2]
+    point_cloud[:, 1] = - point_cloud[:, 1]
+    point_cloud[:, -1] = - point_cloud[:, -1]
 
     # check if ply file is empty. Stop execution if it is.
     if np.shape(point_cloud)[0] == 0:
@@ -31,7 +31,7 @@ def load_data(path_to_ply, path_to_csv):
     # extract frame_number from filename
     file_name = path_to_ply.split('/')[-1]  # keep the last part of the path, i.e. the file name
     frame_number = int(file_name[:-4])  # remove the part '.ply' and convert to int
-   #print('frame number', frame_number)
+    #print('frame number', frame_number)
     # load csv-file with global coordinates
     global_coordinates = np.loadtxt(path_to_csv, skiprows=1, delimiter=',')
 
@@ -40,17 +40,6 @@ def load_data(path_to_ply, path_to_csv):
     #print('row where to find frame number', row)
     global_lidar_coordinates = global_coordinates[row, 1:5]
     global_lidar_coordinates[0][3] = global_lidar_coordinates[0][3] + 90
-
-    # Change coordinate system
-    #print('y: ',point_cloud[1:10,1])
-    #print('z: ', point_cloud[1:10,2])
-
-    point_cloud[:, 1] = point_cloud[:, 1]
-    point_cloud[:, 2] = -point_cloud[:, 2]
-    #
-
-    global_lidar_coordinates[0][3] = global_lidar_coordinates[0][3] + 90
-
 
     return point_cloud, global_lidar_coordinates #, frame_number
 
@@ -110,23 +99,18 @@ def trim_pointcloud(point_cloud, range=15, roof=10, floor=-3): # the hard coded 
     points_in_range = np.max(np.absolute(point_cloud), axis=1) <= range  # this takes care of both x, y,and z
     point_cloud = point_cloud[points_in_range]
 
-    # Remove points that are more then roof meters above and floor meters below LiDAR
     z_coordinates = point_cloud[:, -1]
+    # Remove points that are more then loor and roof meters above ground coordinate
+    ground_coordinate = min(z_coordinates)
 
-    # calculate the floor variable
-    ground_coordinate = max(z_coordinates)
-    floor = -(ground_coordinate - floor)
+    floor = ground_coordinate + floor
+    roof =  ground_coordinate + roof
 
-    # calculate the roof variable
-    roof = -ground_coordinate + roof
-
-    z_coordinates_shifted = -point_cloud[:, -1]  # Changes the sign of the z-coordinate.
-    coordinate_rows = list(map(lambda x: floor <= x <= roof, z_coordinates_shifted))
+    coordinate_rows = list(map(lambda x: floor <= x <= roof, z_coordinates))
 
     point_cloud = point_cloud[coordinate_rows]
 
     return point_cloud
-
 
 def discretize_pointcloud(trimmed_point_cloud, array_size=600, trim_range=15, spatial_resolution=0.05, padding=False, pad_size=150):
     '''
