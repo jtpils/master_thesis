@@ -45,10 +45,10 @@ for file in dir_list:
 # path_to_pc = '/Users/annikal/Desktop/drive-download-20190220T155133Z-001/_out_framenumber/pc/'
 
 
-translation = 1
-rotation = 0
+translation = int(input('Translation in meters:'))
+rotation = int(input('Rotation in degrees:'))
 
-number_of_files_to_load = 50
+number_of_files_to_load = int(input('How many training samples do you want to create:'))
 ########################################################################################################
 
 # create a list of all ply-files in a directory
@@ -97,6 +97,6 @@ for file_name in ply_files[:number_of_files_to_load]:
 
     # write frame_number in column 1, and the transformation in the next columns
     with open(csv_labels_path , mode ='a') as csv_file:
-        csv_writer = csv.writer(csv_file, delimiter=',' , quotechar='"', quoting=csv.QUOTE_MINIMAL)
+        csv_writer = csv.writer(csv_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
         csv_writer.writerow([i, rand_trans[0], rand_trans[1], rand_trans[2]])
 
