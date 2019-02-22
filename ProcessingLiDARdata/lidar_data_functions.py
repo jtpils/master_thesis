@@ -133,7 +133,6 @@ def discretize_pointcloud(trimmed_point_cloud, array_size=600, trim_range=15, sp
     '''
     array_size = int(array_size)
     discretized_pointcloud = np.zeros([4, array_size, array_size])
-
     if len(trimmed_point_cloud) is 0:
 
         discretized_pointcloud[0, :, :] = 0
@@ -151,7 +150,6 @@ def discretize_pointcloud(trimmed_point_cloud, array_size=600, trim_range=15, sp
             x_interval = list(map(lambda x: lower_bound < x <= upper_bound, x_sorted_point_cloud[:, 0]))
 
             x_interval = x_sorted_point_cloud[x_interval]
-
             # sort the x-interval by increasing y
             x_sorted_by_y = np.asarray(sorted(x_interval, key=lambda row: row[1]))
 
@@ -165,7 +163,6 @@ def discretize_pointcloud(trimmed_point_cloud, array_size=600, trim_range=15, sp
                     lower_bound = spatial_resolution * y_cell - trim_range
                     upper_bound = (y_cell + 1) * spatial_resolution - trim_range
                     y_interval = np.asarray(x_sorted_by_y[list(map(lambda x: lower_bound < x <= upper_bound, x_sorted_by_y[:, 1]))])
-
                     # if there are detections save these in right channel
                     if np.shape(y_interval)[0] is not 0:
                         discretized_pointcloud[0, x_cell, y_cell] = np.shape(y_interval)[0]
@@ -240,7 +237,7 @@ def array_to_png(discretized_pointcloud):
     # Save images
         img = Image.fromarray(discretized_pointcloud[channel, :, :])
         new_img = img.convert("L")
-        new_img.save(png_path)
+        new_img.rotate(180).save(png_path)
 
 
 def random_rigid_transformation(bound_translation_meter, bound_rotation_degrees):

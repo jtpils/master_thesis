@@ -23,8 +23,8 @@ def discretize_pointcloud_map(map_point_cloud, min_max_coordinates, spatial_reso
 
     # calculate the dimension of the array needed to store all the loaded ply-files
     x_min, x_max, y_min, y_max = min_max_coordinates
-    number_x_cells = int(np.ceil((x_max - x_min) / spatial_resolution)) +10 # should there be a +1 or -1 or something like that? Now Sabina has set 10 of some reason she can't explain.
-    number_y_cells = int(np.ceil((y_max - y_min) / spatial_resolution)) +10# should there be a +1 or -1 or something like that?
+    number_x_cells = int(np.ceil((x_max - x_min) / spatial_resolution))  # should there be a +1 or -1 or something like that? Now Sabina has set 10 of some reason she can't explain.
+    number_y_cells = int(np.ceil((y_max - y_min) / spatial_resolution))  # should there be a +1 or -1 or something like that?
     # print('number of cells', number_x_cells)
 
     discretized_pointcloud = np.zeros([4, number_x_cells, number_y_cells])
@@ -40,7 +40,6 @@ def discretize_pointcloud_map(map_point_cloud, min_max_coordinates, spatial_reso
         x_interval = list(map(lambda x: lower_bound < x <= upper_bound, x_sorted_point_cloud[:, 0]))
 
         x_interval = x_sorted_point_cloud[x_interval]
-
         # sort the x-interval by increasing y
         x_sorted_by_y = np.asarray(sorted(x_interval, key=lambda row: row[1]))
 

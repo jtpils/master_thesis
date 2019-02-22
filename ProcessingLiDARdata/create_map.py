@@ -6,7 +6,8 @@ from matplotlib import pyplot as plt
 path_to_ply_folder = '/home/master04/Desktop/_out_Town02_190221_1/pc/'
 path_to_csv = '/home/master04/Desktop/_out_Town02_190221_1/Town02_190221_1.csv'
 
-files_in_ply_folder = os.listdir(path_to_ply_folder)
+files_in_ply_folder = ['003121.ply']
+#files_in_ply_folder = os.listdir(path_to_ply_folder)
 number_of_files_to_load = len(files_in_ply_folder)
 
 # pc_dict = {}
@@ -67,8 +68,8 @@ for file in files_in_ply_folder[0:10]:  # the last number is how large steps to 
 # delete the zeros in the first row in the super array that was used at the initalization of the array.
 pc_super_array = np.delete(pc_super_array, 0, axis=0)
 
-
-# Visualization of the point cloud.
+'''
+# VISUALISATION OF POINT CLOUD
 x = pc_super_array[:, 0]
 y = pc_super_array[:, 1]
 
@@ -76,20 +77,21 @@ plt.plot(x , y, 'b.')
 plt.ylabel('y')
 plt.xlabel('x')
 plt.show()
+'''
 
 # save the max and min values in an array. This is used to decide the size of the map
 min_max = np.array((min_x_val, max_x_val, min_y_val, max_y_val))
 
-# discretice the point cloud.
+# Discretize the point cloud.
 discretized_pc = discretize_pointcloud_map(pc_super_array, min_max)
 
-# Save the discretized map in a folder.
-#array_to_png(discretized_pc)
+# UNCOMMENT IF YOU WANT TO SAVE THE DISCRETIZED MAP.
+# array_to_png(discretized_pc)
 
-# show map
-# NORMALIZE THE BEV IMAGE
-
-max_value = np.max(discretized_pc[1, :, :])
+'''
+# VISUALIZATION OF DISCRETIZED MAP 
+# normalize the BEV image 
+max_value = np.max(discretized_pc[2, :, :])
 print('Max max_value inarray_to_png: ', max_value)
 
 # avoid division with 0
@@ -97,12 +99,10 @@ if max_value == 0:
     max_value = 1
 
 scale = 255/max_value
-discretized_pc[1, :, :] = discretized_pc[1, :, :] * scale
-print('Largest pixel value (should be 255) : ', np.max(discretized_pc[1, :, :]))
+discretized_pc[1, :, :] = discretized_pc[2, :, :] * scale
+print('Largest pixel value (should be 255) : ', np.max(discretized_pc[2, :, :]))
 
 img = Image.fromarray(discretized_pc[1, :, :])
 new_img = img.convert("L")
-new_img.show()
-
-
-
+new_img.rotate(180).show()
+'''
