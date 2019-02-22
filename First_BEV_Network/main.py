@@ -21,10 +21,6 @@ train_loader, val_loader = get_loaders(path_training_data, batch_size_train, bat
 # CNN = FirstBEVNet()
 CNN = SuperSimpleCNN()
 
-# print("Model's state_dict:")
-# for param_tensor in CNN.state_dict():
-#     print(param_tensor, "\t", CNN.state_dict()[param_tensor].size())
-
 
 # create directory for model weights
 current_path = os.getcwd()
