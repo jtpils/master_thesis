@@ -10,7 +10,7 @@ model_name = input('Folder name: ')
 n_epochs = int(input('Number of epochs:'))
 learning_rate = float(input('Learning rate:'))
 
-path_training_data = '/Users/annikal/Desktop/fake_training_data_trans2'
+path_training_data = input('Path to training data folder: ')
 batch_size_train = 2
 batch_size_val = 2
 
