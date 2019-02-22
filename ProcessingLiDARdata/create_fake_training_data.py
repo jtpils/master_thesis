@@ -8,6 +8,7 @@ import random
 ########################################################################################################
 
 input_folder_name = input('Type name of new folder to save data:')
+print(' ')
 
 current_path = os.getcwd()
 folder_path = current_path + '/fake_training_data_' + input_folder_name
@@ -22,7 +23,7 @@ else:
     print('Successfully created new directory with subdirectory, at ', folder_path)
 
 ################################# CHANGE HERE ###########################################################
-
+print(' ')
 path_to_lidar_data = input('Type complete path to the folder that contains "pc"-folder with LiDAR data and a csv file, e.g. Town02_190222_1 :')
 dir_list = os.listdir(path_to_lidar_data) # this should return a list where only one object is our csv_file
 path_to_pc = os.path.join(path_to_lidar_data, 'pc/')  # we assume we follow the structure of creating lidar data folder with a pc folder for ply
@@ -33,8 +34,8 @@ for file in dir_list:
 
 translation = int(input('Translation in meters:'))
 rotation = int(input('Rotation in degrees:'))
-
 number_of_files_to_load = int(input('How many training samples do you want to create:'))
+print(' ')
 ########################################################################################################
 
 # create a list of all ply-files in a directory
