@@ -2,12 +2,13 @@ from functions import *
 import time
 from torch.autograd import Variable
 import numpy as np
+import os
 
 
-def train_network(net, train_loader, val_loader, n_epochs, learning_rate):
+def train_network(net, train_loader, val_loader, n_epochs, learning_rate, folder_path):
     # Print all of the hyperparameters of the training iteration:
     print("===== HYPERPARAMETERS =====")
-    #print("batch_size =", batch_size)
+    # print("batch_size =", batch_size)
     print("epochs =", n_epochs)
     print("learning_rate =", learning_rate)
     print("=" * 30)
@@ -30,7 +31,7 @@ def train_network(net, train_loader, val_loader, n_epochs, learning_rate):
     for epoch in range(n_epochs):
 
         running_loss = 0.0
-        print_every = n_batches // 5
+        print_every = n_batches // 1
         start_time = time.time()
         total_train_loss = 0
 
@@ -83,6 +84,16 @@ def train_network(net, train_loader, val_loader, n_epochs, learning_rate):
         # save the loss for each epoch
         train_loss.append(total_train_loss)
         val_loss.append(total_val_loss)
+
+        if len(train_loss) > 1 and train_loss[-1] < train_loss[-2]: # if the loss is smaller this epoch (change to validation loss in the future)
+            file_name = 'epoch' + str(epoch) + '.pt'
+            path = os.path.join(folder_path, file_name)
+            torch.save({
+                'epoch': epoch,
+                'model_state_dict': net.state_dict(),
+                'train_loss': total_train_loss,
+                'val_loss': total_val_loss
+            }, path)
 
     print("Training finished, took {:.2f}s".format(time.time() - training_start_time))
     return train_loss, val_loss
