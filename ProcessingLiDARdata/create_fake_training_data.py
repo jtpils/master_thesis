@@ -25,24 +25,10 @@ else:
 
 path_to_lidar_data = input('Type complete path to the folder that contains "pc"-folder with LiDAR data and a csv file, e.g. Town02_190222_1 :')
 dir_list = os.listdir(path_to_lidar_data) # this should return a list where only one object is our csv_file
-path_to_pc = os.path.join(path_to_lidar_data, 'pc')  # we assume we follow the structure of creating lidar data folder with a pc folder for ply
+path_to_pc = os.path.join(path_to_lidar_data, 'pc/')  # we assume we follow the structure of creating lidar data folder with a pc folder for ply
 for file in dir_list:
     if '.csv' in file:  # find csv-file
         path_to_csv = os.path.join(path_to_lidar_data, file)
-
-
-
-# Sabina's computer
-# path_to_csv = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/_out_Town03_190207_18/Town03_190207_18.csv'
-# path_to_pc = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/_out_Town03_190207_18/pc/'
-
-# Local computer
-# path_to_csv = '/home/master04/Desktop/_out_Town02_190221_1/Town02_190221_1.csv'
-# path_to_pc = '/home/master04/Desktop/_out_Town02_190221_1/pc/'
-
-# Annika's computer
-# path_to_csv = '/Users/annikal/Desktop/drive-download-20190220T155133Z-001/_out_framenumber/framenumber.csv'
-# path_to_pc = '/Users/annikal/Desktop/drive-download-20190220T155133Z-001/_out_framenumber/pc/'
 
 
 translation = int(input('Translation in meters:'))
