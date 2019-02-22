@@ -102,7 +102,6 @@ def trim_pointcloud(point_cloud, range=15, roof=10, floor=-3): # the hard coded 
     z_coordinates = point_cloud[:, -1]
     # Remove points that are more then loor and roof meters above ground coordinate
     ground_coordinate = min(z_coordinates)
-    print('min z-coord', min(z_coordinates))
 
     floor = ground_coordinate + floor
     roof =  ground_coordinate + roof
