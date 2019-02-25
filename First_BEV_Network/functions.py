@@ -15,13 +15,12 @@ def output_size(in_size, kernel_size, stride, padding):
 
 def create_loss_and_optimizer(net, learning_rate=0.001):
     # Loss function
-    #loss = torch.nn.CrossEntropyLoss()
+    # loss = torch.nn.CrossEntropyLoss()
     loss = torch.nn.MSELoss()
 
     # Optimizer
     optimizer = optim.Adam(net.parameters(), lr=learning_rate)
-    #optimizer = optim.Adagrad(net.parameters(), lr=learning_rate, lr_decay=1e-3)
-
-    #optimizer = optim.SGD(net.parameters(), lr=learning_rate)
+    # optimizer = optim.Adagrad(net.parameters(), lr=learning_rate, lr_decay=1e-3)
+    # optimizer = optim.SGD(net.parameters(), lr=learning_rate)
 
     return loss, optimizer

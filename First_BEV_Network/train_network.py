@@ -5,7 +5,7 @@ import numpy as np
 import os
 
 
-def train_network(net, train_loader, val_loader, n_epochs, learning_rate, folder_path, use_gpu):
+def train_network(net, train_loader, val_loader, n_epochs, learning_rate, folder_path, use_cuda):
     # Print all of the hyperparameters of the training iteration:
     print("===== HYPERPARAMETERS =====")
     # print("batch_size =", batch_size)
@@ -41,11 +41,10 @@ def train_network(net, train_loader, val_loader, n_epochs, learning_rate, folder
             labels = data['labels']
 
             # Wrap them in a Variable object
-            if use_gpu:
+            if use_cuda:
                 sample, labels = Variable(sample).cuda(), Variable(labels).cuda()
             else:
                 sample, labels = Variable(sample), Variable(labels)
-            #sample, labels = Variable(sample), Variable(labels)
 
             # Set the parameter gradients to zero
             optimizer.zero_grad()
@@ -75,11 +74,10 @@ def train_network(net, train_loader, val_loader, n_epochs, learning_rate, folder
             labels = data['labels']
 
             # Wrap them in a Variable object
-            if use_gpu:
+            if use_cuda:
                 sample, labels = Variable(sample).cuda(), Variable(labels).cuda()
             else:
                 sample, labels = Variable(sample), Variable(labels)
-            #sample, labels = Variable(sample), Variable(labels)
 
             # Forward pass
             val_outputs = net.forward(sample)
@@ -92,6 +90,7 @@ def train_network(net, train_loader, val_loader, n_epochs, learning_rate, folder
         # save the loss for each epoch
         train_loss.append(total_train_loss)
         val_loss.append(total_val_loss)
+
 
         if len(train_loss) > 1 and train_loss[-1] < train_loss[-2]: # if the loss is smaller this epoch (change to validation loss in the future)
             file_name = 'epoch' + str(epoch) + '.pt'

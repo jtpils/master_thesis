@@ -8,16 +8,15 @@ from torch.utils.data import Dataset
 class LiDARDataSet(Dataset):
     """Lidar sample dataset."""
 
-    def __init__(self, csv_file, sample_dir, use_gpu):
+    def __init__(self, csv_file, sample_dir):
         """
         Args:
             csv_file (string): Path to the csv file with labels.
-            input_dir (string): Directory with all the samples.
+            sample_dir (string): Directory with all the samples.
         """
 
         self.csv_labels = pd.read_csv(csv_file)
         self.sample_dir = sample_dir
-        self.use_gpu = use_gpu
 
     def __len__(self):
         return len(self.csv_labels)
@@ -25,14 +24,6 @@ class LiDARDataSet(Dataset):
     def __getitem__(self, idx):
 
         sample_file = os.path.join(self.sample_dir, str(idx))
-
-        '''if self.use_gpu:  # gpu
-            print('Current gpu device: ', torch.cuda.current_device())
-            sample = torch.from_numpy(np.load(sample_file + '.npy')).float()
-            sample = sample(device = torch.cuda.current_device())
-        else:  # cpu
-            sample = torch.from_numpy(np.load(sample_file + '.npy')).float()'''
-
         sample = torch.from_numpy(np.load(sample_file + '.npy')).float()
 
         labels = self.csv_labels.iloc[idx-1, 1:4]
