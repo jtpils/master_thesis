@@ -15,17 +15,24 @@ path_training_data = input('Path to training data folder: ')
 batch_size_train = 2
 batch_size_val = 2
 
+
+#print('Number of GPUs available: ', torch.cuda.device_count())
+
+
+use_gpu = int(input('Enter 0 for cpu, 1 for gpu:'))  # check that the user really provides 0 or 1
+
 # get data loaders
-train_loader, val_loader = get_loaders(path_training_data, batch_size_train, batch_size_val, train_split=0.5)
+train_loader, val_loader = get_loaders(path_training_data, batch_size_train, batch_size_val, use_gpu, train_split=0.5)
 
 
-print('Number of GPUs available: ', torch.cuda.device_count())
+
 
 # Create network instance
 # CNN = FirstBEVNet()
 CNN = SuperSimpleCNN()
-CNN = CNN.cuda()
-print('Are model parameters on CUDA? ', next(CNN.parameters()).is_cuda)
+if use_gpu:
+    CNN = CNN.cuda()
+#print('Are model parameters on CUDA? ', next(CNN.parameters()).is_cuda)
 
 
 
@@ -37,7 +44,7 @@ weights_path = os.path.join(model_path, 'weights')
 os.mkdir(weights_path)
 
 # train!
-train_loss, val_loss = train_network(CNN, train_loader, val_loader, n_epochs, learning_rate, weights_path)
+train_loss, val_loss = train_network(CNN, train_loader, val_loader, n_epochs, learning_rate, weights_path, use_gpu)
 
 # plot loss
 '''epochs_vec = np.arange(1, n_epochs+1)

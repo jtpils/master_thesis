@@ -4,11 +4,11 @@ from torch.utils.data.sampler import SubsetRandomSampler
 from LiDARDataSet import LiDARDataSet
 
 
-def get_loaders(path_training_data, batch_size_train, batch_size_val, train_split=0.7):
+def get_loaders(path_training_data, batch_size_train, batch_size_val, use_gpu, train_split=0.7):
     csv_file = path_training_data + '/labels.csv'
     sample_dir = path_training_data + '/samples/'
 
-    lidar_data_set = LiDARDataSet(csv_file, sample_dir)
+    lidar_data_set = LiDARDataSet(csv_file, sample_dir, use_gpu)
 
     # Training
     n_training_samples = np.ceil(train_split*len(lidar_data_set))

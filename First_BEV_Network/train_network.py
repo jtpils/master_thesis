@@ -5,7 +5,7 @@ import numpy as np
 import os
 
 
-def train_network(net, train_loader, val_loader, n_epochs, learning_rate, folder_path):
+def train_network(net, train_loader, val_loader, n_epochs, learning_rate, folder_path, use_gpu):
     # Print all of the hyperparameters of the training iteration:
     print("===== HYPERPARAMETERS =====")
     # print("batch_size =", batch_size)
@@ -41,7 +41,10 @@ def train_network(net, train_loader, val_loader, n_epochs, learning_rate, folder
             labels = data['labels']
 
             # Wrap them in a Variable object
-            sample, labels = Variable(sample), Variable(labels)
+            if use_gpu:
+                sample, labels = Variable(sample).cuda(), Variable(labels).cuda()
+            else:
+                sample, labels = Variable(sample), Variable(labels)
 
             # Set the parameter gradients to zero
             optimizer.zero_grad()
@@ -71,7 +74,10 @@ def train_network(net, train_loader, val_loader, n_epochs, learning_rate, folder
             labels = data['labels']
 
             # Wrap them in a Variable object
-            sample, labels = Variable(sample), Variable(labels)
+            if use_gpu:
+                sample, labels = Variable(sample).cuda(), Variable(labels).cuda()
+            else:
+                sample, labels = Variable(sample), Variable(labels)
 
             # Forward pass
             val_outputs = net.forward(sample)
