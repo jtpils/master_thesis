@@ -2,7 +2,7 @@ import torch
 #import pycuda.driver as cuda
 
 
-cuda.init()
+#cuda.init()
 
 print(torch.cuda.current_device())
 
