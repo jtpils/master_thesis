@@ -27,7 +27,9 @@ class LiDARDataSet(Dataset):
         sample_file = os.path.join(self.sample_dir, str(idx))
 
         if self.use_gpu:  # gpu
-            sample = torch.from_numpy(np.load(sample_file + '.npy')).cuda.FloatTensor()
+            gpu = torch.cuda.current_device()
+            sample = torch.from_numpy(np.load(sample_file + '.npy')).float()
+            sample = sample(device = torch.cuda.current_device())
         else:  # cpu
             sample = torch.from_numpy(np.load(sample_file + '.npy')).float()
 
