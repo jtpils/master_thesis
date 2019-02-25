@@ -41,11 +41,11 @@ def train_network(net, train_loader, val_loader, n_epochs, learning_rate, folder
             labels = data['labels']
 
             # Wrap them in a Variable object
-            '''if use_gpu:
+            if use_gpu:
                 sample, labels = Variable(sample).cuda(), Variable(labels).cuda()
             else:
-                sample, labels = Variable(sample), Variable(labels)'''
-            sample, labels = Variable(sample), Variable(labels)
+                sample, labels = Variable(sample), Variable(labels)
+            #sample, labels = Variable(sample), Variable(labels)
 
             # Set the parameter gradients to zero
             optimizer.zero_grad()
@@ -75,11 +75,11 @@ def train_network(net, train_loader, val_loader, n_epochs, learning_rate, folder
             labels = data['labels']
 
             # Wrap them in a Variable object
-            #if use_gpu:
-            #    sample, labels = Variable(sample).cuda(), Variable(labels).cuda()
-            #else:
-            #    sample, labels = Variable(sample), Variable(labels)
-            sample, labels = Variable(sample), Variable(labels)
+            if use_gpu:
+                sample, labels = Variable(sample).cuda(), Variable(labels).cuda()
+            else:
+                sample, labels = Variable(sample), Variable(labels)
+            #sample, labels = Variable(sample), Variable(labels)
 
             # Forward pass
             val_outputs = net.forward(sample)
