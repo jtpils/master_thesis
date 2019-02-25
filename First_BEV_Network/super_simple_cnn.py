@@ -33,7 +33,7 @@ class SuperSimpleCNN(torch.nn.Module):
         # FC-CONNECTED
         # "Flatten layer"       
         x = x.view(-1, 4 * 50 * 50)  # change size from (4, 50, 50) to (1, 1000)
-        x = F.relu(self.fc1(x))  # Change size from (1, 1000) to (1, 128)
-        x = F.relu(self.fc2(x))  # Change size from (1, 128) to (1, 3)
+        x = F.tanh(self.fc1(x))  # Change size from (1, 1000) to (1, 128)
+        x = F.tanh(self.fc2(x))  # Change size from (1, 128) to (1, 3)
 
         return x
