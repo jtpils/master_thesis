@@ -22,7 +22,7 @@ class SuperSimpleCNN(torch.nn.Module):
         self.fc2 = torch.nn.Linear(128, 3)
 
     def forward(self, x):
-        x = torch.tanh(self.conv1(x))  # Size changes from (8, 900, 900) to (8, 900, 900)
+        x = F.relu(self.conv1(x))  # Size changes from (8, 900, 900) to (8, 900, 900)
 
         x = self.pool1(x)  # Size changes from (8, 900, 900) to (8, 450, 450)
 
