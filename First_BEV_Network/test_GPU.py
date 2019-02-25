@@ -1,5 +1,5 @@
 import torch
-import pycuda.driver as cuda
+#import pycuda.driver as cuda
 
 
 cuda.init()
