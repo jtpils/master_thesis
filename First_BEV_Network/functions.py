@@ -20,6 +20,8 @@ def create_loss_and_optimizer(net, learning_rate=0.001):
 
     # Optimizer
     #optimizer = optim.Adam(net.parameters(), lr=learning_rate)
-    optimizer = optim.SGD(net.parameters(), lr=learning_rate)
+    optimizer = optim.Adagrad(net.parameters(), lr=learning_rate, lr_decay=1e-3)
+
+    #optimizer = optim.SGD(net.parameters(), lr=learning_rate)
 
     return loss, optimizer
