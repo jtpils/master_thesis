@@ -22,18 +22,18 @@ class SuperSimpleCNN(torch.nn.Module):
         self.fc2 = torch.nn.Linear(128, 3)
 
     def forward(self, x):
-        x = F.relu(self.conv1(x))  # Size changes from (8, 900, 900) to (8, 900, 900)
+        x = torch.tanh(self.conv1(x))  # Size changes from (8, 900, 900) to (8, 900, 900)
 
         x = self.pool1(x)  # Size changes from (8, 900, 900) to (8, 450, 450)
 
-        x = F.relu(self.conv2(x))  # Size changes from  (8, 450, 450) to (4, 150, 150)
+        x = torch.tanh(self.conv2(x))  # Size changes from  (8, 450, 450) to (4, 150, 150)
 
         x = self.pool2(x)  # Size changes from (4, 150, 150) to (4, 50, 50)
 
         # FC-CONNECTED
         # "Flatten layer"       
         x = x.view(-1, 4 * 50 * 50)  # change size from (4, 50, 50) to (1, 1000)
-        x = F.tanh(self.fc1(x))  # Change size from (1, 1000) to (1, 128)
+        x = torch.tanh(self.fc1(x))  # Change size from (1, 1000) to (1, 128)
         x = self.fc2(x)  # Change size from (1, 128) to (1, 3)
 
         return x
