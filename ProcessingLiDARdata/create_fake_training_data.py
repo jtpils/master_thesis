@@ -7,7 +7,8 @@ import random
 # A FIRST SKETCH ON HOW TO CREATE FAKE TRAINING SAMPLES (of one single sweep) WITHOUT A NEED FOR A MAP #
 ########################################################################################################
 
-input_folder_name = input('Type name of new folder:')
+input_folder_name = input('Type name of new folder to save data:')
+print(' ')
 
 current_path = os.getcwd()
 folder_path = current_path + '/fake_training_data_' + input_folder_name
@@ -22,22 +23,19 @@ else:
     print('Successfully created new directory with subdirectory, at ', folder_path)
 
 ################################# CHANGE HERE ###########################################################
-
-# Sabina's computer
-# path_to_csv = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/_out_Town03_190207_18/Town03_190207_18.csv'
-# path_to_pc = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/_out_Town03_190207_18/pc/'
-
-path_to_csv = '/home/master04/Desktop/_out_Town02_190221_1/Town02_190221_1.csv'
-path_to_pc = '/home/master04/Desktop/_out_Town02_190221_1/pc/'
-
-# path_to_csv = '/Users/annikal/Desktop/drive-download-20190220T155133Z-001/_out_framenumber/framenumber.csv'
-# path_to_pc = '/Users/annikal/Desktop/drive-download-20190220T155133Z-001/_out_framenumber/pc/'
+print(' ')
+path_to_lidar_data = input('Type complete path to the folder that contains "pc"-folder with LiDAR data and a csv file, e.g. Town02_190222_1 :')
+dir_list = os.listdir(path_to_lidar_data) # this should return a list where only one object is our csv_file
+path_to_pc = os.path.join(path_to_lidar_data, 'pc/')  # we assume we follow the structure of creating lidar data folder with a pc folder for ply
+for file in dir_list:
+    if '.csv' in file:  # find csv-file
+        path_to_csv = os.path.join(path_to_lidar_data, file)
 
 
-translation = 1
-rotation = 0
-
-number_of_files_to_load = 50
+translation = int(input('Translation in meters:'))
+rotation = int(input('Rotation in degrees:'))
+number_of_files_to_load = int(input('How many training samples do you want to create:'))
+print(' ')
 ########################################################################################################
 
 # create a list of all ply-files in a directory
@@ -86,6 +84,6 @@ for file_name in ply_files[:number_of_files_to_load]:
 
     # write frame_number in column 1, and the transformation in the next columns
     with open(csv_labels_path , mode ='a') as csv_file:
-        csv_writer = csv.writer(csv_file, delimiter=',' , quotechar='"', quoting=csv.QUOTE_MINIMAL)
+        csv_writer = csv.writer(csv_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
         csv_writer.writerow([i, rand_trans[0], rand_trans[1], rand_trans[2]])
 

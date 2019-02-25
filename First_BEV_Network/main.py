@@ -10,7 +10,7 @@ model_name = input('Folder name: ')
 n_epochs = int(input('Number of epochs:'))
 learning_rate = float(input('Learning rate:'))
 
-path_training_data = '/Users/annikal/Desktop/fake_training_data_trans2'
+path_training_data = input('Path to training data folder: ')
 batch_size_train = 2
 batch_size_val = 2
 
@@ -33,11 +33,11 @@ os.mkdir(weights_path)
 train_loss, val_loss = train_network(CNN, train_loader, val_loader, n_epochs, learning_rate, weights_path)
 
 # plot loss
-epochs_vec = np.arange(1, n_epochs+1)
+'''epochs_vec = np.arange(1, n_epochs+1)
 plt.plot(epochs_vec, train_loss, label='train loss')
 plt.plot(epochs_vec, val_loss, label='val loss')
 plt.legend()
-plt.show()
+plt.show()'''
 
 # save loss
 loss_path = os.path.join(model_path, 'train_loss.npy')
