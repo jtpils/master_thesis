@@ -26,7 +26,7 @@ class SuperSimpleCNN(torch.nn.Module):
 
         x = self.pool1(x)  # Size changes from (8, 900, 900) to (8, 450, 450)
 
-        x = torch.tanh(self.conv2(x))  # Size changes from  (8, 450, 450) to (4, 150, 150)
+        x = F.relu(self.conv2(x))  # Size changes from  (8, 450, 450) to (4, 150, 150)
 
         x = self.pool2(x)  # Size changes from (4, 150, 150) to (4, 50, 50)
 
