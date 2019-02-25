@@ -1,7 +1,7 @@
 % plots the LiDAR position and point cloud, but removes detections on the
 % ground.
 
-clear;clc
+clear all;clc
 % CHANGE PATH HERE
 %pc_path = './_out_position/pc/';
 %csv_path = './_out_position/position.csv';
@@ -10,7 +10,7 @@ csv_path = '/home/master04/Desktop/_out_Town02_190221_1/Town02_190221_1.csv';
 global_coordinates = importdata(csv_path);
 
 %files = dir(strcat(pc_path,'/*.ply'));
-files = dir(strcat(pc_path,'/003119.ply'))
+files = dir(strcat(pc_path,'/003121.ply'))
 delimiterIn = ' ';
 headerlinesIn = 7;
 
@@ -32,16 +32,16 @@ for file_number=1:step:length(files)
     
     if isempty(temp.data) == 0  % if the file contains any points
         % keep all values that are smaller than 2, above ground
-        keep = temp.data(:,3) < 1;
+        keep = temp.data(:,3) < 1.5;
         temp.data = temp.data(keep,:);
         % keep all values that are larger than -10, to remove some detections upwards
-        keep = temp.data(:,3 )> -10;
+        keep = temp.data(:,3 )> -11;
         temp.data = temp.data(keep,:);
-        
+
         % transform to our preferred coordinate system
-        temp.data(2,:) = -temp.data(2,:); % y
-        temp.data(3,:) = -temp.data(3,:); % z
-        
+        temp.data(:,2) = -temp.data(:,2); % y
+        temp.data(:,3) = -temp.data(:,3); % z
+
         % rotate and transform
         yaw = global_coordinates.data(row,5) + 90; % yaw in degrees
         
