@@ -25,9 +25,8 @@ print('Number of GPUs available: ', torch.cuda.device_count())
 # CNN = FirstBEVNet()
 CNN = SuperSimpleCNN()
 CNN = CNN.cuda()
-print('Are model parameters on CUDA? ', CNN.cuda())
-print('Are model parameters on CUDA? ', next(CNN.parameters()))#.is_cuda())
-print(type(next(CNN.parameters())))
+print('Are model parameters on CUDA? ', next(CNN.parameters()).is_cuda())
+
 
 
 # create directory for model weights
