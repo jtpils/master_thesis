@@ -4,6 +4,7 @@ from train_network import *
 from super_simple_cnn import SuperSimpleCNN
 import matplotlib.pyplot as plt
 import os
+import torch
 
 
 model_name = input('Folder name: ')
@@ -17,10 +18,15 @@ batch_size_val = 2
 # get data loaders
 train_loader, val_loader = get_loaders(path_training_data, batch_size_train, batch_size_val, train_split=0.5)
 
+
+print('Number of GPUs available: ', torch.cuda.device_count())
+
 # Create network instance
 # CNN = FirstBEVNet()
 CNN = SuperSimpleCNN()
-
+CNN = CNN.cuda()
+print('Are model parameters on CUDA? ', next(CNN.parameters()).is_cuda())
+print('Are model parameters on CUDA? ', CNN.cuda())
 
 # create directory for model weights
 current_path = os.getcwd()
