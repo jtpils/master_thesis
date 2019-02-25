@@ -98,6 +98,7 @@ def train_network(net, train_loader, val_loader, n_epochs, learning_rate, folder
             torch.save({
                 'epoch': epoch,
                 'model_state_dict': net.state_dict(),
+                'optimizer_state_dict': optimizer.state_dict(), # I red in a tutorial that this one is needed, as this contains buffers and parameters that are updated as the model trains.
                 'train_loss': total_train_loss,
                 'val_loss': total_val_loss
             }, path)
