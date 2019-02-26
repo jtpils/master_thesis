@@ -13,7 +13,7 @@ def create_loss_and_optimizer(net, learning_rate=0.001):
     loss = torch.nn.MSELoss()
 
     # Optimizer
-    optimizer = optim.Adam(net.parameters(), lr=learning_rate)
+    optimizer = optim.Adam(net.parameters(), lr=learning_rate, weight_decay=1e-5)
     # optimizer = optim.Adagrad(net.parameters(), lr=learning_rate, lr_decay=1e-3)
     # optimizer = optim.SGD(net.parameters(), lr=learning_rate)
 
@@ -100,7 +100,6 @@ def train_network(net, train_loader, val_loader, n_epochs, learning_rate, patien
 
         # At the end of the epoch, do a pass on the validation set
         total_val_loss = 0
-
         net.eval()
         with torch.no_grad():
             for data in val_loader:
@@ -127,9 +126,8 @@ def train_network(net, train_loader, val_loader, n_epochs, learning_rate, patien
         train_loss.append(total_train_loss / len(train_loader))
         val_loss.append(total_val_loss / len(val_loader))
 
-	# see if validation loss has decreased, if it has a checkpoint will be saved of the current model.
+        # see if validation loss has decreased, if it has a checkpoint will be saved of the current model.
         early_stopping(epoch, total_train_loss, total_val_loss, net, optimizer)
-
 
         # If the validation has not improved in patience # of epochs the training loop will break.
         if early_stopping.early_stop:
