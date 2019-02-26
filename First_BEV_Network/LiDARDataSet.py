@@ -27,6 +27,9 @@ class LiDARDataSet(Dataset):
         sample = torch.from_numpy(np.load(sample_file + '.npy')).float()
 
         labels = self.csv_labels.iloc[idx-1, 1:4]
-        training_sample = {'sample': sample, 'labels': labels.to_numpy()}
+
+        training_sample = {'sample': sample, 'labels': labels.values}  #  This worked on Sabinas Mac.
+        # training_sample = {'sample': sample, 'labels': labels.to_numpy()}
+        type(training_sample)
 
         return training_sample
