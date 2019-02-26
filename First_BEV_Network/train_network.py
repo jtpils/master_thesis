@@ -43,7 +43,7 @@ def train_network(net, train_loader, val_loader, n_epochs, learning_rate, patien
 
     # Create our loss and optimizer functions
     loss, optimizer = create_loss_and_optimizer(net, learning_rate)
-    scheduler = StepLR(optimizer, step_size=30, gamma=0.1)
+    scheduler = StepLR(optimizer, step_size=20, gamma=0.1)
 
     # Time for printing
     training_start_time = time.time()

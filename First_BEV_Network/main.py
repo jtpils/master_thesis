@@ -14,7 +14,7 @@ import torch
 
 # load old weights! change here manually
 load_weights = False
-load_weights_path = '/home/master04/Documents/master_thesis/First_BEV_Network/trans1/weights/epoch19.pt'
+load_weights_path = '/home/master04/Documents/master_thesis/First_BEV_Network/test/parameters/epoch_29_checkpoint.pt'
 
 model_name = input('Type name of new folder: ')
 n_epochs = int(input('Number of epochs: '))
