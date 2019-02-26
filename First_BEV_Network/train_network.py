@@ -35,6 +35,7 @@ def train_network(net, train_loader, val_loader, n_epochs, learning_rate, folder
         start_time = time.time()
         total_train_loss = 0
 
+        net.train()
         for i, data in enumerate(train_loader, 1):
             # Get inputs
             sample = data['sample']
@@ -75,6 +76,8 @@ def train_network(net, train_loader, val_loader, n_epochs, learning_rate, folder
 
         # At the end of the epoch, do a pass on the validation set
         total_val_loss = 0
+        
+        net.eval()
         for data in val_loader:
             sample = data['sample']
             labels = data['labels']
