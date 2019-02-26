@@ -31,7 +31,7 @@ def train_network(net, train_loader, val_loader, n_epochs, learning_rate, folder
     for epoch in range(n_epochs):
 
         running_loss = 0.0
-        # print_every = n_batches // 1
+        print_every = n_batches // 3  # how many mini-bacthes iw we want to print stats 3 times per epoch
         start_time = time.time()
         total_train_loss = 0
 
@@ -67,12 +67,11 @@ def train_network(net, train_loader, val_loader, n_epochs, learning_rate, folder
                 running_loss = 0.0
                 start_time = time.time()'''
     
-            if (i+1) % 10 == 0:
-                print ('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}' 
-                       .format(epoch+1, n_epochs, i+1, n_batches, running_loss/10))
+            if (i+1) % print_every == 0:
+                print('Epoch [{}/{}], Batch [{}/{}], Loss: {:.4f}'
+                       .format(epoch+1, n_epochs, i+1, n_batches, running_loss/print_every))
                 running_loss = 0.0
         
-        print("Training loss = {:.2f}".format(total_train_loss / len(train_loader)))
 
         # At the end of the epoch, do a pass on the validation set
         total_val_loss = 0
@@ -92,11 +91,11 @@ def train_network(net, train_loader, val_loader, n_epochs, learning_rate, folder
             val_loss_size = loss(val_outputs, labels.float())
             total_val_loss += val_loss_size.item()
 
-        print("Validation loss = {:.2f}".format(total_val_loss / len(val_loader)))
-
+        print("Training loss = {:.4f}".format(total_train_loss / len(train_loader)), "Validation loss = {:.4f}".format(total_val_loss / len(val_loader)))
+        print(' ')
         # save the loss for each epoch
-        train_loss.append(total_train_loss)
-        val_loss.append(total_val_loss)
+        train_loss.append(total_train_loss / len(train_loader))
+        val_loss.append(total_val_loss / len(val_loader))
 
 
         if len(train_loss) > 1 and train_loss[-1] < train_loss[-2]: # if the loss is smaller this epoch (change to validation loss in the future)
