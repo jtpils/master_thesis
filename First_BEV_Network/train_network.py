@@ -13,13 +13,13 @@ def train_network(net, train_loader, val_loader, n_epochs, learning_rate, folder
     print("learning_rate =", learning_rate)
     print("=" * 30)
 
-    # declare variables for storing validation and training loss
+    # declare variables for storing validation and training loss to return
     val_loss = []
     train_loss = []
 
     # Get training data
     n_batches = len(train_loader)
-    print('Number of batches: ', n_batches)
+    # print('Number of batches: ', n_batches)
 
     # Create our loss and optimizer functions
     loss, optimizer = create_loss_and_optimizer(net, learning_rate)
@@ -31,7 +31,7 @@ def train_network(net, train_loader, val_loader, n_epochs, learning_rate, folder
     for epoch in range(n_epochs):
 
         running_loss = 0.0
-        print_every = n_batches // 1
+        # print_every = n_batches // 1
         start_time = time.time()
         total_train_loss = 0
 
@@ -42,7 +42,7 @@ def train_network(net, train_loader, val_loader, n_epochs, learning_rate, folder
 
             # Wrap them in a Variable object
             if use_cuda:
-                sample, labels = Variable(sample).cuda(), Variable(labels).cuda()
+                sample, labels = Variable(sample).cuda(), Variable(labels).cuda()  # maybe we should use .to(deveice) here?
             else:
                 sample, labels = Variable(sample), Variable(labels)
 
@@ -60,12 +60,19 @@ def train_network(net, train_loader, val_loader, n_epochs, learning_rate, folder
             total_train_loss += loss_size.item()
 
             # Print every batch of an epoch
-            if i % print_every == 0:
+            '''if i % print_every == 0:
                 print("Epoch {}, {:d}% \t train_loss: {:.2f} took: {:.2f}s".format(
                     epoch + 1, int(100 * i / n_batches), running_loss / print_every, time.time() - start_time))
                 # Reset running loss and time
                 running_loss = 0.0
-                start_time = time.time()
+                start_time = time.time()'''
+    
+            if (i+1) % 10 == 0:
+                print ('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}' 
+                       .format(epoch+1, n_epochs, i+1, n_batches, running_loss/10))
+                running_loss = 0.0
+        
+        print("Training loss = {:.2f}".format(total_train_loss / len(train_loader)))
 
         # At the end of the epoch, do a pass on the validation set
         total_val_loss = 0

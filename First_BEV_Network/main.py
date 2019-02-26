@@ -6,15 +6,15 @@ import os
 import torch
 
 
-
-# training folder: /home/master04/Documents/master_thesis/ProcessingLiDARdata/fake_training_data_trans_1
-
+# training folder:
+# /home/master04/Documents/master_thesis/ProcessingLiDARdata/fake_training_data_trans_1
+# /home/master04/Documents/master_thesis/ProcessingLiDARdata/fake_training_data_rot_5
 
 # load old weights! change here manually
-load_weights = True
+load_weights = False
+load_weights_path = '/home/master04/Documents/master_thesis/First_BEV_Network/trans1/weights/epoch19.pt'
 
-
-model_name = input('Folder name: ')
+model_name = input('Type name of new folder: ')
 n_epochs = int(input('Number of epochs:'))
 learning_rate = float(input('Learning rate:'))
 
@@ -33,7 +33,7 @@ print('Device: ', device)
 #use_gpu = int(input('Enter 0 for cpu, 1 for gpu:'))  # check that the user really provides 0 or 1
 
 # Create network instance
-# CNN = FirstBEVNet()
+#CNN = FirstBEVNet().to(device)
 CNN = SuperSimpleCNN().to(device)
 #if use_gpu:
 #    CNN = CNN.cuda()
@@ -42,7 +42,7 @@ print(' ')
 
 # Load weights
 if load_weights:
-    network_param = torch.load('/home/master04/Documents/master_thesis/First_BEV_Network/test3/weights/epoch45.pt')
+    network_param = torch.load(load_weights_path)
     CNN.load_state_dict(network_param['model_state_dict'])
 CNN.train()
 
