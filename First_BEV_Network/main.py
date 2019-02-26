@@ -8,15 +8,15 @@ import torch
 
 
 # training folder: /home/master04/Documents/master_thesis/ProcessingLiDARdata/fake_training_data_trans_1
-
+# training_folder_sabina: /Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/fake_training_data_translated
 
 # load old weights! change here manually
-load_weights = True
-
+load_weights = False
 
 model_name = input('Folder name: ')
 n_epochs = int(input('Number of epochs:'))
 learning_rate = float(input('Learning rate:'))
+patience = 10 # Threshold for early stopping. Number of epochs that we will wait until brake
 
 path_training_data = input('Path to training data folder: ')
 batch_size_train = 2
@@ -30,19 +30,19 @@ device = torch.device("cuda" if use_cuda else "cpu")
 print('Device: ', device)
 
 
-#use_gpu = int(input('Enter 0 for cpu, 1 for gpu:'))  # check that the user really provides 0 or 1
+# use_gpu = int(input('Enter 0 for cpu, 1 for gpu:'))  # check that the user really provides 0 or 1
 
 # Create network instance
 # CNN = FirstBEVNet()
 CNN = SuperSimpleCNN().to(device)
-#if use_gpu:
-#    CNN = CNN.cuda()
+# if use_gpu:
+#     CNN = CNN.cuda()
 print('Are model parameters on CUDA? ', next(CNN.parameters()).is_cuda)
 print(' ')
 
 # Load weights
 if load_weights:
-    network_param = torch.load('/home/master04/Documents/master_thesis/First_BEV_Network/test3/weights/epoch45.pt')
+    network_param = torch.load('/Users/sabinalinderoth/Documents/master_thesis/First_BEV_Network/Training_1/weights/epoch_23_checkpoint.pt')
     CNN.load_state_dict(network_param['model_state_dict'])
 CNN.train()
 
@@ -51,21 +51,20 @@ CNN.train()
 kwargs = {'pin_memory': True} if use_cuda else {}
 train_loader, val_loader = get_loaders(path_training_data, batch_size_train, batch_size_val, kwargs, train_split=0.5)
 
-
+print(type(train_loader))
 # create directory for model weights
 current_path = os.getcwd()
 model_path = os.path.join(current_path, model_name)
 os.mkdir(model_path)
-weights_path = os.path.join(model_path, 'weights')
-os.mkdir(weights_path)
+parameter_path = os.path.join(model_path, 'parameters')
+os.mkdir(parameter_path)
 
 # train!
-train_loss, val_loss = train_network(CNN, train_loader, val_loader, n_epochs, learning_rate, weights_path, use_cuda)
-
-
+train_loss, val_loss = train_network(CNN, train_loader, val_loader, n_epochs, learning_rate, patience, parameter_path, use_cuda)
 
 # plot loss
-epochs_vec = np.arange(1, n_epochs+1)
+np.shape(train_loss)
+epochs_vec = np.arange(1, np.shape(train_loss)[0] + 1) # uses the shape of the train loss to plot to be the same of epochs before early stopping did its work.
 plt.plot(epochs_vec, train_loss, label='train loss')
 plt.plot(epochs_vec, val_loss, label='val loss')
 plt.legend()
