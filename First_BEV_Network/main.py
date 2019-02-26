@@ -18,7 +18,7 @@ model_name = input('Type name of new folder: ')
 n_epochs = int(input('Number of epochs: '))
 learning_rate = float(input('Learning rate: '))
 
-path_training_data = input('Path to training data folder: ')
+path_training_data = input('Path to data set folder: ')
 batch_size_train = 2
 batch_size_val = 2
 
@@ -46,11 +46,9 @@ if load_weights:
     CNN.load_state_dict(network_param['model_state_dict'])
 CNN.train()
 
-
 # get data loaders
 kwargs = {'pin_memory': True} if use_cuda else {}
-train_loader, val_loader = get_loaders(path_training_data, batch_size_train, batch_size_val, kwargs, train_split=0.8)
-
+train_loader, val_loader, test_loader = get_loaders(path_training_data, batch_size_train, batch_size_val, kwargs, train_split=0.8)
 
 # create directory for model weights
 current_path = os.getcwd()
@@ -62,8 +60,6 @@ os.mkdir(weights_path)
 # train!
 train_loss, val_loss = train_network(CNN, train_loader, val_loader, n_epochs, learning_rate, weights_path, use_cuda)
 
-
-
 # plot loss
 epochs_vec = np.arange(1, n_epochs+1)
 plt.plot(epochs_vec, train_loss, label='train loss')
@@ -71,10 +67,8 @@ plt.plot(epochs_vec, val_loss, label='val loss')
 plt.legend()
 plt.show()
 
-
 # save loss
 loss_path = os.path.join(model_path, 'train_loss.npy')
 np.save(loss_path, train_loss)
 loss_path = os.path.join(model_path, 'val_loss.npy')
 np.save(loss_path, val_loss)
-
