@@ -6,16 +6,19 @@ import os
 import torch
 
 
+# training folder:
+# /home/master04/Documents/master_thesis/ProcessingLiDARdata/fake_training_data_trans_1
+# /home/master04/Documents/master_thesis/ProcessingLiDARdata/fake_training_data_rot_5
+# /Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/fake_training_data_translated
 
-# training folder: /home/master04/Documents/master_thesis/ProcessingLiDARdata/fake_training_data_trans_1
-# training_folder_sabina: /Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/fake_training_data_translated
 
 # load old weights! change here manually
 load_weights = False
+load_weights_path = '/home/master04/Documents/master_thesis/First_BEV_Network/trans1/weights/epoch19.pt'
 
-model_name = input('Folder name: ')
-n_epochs = int(input('Number of epochs:'))
-learning_rate = float(input('Learning rate:'))
+model_name = input('Type name of new folder: ')
+n_epochs = int(input('Number of epochs: '))
+learning_rate = float(input('Learning rate: '))
 patience = 10 # Threshold for early stopping. Number of epochs that we will wait until brake
 
 path_training_data = input('Path to training data folder: ')
@@ -33,7 +36,7 @@ print('Device: ', device)
 # use_gpu = int(input('Enter 0 for cpu, 1 for gpu:'))  # check that the user really provides 0 or 1
 
 # Create network instance
-# CNN = FirstBEVNet()
+#CNN = FirstBEVNet().to(device)
 CNN = SuperSimpleCNN().to(device)
 # if use_gpu:
 #     CNN = CNN.cuda()
@@ -42,14 +45,14 @@ print(' ')
 
 # Load weights
 if load_weights:
-    network_param = torch.load('/Users/sabinalinderoth/Documents/master_thesis/First_BEV_Network/Training_1/weights/epoch_23_checkpoint.pt')
+    network_param = torch.load(load_weights_path)
     CNN.load_state_dict(network_param['model_state_dict'])
 CNN.train()
 
 
 # get data loaders
 kwargs = {'pin_memory': True} if use_cuda else {}
-train_loader, val_loader = get_loaders(path_training_data, batch_size_train, batch_size_val, kwargs, train_split=0.5)
+train_loader, val_loader = get_loaders(path_training_data, batch_size_train, batch_size_val, kwargs, train_split=0.8)
 
 print(type(train_loader))
 # create directory for model weights
