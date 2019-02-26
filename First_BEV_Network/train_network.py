@@ -76,30 +76,30 @@ def train_network(net, train_loader, val_loader, n_epochs, learning_rate, folder
 
         # At the end of the epoch, do a pass on the validation set
         total_val_loss = 0
-        
+
         net.eval()
-        for data in val_loader:
-            sample = data['sample']
-            labels = data['labels']
+        with torch.no_grad():
+            for data in val_loader:
+                sample = data['sample']
+                labels = data['labels']
 
-            # Wrap them in a Variable object
-            if use_cuda:
-                sample, labels = Variable(sample).cuda(), Variable(labels).cuda()
-            else:
-                sample, labels = Variable(sample), Variable(labels)
+                # Wrap them in a Variable object
+                if use_cuda:
+                    sample, labels = Variable(sample).cuda(), Variable(labels).cuda()
+                else:
+                    sample, labels = Variable(sample), Variable(labels)
 
-            # Forward pass
-            val_outputs = net.forward(sample)
+                # Forward pass
+                val_outputs = net.forward(sample)
 
-            val_loss_size = loss(val_outputs, labels.float())
-            total_val_loss += val_loss_size.item()
+                val_loss_size = loss(val_outputs, labels.float())
+                total_val_loss += val_loss_size.item()
 
-        print("Training loss = {:.4f}".format(total_train_loss / len(train_loader)), "Validation loss = {:.4f}".format(total_val_loss / len(val_loader)))
-        print(' ')
-        # save the loss for each epoch
-        train_loss.append(total_train_loss / len(train_loader))
-        val_loss.append(total_val_loss / len(val_loader))
-
+            print("Training loss = {:.4f}".format(total_train_loss / len(train_loader)), "Validation loss = {:.4f}".format(total_val_loss / len(val_loader)))
+            print(' ')
+            # save the loss for each epoch
+            train_loss.append(total_train_loss / len(train_loader))
+            val_loss.append(total_val_loss / len(val_loader))
 
         if len(train_loss) > 1 and train_loss[-1] < train_loss[-2]: # if the loss is smaller this epoch (change to validation loss in the future)
             file_name = 'epoch' + str(epoch) + '.pt'
