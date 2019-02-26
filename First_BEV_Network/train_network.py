@@ -1,8 +1,22 @@
 from functions import *
 import time
 from torch.autograd import Variable
+from torch.optim.lr_scheduler import StepLR
 import numpy as np
 import os
+
+
+def create_loss_and_optimizer(net, learning_rate=0.001):
+    # Loss function
+    # loss = torch.nn.CrossEntropyLoss()
+    loss = torch.nn.MSELoss()
+
+    # Optimizer
+    optimizer = optim.Adam(net.parameters(), lr=learning_rate)
+    # optimizer = optim.Adagrad(net.parameters(), lr=learning_rate, lr_decay=1e-3)
+    # optimizer = optim.SGD(net.parameters(), lr=learning_rate)
+
+    return loss, optimizer
 
 
 def train_network(net, train_loader, val_loader, n_epochs, learning_rate, folder_path, use_cuda):
@@ -10,7 +24,7 @@ def train_network(net, train_loader, val_loader, n_epochs, learning_rate, folder
     print("===== HYPERPARAMETERS =====")
     # print("batch_size =", batch_size)
     print("epochs =", n_epochs)
-    print("learning_rate =", learning_rate)
+    print("initial learning_rate =", learning_rate)
     print("=" * 30)
 
     # declare variables for storing validation and training loss to return
@@ -23,15 +37,19 @@ def train_network(net, train_loader, val_loader, n_epochs, learning_rate, folder
 
     # Create our loss and optimizer functions
     loss, optimizer = create_loss_and_optimizer(net, learning_rate)
+    scheduler = StepLR(optimizer, step_size=20, gamma=0.1)
 
     # Time for printing
     training_start_time = time.time()
 
     # Loop for n_epochs
     for epoch in range(n_epochs):
+        scheduler.step()
+        params = optimizer.state_dict()['param_groups']
+        print('learning rate: ', params[0]['lr'])
 
         running_loss = 0.0
-        print_every = n_batches // 3  # how many mini-bacthes iw we want to print stats 3 times per epoch
+        print_every = n_batches // 3  # how many mini-batches iw we want to print stats 3 times per epoch
         start_time = time.time()
         total_train_loss = 0
 
