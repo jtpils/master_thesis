@@ -95,7 +95,9 @@ def train_network(net, train_loader, val_loader, n_epochs, learning_rate, folder
                 val_loss_size = loss(val_outputs, labels.float())
                 total_val_loss += val_loss_size.item()
 
-            print("Training loss = {:.4f}".format(total_train_loss / len(train_loader)), "Validation loss = {:.4f}".format(total_val_loss / len(val_loader)))
+            print("Training loss: {:.4f}".format(total_train_loss / len(train_loader)),
+                  ", Validation loss: {:.4f}".format(total_val_loss / len(val_loader)),
+                  ", Time: {:.2f}s".format(time.time() - start_time))
             print(' ')
             # save the loss for each epoch
             train_loss.append(total_train_loss / len(train_loader))
