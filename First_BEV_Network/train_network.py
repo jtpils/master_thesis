@@ -4,6 +4,7 @@ from torch.autograd import Variable
 from torch.optim.lr_scheduler import StepLR
 import numpy as np
 import os
+from early_stopping import EarlyStopping
 
 
 def create_loss_and_optimizer(net, learning_rate=0.001):
@@ -19,17 +20,22 @@ def create_loss_and_optimizer(net, learning_rate=0.001):
     return loss, optimizer
 
 
-def train_network(net, train_loader, val_loader, n_epochs, learning_rate, folder_path, use_cuda):
+def train_network(net, train_loader, val_loader, n_epochs, learning_rate, patience, folder_path, use_cuda):
+
     # Print all of the hyperparameters of the training iteration:
     print("===== HYPERPARAMETERS =====")
     # print("batch_size =", batch_size)
     print("epochs =", n_epochs)
     print("initial learning_rate =", learning_rate)
     print("=" * 30)
+    print('patience:', patience)
 
     # declare variables for storing validation and training loss to return
     val_loss = []
     train_loss = []
+
+    # initialize the early_stopping object
+    early_stopping = EarlyStopping(folder_path, patience, verbose=True)
 
     # Get training data
     n_batches = len(train_loader)
@@ -113,24 +119,22 @@ def train_network(net, train_loader, val_loader, n_epochs, learning_rate, folder
                 val_loss_size = loss(val_outputs, labels.float())
                 total_val_loss += val_loss_size.item()
 
-            print("Training loss: {:.4f}".format(total_train_loss / len(train_loader)),
-                  ", Validation loss: {:.4f}".format(total_val_loss / len(val_loader)),
-                  ", Time: {:.2f}s".format(time.time() - start_time))
-            print(' ')
-            # save the loss for each epoch
-            train_loss.append(total_train_loss / len(train_loader))
-            val_loss.append(total_val_loss / len(val_loader))
+        print("Training loss: {:.4f}".format(total_train_loss / len(train_loader)),
+              ", Validation loss: {:.4f}".format(total_val_loss / len(val_loader)),
+              ", Time: {:.2f}s".format(time.time() - start_time))
+        print(' ')
+        # save the loss for each epoch
+        train_loss.append(total_train_loss / len(train_loader))
+        val_loss.append(total_val_loss / len(val_loader))
 
-        if len(train_loss) > 1 and train_loss[-1] < train_loss[-2]: # if the loss is smaller this epoch (change to validation loss in the future)
-            file_name = 'epoch' + str(epoch) + '.pt'
-            path = os.path.join(folder_path, file_name)
-            torch.save({
-                'epoch': epoch,
-                'model_state_dict': net.state_dict(),
-                'optimizer_state_dict': optimizer.state_dict(), # I red in a tutorial that this one is needed, as this contains buffers and parameters that are updated as the model trains.
-                'train_loss': total_train_loss,
-                'val_loss': total_val_loss
-            }, path)
+	# see if validation loss has decreased, if it has a checkpoint will be saved of the current model.
+        early_stopping(epoch, total_train_loss, total_val_loss, net, optimizer)
+
+
+        # If the validation has not improved in patience # of epochs the training loop will break.
+        if early_stopping.early_stop:
+            print("Early stopping")
+            break
 
     print("Training finished, took {:.2f}s".format(time.time() - training_start_time))
     return train_loss, val_loss

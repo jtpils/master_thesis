@@ -9,6 +9,8 @@ import torch
 # training folder:
 # /home/master04/Documents/master_thesis/ProcessingLiDARdata/fake_training_data_trans_1
 # /home/master04/Documents/master_thesis/ProcessingLiDARdata/fake_training_data_rot_5
+# /Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/fake_training_data_translated
+
 
 # load old weights! change here manually
 load_weights = False
@@ -17,6 +19,7 @@ load_weights_path = '/home/master04/Documents/master_thesis/First_BEV_Network/tr
 model_name = input('Type name of new folder: ')
 n_epochs = int(input('Number of epochs: '))
 learning_rate = float(input('Learning rate: '))
+patience = 10 # Threshold for early stopping. Number of epochs that we will wait until brake
 
 path_training_data = input('Path to data set folder: ')
 batch_size_train = 2
@@ -30,13 +33,13 @@ device = torch.device("cuda" if use_cuda else "cpu")
 print('Device: ', device)
 
 
-#use_gpu = int(input('Enter 0 for cpu, 1 for gpu:'))  # check that the user really provides 0 or 1
+# use_gpu = int(input('Enter 0 for cpu, 1 for gpu:'))  # check that the user really provides 0 or 1
 
 # Create network instance
 #CNN = FirstBEVNet().to(device)
 CNN = SuperSimpleCNN().to(device)
-#if use_gpu:
-#    CNN = CNN.cuda()
+# if use_gpu:
+#     CNN = CNN.cuda()
 print('Are model parameters on CUDA? ', next(CNN.parameters()).is_cuda)
 print(' ')
 
@@ -54,14 +57,16 @@ train_loader, val_loader, test_loader = get_loaders(path_training_data, batch_si
 current_path = os.getcwd()
 model_path = os.path.join(current_path, model_name)
 os.mkdir(model_path)
-weights_path = os.path.join(model_path, 'weights')
-os.mkdir(weights_path)
+parameter_path = os.path.join(model_path, 'parameters')
+os.mkdir(parameter_path)
 
 # train!
-train_loss, val_loss = train_network(CNN, train_loader, val_loader, n_epochs, learning_rate, weights_path, use_cuda)
+train_loss, val_loss = train_network(CNN, train_loader, val_loader, n_epochs, learning_rate, patience, parameter_path, use_cuda)
+
 
 # plot loss
-epochs_vec = np.arange(1, n_epochs+1)
+np.shape(train_loss)
+epochs_vec = np.arange(1, np.shape(train_loss)[0] + 1) # uses the shape of the train loss to plot to be the same of epochs before early stopping did its work.
 plt.plot(epochs_vec, train_loss, label='train loss')
 plt.plot(epochs_vec, val_loss, label='val loss')
 plt.legend()
