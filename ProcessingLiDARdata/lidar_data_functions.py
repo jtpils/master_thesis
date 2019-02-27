@@ -34,10 +34,8 @@ def load_data(path_to_ply, path_to_csv):
     #print('frame number', frame_number)
     # load csv-file with global coordinates
     global_coordinates = np.loadtxt(path_to_csv, skiprows=1, delimiter=',')
-
     # extract information from csv at given frame_number
     row = np.where(global_coordinates == frame_number)[0]  # returns which row the frame number is located on
-    #print('row where to find frame number', row)
     global_lidar_coordinates = global_coordinates[row, 1:5]
     global_lidar_coordinates[0][3] = global_lidar_coordinates[0][3] + 90
 
