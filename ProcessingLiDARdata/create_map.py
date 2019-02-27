@@ -3,11 +3,11 @@ from lidar_data_functions import *
 from map_functions import *
 from matplotlib import pyplot as plt
 
-path_to_ply_folder = '/home/master04/Desktop/_out_Town02_190221_1/pc/'
-path_to_csv = '/home/master04/Desktop/_out_Town02_190221_1/Town02_190221_1.csv'
+path_to_ply_folder = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/_out_Town02_190221_1/pc/'
+path_to_csv = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/_out_Town02_190221_1/Town02_190221_1.csv'
 
-files_in_ply_folder = ['003121.ply']
-#files_in_ply_folder = os.listdir(path_to_ply_folder)
+#files_in_ply_folder = ['003121.ply']
+files_in_ply_folder = os.listdir(path_to_ply_folder)
 number_of_files_to_load = len(files_in_ply_folder)
 
 # pc_dict = {}
@@ -19,7 +19,7 @@ min_x_val = float("inf")
 min_y_val = float("inf")
 i = 0
 
-for file in files_in_ply_folder[0:10]:  # the last number is how large steps to take
+for file in files_in_ply_folder[0:100]:  # the last number is how large steps to take
     # i = i+1  # this parameter is used if storing each ply file in a dict
 
     try:
@@ -33,7 +33,7 @@ for file in files_in_ply_folder[0:10]:  # the last number is how large steps to 
         continue
 
     # rotate, translate the point cloud to global coordinates and trim the point cloud
-    trimmed_pc = trim_pointcloud(point_cloud, range=500, roof=7, floor=.5)
+    trimmed_pc = trim_pointcloud(point_cloud, range=500, roof=6, floor=1.5)
     rotated_pc = rotate_pointcloud_to_global(trimmed_pc, global_coordinates)
     rotated_and_translated_pc = translate_pointcloud_to_global(rotated_pc, global_coordinates)
 
