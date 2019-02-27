@@ -10,20 +10,19 @@ import torch
 # /home/master04/Documents/master_thesis/ProcessingLiDARdata/fake_training_data_trans_1
 # /home/master04/Documents/master_thesis/ProcessingLiDARdata/fake_training_data_rot_5
 # /Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/fake_training_data_translated
-
+# /Users/annikal/Desktop/fake_training_data_trans2
 
 # load old weights! change here manually
 load_weights = False
-load_weights_path = '/home/master04/Documents/master_thesis/First_BEV_Network/trans1/weights/epoch19.pt'
+load_weights_path = '/home/master04/Documents/master_thesis/First_BEV_Network/test/parameters/epoch_29_checkpoint.pt'
 
 model_name = input('Type name of new folder: ')
 n_epochs = int(input('Number of epochs: '))
 learning_rate = float(input('Learning rate: '))
-patience = 10 # Threshold for early stopping. Number of epochs that we will wait until brake
+patience = int(input('Input patience for EarlyStopping: ')) # Threshold for early stopping. Number of epochs that we will wait until brake
 
 path_training_data = input('Path to data set folder: ')
-batch_size_train = 2
-batch_size_val = 2
+batch_size = int(input('Input batch size: '))
 
 print(' ')
 print('Number of GPUs available: ', torch.cuda.device_count())
@@ -51,7 +50,7 @@ CNN.train()
 
 # get data loaders
 kwargs = {'pin_memory': True} if use_cuda else {}
-train_loader, val_loader, test_loader = get_loaders(path_training_data, batch_size_train, batch_size_val, kwargs, train_split=0.8)
+train_loader, val_loader, test_loader = get_loaders(path_training_data, batch_size, kwargs, train_split=0.8)
 
 # create directory for model weights
 current_path = os.getcwd()

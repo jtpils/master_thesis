@@ -4,7 +4,7 @@ from torch.utils.data.sampler import SubsetRandomSampler
 from LiDARDataSet import LiDARDataSet
 
 
-def get_loaders(path_training_data, batch_size_train, batch_size_val, kwargs, train_split=0.7):
+def get_loaders(path_training_data, batch_size, kwargs, train_split=0.7):
     csv_file = path_training_data + '/labels.csv'
     sample_dir = path_training_data + '/samples/'
 
@@ -22,18 +22,18 @@ def get_loaders(path_training_data, batch_size_train, batch_size_val, kwargs, tr
     n_training_samples = len(train_dataset)
     print('Number of training samples: ', n_training_samples)
     train_sampler = SubsetRandomSampler(np.arange(n_training_samples, dtype=np.int64))
-    train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size_train, sampler=train_sampler, num_workers=4, **kwargs)
+    train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size, sampler=train_sampler, num_workers=4, **kwargs)
 
     # Validation
     n_val_samples = len(val_dataset)
     print('Number of validation samples: ', n_val_samples)
     val_sampler = SubsetRandomSampler(np.arange(n_val_samples, dtype=np.int64))
-    val_loader = torch.utils.data.DataLoader(val_dataset, batch_size=batch_size_val, sampler=val_sampler, num_workers=4, **kwargs)
+    val_loader = torch.utils.data.DataLoader(val_dataset, batch_size=batch_size, sampler=val_sampler, num_workers=4, **kwargs)
 
     # Test
     n_test_samples = len(test_dataset)
     print('Number of test samples: ', n_test_samples)
     test_sampler = SubsetRandomSampler(np.arange(n_test_samples, dtype=np.int64))
-    test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=batch_size_val, sampler=test_sampler, num_workers=4, **kwargs)
+    test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=batch_size, sampler=test_sampler, num_workers=4, **kwargs)
 
     return train_loader, val_loader, test_loader
