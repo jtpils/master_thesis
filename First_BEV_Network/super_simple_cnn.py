@@ -23,9 +23,9 @@ class SuperSimpleCNN(torch.nn.Module):
 
         # FC-layers
         # 4 * 50 * 50
-        dim1 = 512
-        dim2 = 256
-        dim3 = 128
+        dim1 = 256
+        dim2 = 64
+        dim3 = 32
         self.fc1 = torch.nn.Linear(4 * 50 * 50, dim1)
         self.fc1_bn = torch.nn.BatchNorm1d(dim1)
 

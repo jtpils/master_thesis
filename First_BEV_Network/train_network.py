@@ -67,7 +67,7 @@ def train_network(net, train_loader, val_loader, n_epochs, learning_rate, patien
 
             # Wrap them in a Variable object
             if use_cuda:
-                sample, labels = Variable(sample).cuda(), Variable(labels).cuda()  # maybe we should use .to(deveice) here?
+                sample, labels = Variable(sample).cuda(), Variable(labels).cuda()  # maybe we should use # .to(deveice) here?
             else:
                 sample, labels = Variable(sample), Variable(labels)
 
