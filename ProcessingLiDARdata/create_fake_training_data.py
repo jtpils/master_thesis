@@ -32,8 +32,8 @@ for file in dir_list:
         path_to_csv = os.path.join(path_to_lidar_data, file)
 
 
-translation = int(input('Translation in meters:'))
-rotation = int(input('Rotation in degrees:'))
+translation = float(input('Translation in meters:'))
+rotation = float(input('Rotation in degrees:'))
 number_of_files_to_load = int(input('How many training samples do you want to create:'))
 print(' ')
 ########################################################################################################
