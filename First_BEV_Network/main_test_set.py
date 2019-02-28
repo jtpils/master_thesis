@@ -14,7 +14,7 @@ import torch
 
 # load old weights! change here manually
 load_weights = True
-load_weights_path = '/Users/annikal/Documents/master_thesis/First_BEV_Network/test/parameters/epoch_24_checkpoint.pt'
+load_weights_path = '/home/master04/Documents/master_thesis/First_BEV_Network/first_model/parameters/epoch_37_checkpoint.pt'
 
 path_training_data = input('Path to data set folder: ')
 
@@ -80,9 +80,19 @@ diff_x = np.array(x_label) - np.array(x_list)
 diff_y = np.array(y_label) - np.array(y_list)
 diff_angle = np.array(angle_label) - np.array(angle_list)
 
+print('diff_x: ', diff_x)
+print('diff_y: ', diff_y)
+print('diff_angle: ', diff_angle)
+
+plt.subplot(1, 2, 1)
 plt.plot(vec, diff_x, label='Difference x')
 plt.plot(vec, diff_y, label='Difference y')
+plt.legend()
+plt.ylabel('Difference in meters')
+
+plt.subplot(1, 2, 2)
 plt.plot(vec, diff_angle, label='Difference angle')
 plt.legend()
-plt.xlabel('Difference in meters or degrees')
+plt.ylabel('Difference in degrees')
+
 plt.show()

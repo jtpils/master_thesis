@@ -13,7 +13,7 @@ import torch
 # /Users/annikal/Desktop/fake_training_data_trans2
 
 # load old weights! change here manually
-'''load_weights = False
+load_weights = False
 load_weights_path = '/home/master04/Documents/master_thesis/First_BEV_Network/test/parameters/epoch_29_checkpoint.pt'
 
 model_name = input('Type name of new folder: ')
@@ -22,7 +22,7 @@ learning_rate = float(input('Learning rate: '))
 patience = int(input('Input patience for EarlyStopping: ')) # Threshold for early stopping. Number of epochs that we will wait until brake
 
 path_training_data = input('Path to data set folder: ')
-batch_size = int(input('Input batch size: '))'''
+batch_size = int(input('Input batch size: '))
 
 print(' ')
 print('Number of GPUs available: ', torch.cuda.device_count())
@@ -32,20 +32,14 @@ device = torch.device("cuda" if use_cuda else "cpu")
 print('Device: ', device)
 
 
-# use_gpu = int(input('Enter 0 for cpu, 1 for gpu:'))  # check that the user really provides 0 or 1
-
-# Create network instance
-#CNN = FirstBEVNet().to(device)
 CNN = SuperSimpleCNN().to(device)
-# if use_gpu:
-#     CNN = CNN.cuda()
 print('Are model parameters on CUDA? ', next(CNN.parameters()).is_cuda)
 print(' ')
 
 pytorch_total_params = sum(p.numel() for p in CNN.parameters() if p.requires_grad)
 print(pytorch_total_params)
 
-'''
+
 # Load weights
 if load_weights:
     network_param = torch.load(load_weights_path)
@@ -80,4 +74,4 @@ loss_path = os.path.join(model_path, 'train_loss.npy')
 np.save(loss_path, train_loss)
 loss_path = os.path.join(model_path, 'val_loss.npy')
 np.save(loss_path, val_loss)
-'''
+
