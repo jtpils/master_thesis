@@ -2,6 +2,7 @@ import numpy as np
 from PIL import Image
 import os
 import sys
+import pandas as pd
 
 
 def load_data(path_to_ply, path_to_csv):
@@ -19,9 +20,9 @@ def load_data(path_to_ply, path_to_csv):
     '''
 
     # load pointcloud
-    point_cloud = np.loadtxt(path_to_ply, skiprows=7)
-    point_cloud[:, 1] = - point_cloud[:, 1]
-    point_cloud[:, -1] = - point_cloud[:, -1]
+    point_cloud = pd.read_csv(path_to_ply, delimiter=' ', skiprows=7, header=None, names=('x','y','z'))
+    point_cloud = point_cloud.values
+    point_cloud[:, -1] = - point_cloud[:, -1]  # z = -z
 
     # check if ply file is empty. Stop execution if it is.
     if np.shape(point_cloud)[0] == 0:
@@ -31,15 +32,20 @@ def load_data(path_to_ply, path_to_csv):
     # extract frame_number from filename
     file_name = path_to_ply.split('/')[-1]  # keep the last part of the path, i.e. the file name
     frame_number = int(file_name[:-4])  # remove the part '.ply' and convert to int
-    #print('frame number', frame_number)
+
     # load csv-file with global coordinates
-    global_coordinates = np.loadtxt(path_to_csv, skiprows=1, delimiter=',')
+    global_coordinates = pd.read_csv(path_to_csv)
+    global_coordinates = global_coordinates.values
+
 
     # extract information from csv at given frame_number
     row = np.where(global_coordinates == frame_number)[0]  # returns which row the frame number is located on
-    #print('row where to find frame number', row)
     global_lidar_coordinates = global_coordinates[row, 1:5]
-    global_lidar_coordinates[0][3] = global_lidar_coordinates[0][3] + 90
+    if global_lidar_coordinates[0][3] < 0:
+        global_lidar_coordinates[0][3] = global_lidar_coordinates[0][3] + 360  # change to interval [0,360]
+    global_lidar_coordinates[0][3] = global_lidar_coordinates[0][3] + 90  # add 90
+
+    global_lidar_coordinates[0][1] = -global_lidar_coordinates[0][1]  # y = -y
 
     return point_cloud, global_lidar_coordinates #, frame_number
 
@@ -52,14 +58,13 @@ def rotate_pointcloud_to_global(pointcloud, global_coordinates):
     :return: rotated_pointcloud: rotated pointcloud, but coordinates are stil relative to LiDAR (not global)
     '''
 
-    number_of_points = len(pointcloud)  # number of points in the pointcloud
-
-    yaw = np.deg2rad(global_coordinates[0, 3])  # convert yaw in degrees to radians
+    yaw = np.deg2rad(global_coordinates[0, 3]) # convert yaw in degrees to radians
     c, s = np.cos(yaw), np.sin(yaw)
     Rz = np.array(((c, -s, 0), (s, c, 0), (0, 0, 1))) # Rotation matrix
-
     rotated_pointcloud = Rz @ np.transpose(pointcloud) # rotate each vector with coordinates, transpose to get dimensions correctly
-    rotated_pointcloud = np.transpose(np.reshape(rotated_pointcloud, (3, number_of_points)))  # reshape and transpose back
+    rotated_pointcloud = np.transpose(rotated_pointcloud)
+
+    rotated_pointcloud[:,1] = -rotated_pointcloud[:,1]  # y = -y
 
     return rotated_pointcloud
 
@@ -73,7 +78,7 @@ def translate_pointcloud_to_global(pointcloud, global_coordinates):
     :return: global_pointcloud
     '''
 
-    global_pointcloud = pointcloud + global_coordinates[0, :3]  #only add xyz (not yaw)
+    global_pointcloud = pointcloud + global_coordinates[0, :3]  # only add xyz (not yaw)
 
     return global_pointcloud
 
@@ -180,7 +185,6 @@ def discretize_pointcloud(trimmed_point_cloud, array_size=600, trim_range=15, sp
     # Normalize the channels. The values should be between 0 and 1
     for channel in range(np.shape(discretized_pointcloud)[0]):
         max_value = np.max(discretized_pointcloud[channel, :, :])
-        # print('Max max_value inarray_to_png: ', max_value)
 
         # avoid division with 0
         if max_value == 0:
@@ -188,7 +192,6 @@ def discretize_pointcloud(trimmed_point_cloud, array_size=600, trim_range=15, sp
 
         scale = 1/max_value
         discretized_pointcloud[channel, :, :] = discretized_pointcloud[channel, :, :] * scale
-        # print('Largest pixel value (should be 1) : ', np.max(discretized_pointcloud[channel, :, :]))
 
     return discretized_pointcloud
 
