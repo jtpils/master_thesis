@@ -10,7 +10,7 @@ import torch
 # /home/master04/Documents/master_thesis/ProcessingLiDARdata/fake_training_data_trans_1
 # /home/master04/Documents/master_thesis/ProcessingLiDARdata/fake_training_data_rot_5
 # /Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/fake_training_data_translated
-
+# /Users/annikal/Desktop/fake_training_data_trans2
 
 # load old weights! change here manually
 '''load_weights = False
