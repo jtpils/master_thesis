@@ -8,7 +8,7 @@ import torch
 
 n_epochs = int(input('number of epochs:'))
 learning_rate = 0.001
-patience = 10
+patience = int(input('patience: '))
 batch_size = 4
 path_training_data = input('path to training data set:')
 
@@ -38,6 +38,7 @@ networks = [net1, net2, net3, net4]
 
 i = 1
 for net in networks:
+    # TODO Write name of network ls
     print("=" * 27)
     net_name = 'parameters_net' + str(i)
     parameter_path = os.path.join(model_path, net_name)
