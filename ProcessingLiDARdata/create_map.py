@@ -1,11 +1,11 @@
 import numpy as np
 from lidar_data_functions import *
-from map_functions import *
+#from map_functions import *
 from matplotlib import pyplot as plt
 
 
-path_to_ply_folder = '/home/master04/Desktop/_out_town2/pc/'
-path_to_csv = '/home/master04/Desktop/_out_town2/town2.csv'
+path_to_ply_folder = '/home/master04/Documents/master_thesis/ProcessingLiDARdata/_out_Town02_190221_1/pc/'
+path_to_csv = '/home/master04/Documents/master_thesis/ProcessingLiDARdata/_out_Town02_190221_1/Town02_190221_1.csv'
 
 # path_to_ply_folder = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/_out_Town02_190221_1/pc/'
 # path_to_csv = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/_out_Town02_190221_1/Town02_190221_1.csv'
@@ -36,7 +36,7 @@ for file in files_in_ply_folder:#[0:10]:  # the last number is how large steps t
     point_cloud, global_coordinates = load_data(path_to_ply, path_to_csv)
 
     # rotate, translate the point cloud to global coordinates and trim the point cloud
-    trimmed_pc = trim_pointcloud(point_cloud, range=20, roof=100, floor=0.5)
+    trimmed_pc = trim_pointcloud(point_cloud, range=25, roof=100, floor=0.5)
 
     rotated_pc = rotate_pointcloud_to_global(trimmed_pc, global_coordinates)
 
@@ -67,6 +67,7 @@ for file in files_in_ply_folder:#[0:10]:  # the last number is how large steps t
         min_y_val = min_y_val_tmp
 
 
+print('Done loading files. Creating map.')
 # delete the zeros in the first row in the super array that was used at the initalization of the array.
 pc_super_array = np.delete(pc_super_array, 0, axis=0)
 
@@ -85,7 +86,7 @@ array_to_png(discretized_pc)
 # normalize the BEV image
 layer = 2
 max_value = np.max(discretized_pc[layer, :, :])
-print('Max max_value inarray_to_png: ', max_value)
+print('Max max_value in array_to_png: ', max_value)
 
 # avoid division with 0
 if max_value == 0:
