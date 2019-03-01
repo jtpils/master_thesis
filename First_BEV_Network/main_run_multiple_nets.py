@@ -29,10 +29,10 @@ print(' ')
 kwargs = {'pin_memory': True} if use_cuda else {}
 train_loader, val_loader, test_loader = get_loaders(path_training_data, batch_size, kwargs)
 
-net1 = SuperSimpleCNN()
-net2 = MoreConv()
-net3 = LargerFilters()
-net4 = MoreConvFC()
+net1 = SuperSimpleCNN().to(device)
+net2 = MoreConv().to(device)
+net3 = LargerFilters().to(device)
+net4 = MoreConvFC().to(device)
 networks = [net1, net2, net3, net4]
 
 
