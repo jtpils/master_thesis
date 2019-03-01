@@ -6,7 +6,6 @@ import time
 import matplotlib.pyplot as plt
 import os
 import sys
-import random
 import math
 
 
@@ -24,19 +23,19 @@ def rounding(n, r=0.05):
     '''
 
     if n >= 0:
-        rounded_number = round(n - math.fmod(n, r),2)
+        rounded_number = round(n - math.fmod(n, r), 2)
         print(rounded_number)
 
     elif n < 0:
         n = -n + 0.06  # The + 0.06 is for get the
-        rounded_number = -round(n - math.fmod(n, r),2)
+        rounded_number = -round(n - math.fmod(n, r), 2)
         print(rounded_number)
 
     return rounded_number
 
 
-
-def get_cut_out(discretized_point_cloud_map, global_coordinate, max_min_values_map, spatial_resolution=0.05, cut_out_size=900):
+def get_cut_out(discretized_point_cloud_map, global_coordinate, max_min_values_map, spatial_resolution=0.05,
+                cut_out_size=900):
     '''
     :param discretized_point_cloud_map: (np.array) The discretized point cloud map, the map is quadratic.
     :param global_coordinate: (np.array) The global coordinate representing the initial guess.
@@ -50,25 +49,29 @@ def get_cut_out(discretized_point_cloud_map, global_coordinate, max_min_values_m
     print('x_max:', x_max, 'x_min:', x_min, 'y_min:', y_min, 'y_max:', y_max)
 
     # check if we have a global coordinate that is outside the map coordinates. If that's the case stop execution.
-    if global_coordinate[0] < x_min or x_max < global_coordinate[0] or global_coordinate[1] < y_min or y_max < global_coordinate[1]:
+    if global_coordinate[0] < x_min or x_max < global_coordinate[0] or global_coordinate[1] < y_min or y_max < \
+            global_coordinate[1]:
         print('Global coordinate,', global_coordinate, ', is located outside the map boundaries.')
         print(' ')
-        print('Maximum x value:', x_max, '. Minimum x value:', x_min, '. Maximum y value:', y_max, '. Minimum y value:', y_min)
-        sys.exit(0) # we do not want to exit we just want to brake try exept. leave the function!
+        print('Maximum x value:', x_max, '. Minimum x value:', x_min, '. Maximum y value:', y_max, '. Minimum y value:',
+              y_min)
+        sys.exit(0)  # we do not want to exit we just want to brake try exept. leave the function!
 
     # PAD THE MAP HERE!
     # Things that need to be considered is if padding the map here the new bounds must be considered!!!
     # The padding is performed by adding image//2-1 zeros below column 0 and image//2 zeros after last column. image//2-1 zeros below row 0 and image//2 zeros after last row.
 
-    pad_size_low = cut_out_size//2 - 1
-    pad_size_high = cut_out_size//2
+    pad_size_low = cut_out_size // 2 - 1
+    pad_size_high = cut_out_size // 2
 
     print('pad size low', pad_size_low)
     print('pad size high', pad_size_high)
 
-    discretized_point_cloud_map = np.pad(discretized_point_cloud_map, [(0, 0), (pad_size_low, pad_size_high), (pad_size_low, pad_size_high)], mode='constant')
+    discretized_point_cloud_map = np.pad(discretized_point_cloud_map,
+                                         [(0, 0), (pad_size_low, pad_size_high), (pad_size_low, pad_size_high)],
+                                         mode='constant')
 
-    #print('discretized pc map:', discretized_point_cloud_map)
+    # print('discretized pc map:', discretized_point_cloud_map)
 
     # here I want to check which cell i want to cut out.
     # Check the x value and "put" it in the right cell of the map
@@ -76,10 +79,10 @@ def get_cut_out(discretized_point_cloud_map, global_coordinate, max_min_values_m
 
     cell_check_x = rounding(x_min) - pad_size_low
     print('start_cell_check', cell_check_x)
-    #cell_check_x = (int(np.floor(x_min)) - pad_size_low) # we want to start at the nearest sppatial resolution.
-    k = 0 # sice python starts at 0
+    # cell_check_x = (int(np.floor(x_min)) - pad_size_low) # we want to start at the nearest sppatial resolution.
+    k = 0  # sice python starts at 0
     while cell_check_x < global_coordinate[0]:
-        #print('cell_location: ', cell_location)
+        # print('cell_location: ', cell_location)
         x_cell = k
         k += 1
         cell_check_x += spatial_resolution
@@ -90,12 +93,12 @@ def get_cut_out(discretized_point_cloud_map, global_coordinate, max_min_values_m
     # Check the y value and "put" it in the right cell of the map
     # Now the bounds must be fixed since the map now is bigger and have zeros! Lower bound of y is now (y_min - pad_size_low) and Upper bound of y is (y_max + pad_size_high)
 
-    #cell_check_y = int(np.floor(y_min)) - pad_size_low #
+    # cell_check_y = int(np.floor(y_min)) - pad_size_low #
     cell_check_y = rounding(y_min) - pad_size_low
     print('start_cell_check', cell_check_y)
-    k = 0 # sice python starts at 0
+    k = 0  # sice python starts at 0
     while cell_check_y < global_coordinate[1]:
-        #print('cell_location: ', cell_location)
+        # print('cell_location: ', cell_location)
         y_cell = k
         k += 1
         cell_check_y += spatial_resolution
@@ -103,12 +106,11 @@ def get_cut_out(discretized_point_cloud_map, global_coordinate, max_min_values_m
 
     print('y_cell: ', y_cell)
 
+    # start to find deviation how to cut the map and then cut out a piece.
 
-    # start to find deviation how to cut the map and then cut out a piece. 
-    
-    deviation_from_cell_low = cut_out_size//2 - 1
-    deviation_from_cell_high = cut_out_size//2 
-    
+    deviation_from_cell_low = cut_out_size // 2 - 1
+    deviation_from_cell_high = cut_out_size // 2
+
     print('deviation from cell low:', deviation_from_cell_low)
     print('deviation from cell high:', deviation_from_cell_high)
 
@@ -120,22 +122,22 @@ def get_cut_out(discretized_point_cloud_map, global_coordinate, max_min_values_m
     upper_bound_row = row_cell + deviation_from_cell_high + 1  # +1 to include upper bound
 
     lower_bound_col = col_cell - deviation_from_cell_low
-    upper_bound_col = col_cell + deviation_from_cell_high + 1 # +1 to include upper bound
+    upper_bound_col = col_cell + deviation_from_cell_high + 1  # +1 to include upper bound
 
-    print('low bound row:' , lower_bound_row)
-    print('high bound row:' , upper_bound_row)
+    print('low bound row:', lower_bound_row)
+    print('high bound row:', upper_bound_row)
 
     print('low bound col:', lower_bound_col)
     print('high bound col:', upper_bound_col)
 
-    print(discretized_point_cloud_map[0,:,:])
+    print(discretized_point_cloud_map[0, :, :])
 
     # Do the cut out
     cut_out = discretized_point_cloud_map[:, lower_bound_row:upper_bound_row, lower_bound_col:upper_bound_col]
 
     print(np.shape(cut_out))
 
-    print(cut_out[0,:,:])
+    print(cut_out[0, :, :])
 
     return cut_out
 
@@ -169,3 +171,6 @@ global_coordinate = [0.01,0.63, 3]  # x,y,z
 #global_coordinate = [3.35, 8.32, 3.2, 1.3, 0.2, 0.0, 10]
 cut_out = get_cut_out(discretize_pointcloud_map, global_coordinate, max_min_values_map, spatial_resolution, cut_out_size)
 '''
+
+
+
