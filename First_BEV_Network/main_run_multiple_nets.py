@@ -1,6 +1,6 @@
 from data_loader import *
 from train_network import *
-from super_simple_cnn import SuperSimpleCNN
+from super_simple_cnn import *
 import matplotlib.pyplot as plt
 import os
 import torch
@@ -8,7 +8,7 @@ import torch
 
 n_epochs = 1
 learning_rate = 0.001
-patience = 30
+patience = 10
 batch_size = 4
 path_training_data = '/home/master04/Desktop/fake_training_data_small_set'
 
@@ -30,8 +30,10 @@ kwargs = {'pin_memory': True} if use_cuda else {}
 train_loader, val_loader, test_loader = get_loaders(path_training_data, batch_size, kwargs)
 
 net1 = SuperSimpleCNN()
-net2 = SuperSimpleCNN()
-networks = [net1, net2]
+net2 = MoreConv()
+net3 = LargerFilters()
+net4 = MoreConvFC()
+networks = [net1, net2, net3, net4]
 
 
 i = 1
