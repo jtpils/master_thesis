@@ -6,11 +6,11 @@ import os
 import torch
 
 
-n_epochs = 1
+n_epochs = int(input('number of epochs:'))
 learning_rate = 0.001
 patience = 10
 batch_size = 4
-path_training_data = '/home/master04/Desktop/fake_training_data_small_set'
+path_training_data = input('path to training data set:')
 
 # create directory for model weights
 current_path = os.getcwd()
