@@ -27,8 +27,8 @@ def train_network(net, train_loader, val_loader, n_epochs, learning_rate, patien
     # print("batch_size =", batch_size)
     print("epochs =", n_epochs)
     print("initial learning_rate =", learning_rate)
-    print("=" * 30)
     print('patience:', patience)
+    print("=" * 27)
 
     # declare variables for storing validation and training loss to return
     val_loss = []
@@ -43,7 +43,7 @@ def train_network(net, train_loader, val_loader, n_epochs, learning_rate, patien
 
     # Create our loss and optimizer functions
     loss, optimizer = create_loss_and_optimizer(net, learning_rate)
-    scheduler = StepLR(optimizer, step_size=20, gamma=0.1)
+    scheduler = StepLR(optimizer, step_size=15, gamma=0.5)
 
     # Time for printing
     training_start_time = time.time()

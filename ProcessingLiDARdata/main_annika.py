@@ -1,75 +1,36 @@
 import numpy as np
 from lidar_data_functions import *
-from PIL import Image
-import matplotlib.pyplot as plt
-import csv
+from map_functions import *
+from matplotlib import pyplot as plt
+import pandas as pd
 
 
-########################################################################################################
-# A FIRST SKETCH ON HOW TO CREATE FAKE TRAINING SAMPLES (of one single sweep) WITHOUT A NEED FOR A MAP #
-########################################################################################################
+path_to_ply = '/home/master04/Desktop/_out_town2/pc/059176.ply'
+path_to_csv = '/home/master04/Desktop/_out_town2/town2.csv'
 
-'''
-input_folder_name = input('Type name of new folder:')
 
-folder_name = '/data_' + input_folder_name
-current_path = os.getcwd()
-folder_path = current_path + folder_name
-path_sweeps = folder_path + '/sweeps'
-path_cutouts = folder_path + '/cutouts'
+point_cloud, global_coordinates = load_data(path_to_ply, path_to_csv)
 
-try:
-    os.mkdir(folder_path)
-    os.mkdir(path_sweeps)
-    os.mkdir(path_cutouts)
-except OSError:
-    print('Failed to create new directory.')
-else:
-    print('Successfully created new directory with subdirectories. ')
-'''
+# rotate, translate the point cloud to global coordinates and trim the point cloud
+trimmed_pc = trim_pointcloud(point_cloud, range=20, roof=100, floor=0.5)
 
-path_to_csv = '/Users/annikal/Desktop/drive-download-20190220T155133Z-001/_out_framenumber/framenumber.csv'
-path_to_pc = '/Users/annikal/Desktop/drive-download-20190220T155133Z-001/_out_framenumber/pc/'
+rotated_pc = rotate_pointcloud_to_global(trimmed_pc, global_coordinates)
 
-# create a list of all ply-files in a directory
-ply_files = os.listdir(path_to_pc)
-'''
-# create csv-file with header: frame_number, x, y, angle (i.e. the labels)
-csv_path = folder_path + '/labels.csv'
-with open(csv_path, mode='w') as csv_file:
-    fieldnames = ['frame_number', 'x', 'y', 'angle']
-    csv_writer = csv.writer(csv_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-    csv_writer.writerow(fieldnames)
-'''
-i=0
-for file_name in ply_files[:10]:
-    i = i+1
-    print('File ', i, ' of ', len(ply_files))
+rotated_and_translated_pc = translate_pointcloud_to_global(rotated_pc, global_coordinates)
 
-    # Load data:
-    path_to_ply = path_to_pc + file_name
-    pc, global_lidar_coordinates = load_data(path_to_ply, path_to_csv)
+# global_coordinates_plot = np.loadtxt(path_to_csv, skiprows=1, delimiter=',')
+global_coordinates_plot = pd.read_csv(path_to_csv)
+global_coordinates_plot = global_coordinates_plot.values
+global_coordinates_plot[:,2] = - global_coordinates_plot[:,2]
 
-    '''
-    # create the sweep, transform a bit to create training sample
-    print('creating sweep...')
-    rand_trans = random_rigid_transformation(1, 10)
-    sweep = training_sample_rotation_translation(pc, rand_trans)
-    sweep = trim_pointcloud(sweep)
-    sweep_image = discretize_pointcloud(sweep)
-    path = path_sweeps + '/' + str(frame_number)
-    np.save(path, sweep_image)
+x = rotated_and_translated_pc[:, 0]
+y = rotated_and_translated_pc[:, 1]
+#print(x)
 
-    # fake a map cutout
-    print('creating cutout...')
-    cutout = trim_pointcloud(pc, range=1.5*15)
-    cutout_image = discretize_pointcloud(cutout, array_size=600*1.5, trim_range=1.5*15)
-    path = path_cutouts + '/' + str(frame_number)
-    np.save(path, cutout_image)
-
-    # write frame_number in column 1, and the transformation in the next columns
-    with open(csv_path , mode = 'a') as csv_file:
-        csv_writer = csv.writer(csv_file, delimiter=',' , quotechar='"', quoting=csv.QUOTE_MINIMAL)
-        csv_writer.writerow([frame_number, rand_trans[0], rand_trans[1], rand_trans[2]])'''
+plt.plot(x , y,  'b.')
+plt.plot(global_coordinates_plot[:, 1],global_coordinates_plot[:, 2],'kd')
+plt.ylabel('y')
+plt.xlabel('x')
+plt.show()
 
 

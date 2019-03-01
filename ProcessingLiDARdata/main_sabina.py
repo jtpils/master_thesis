@@ -35,6 +35,7 @@ def rounding(n, r=0.05):
     return rounded_number
 
 
+
 def get_cut_out(discretized_point_cloud_map, global_coordinate, max_min_values_map, spatial_resolution=0.05, cut_out_size=900):
     '''
     :param discretized_point_cloud_map: (np.array) The discretized point cloud map, the map is quadratic.
@@ -168,6 +169,3 @@ global_coordinate = [0.01,0.63, 3]  # x,y,z
 #global_coordinate = [3.35, 8.32, 3.2, 1.3, 0.2, 0.0, 10]
 cut_out = get_cut_out(discretize_pointcloud_map, global_coordinate, max_min_values_map, spatial_resolution, cut_out_size)
 '''
-
-
-
