@@ -1,14 +1,14 @@
 import numpy as np
 from lidar_data_functions import *
-from map_functions import *
 from matplotlib import pyplot as plt
+from get_cut_out_function import *
 
 
-path_to_ply_folder = '/home/master04/Desktop/_out_town2/pc/'
-path_to_csv = '/home/master04/Desktop/_out_town2/town2.csv'
-
-# path_to_ply_folder = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/_out_Town02_190221_1/pc/'
-# path_to_csv = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/_out_Town02_190221_1/Town02_190221_1.csv'
+#path_to_ply_folder = '/home/master04/Desktop/_out_town2/pc/'
+#path_to_csv = '/home/master04/Desktop/_out_town2/town2.csv'
+'''
+path_to_ply_folder = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/_out_Town02_190221_1/pc/'
+path_to_csv = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/_out_Town02_190221_1/Town02_190221_1.csv'
 
 
 files_in_ply_folder = os.listdir(path_to_ply_folder)
@@ -75,12 +75,13 @@ min_max = np.array((min_x_val, max_x_val, min_y_val, max_y_val))
 
 # Discretize the point cloud.
 discretized_pc = discretize_pointcloud_map(pc_super_array, min_max)
-np.save('map.npy', discretized_pc)
+# np.save('map_190302.npy', discretized_pc)
 
 # UNCOMMENT IF YOU WANT TO SAVE THE DISCRETIZED MAP.
-array_to_png(discretized_pc)
+array_to_png(discretized_pc, min_max)
+'''
 
-
+'''
 # VISUALIZATION OF DISCRETIZED MAP 
 # normalize the BEV image
 layer = 2
@@ -98,3 +99,18 @@ print('Largest pixel value (should be 255) : ', np.max(discretized_pc[layer, :, 
 img = Image.fromarray(discretized_pc[layer, :, :])
 new_img = img.convert("L")
 new_img.rotate(180).show()
+'''
+
+# load the map
+#discretized_pc = np.load('/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/map_190302_1/map.npy')
+
+#load the max min values 
+max_min_values_map = np.load('/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/map_190302_1/max_min.npy')
+print('max min value map (max_x, min_x, max_y, min_y): ', max_min_values_map)
+
+# take a random global coordinate 
+row = random.randint(0, len(global_coordinates))
+global_coordinate = global_coordinates[row,:]
+print('global coordninates: ', global_coordinate)
+
+cut_out = get_cut_out(discretize_pointcloud_map, global_coordinate, max_min_values_map)
