@@ -1,9 +1,6 @@
 import numpy as np
 from lidar_data_functions import *
-<<<<<<< HEAD
-=======
 #from map_functions import *
->>>>>>> 324d3036c9b84774493ab452fe051fd1864bfb70
 from matplotlib import pyplot as plt
 from get_cut_out_function import *
 
