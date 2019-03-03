@@ -80,7 +80,7 @@ min_max = np.array((min_x_val, max_x_val, min_y_val, max_y_val))
 discretized_pc = discretize_pointcloud_map(pc_super_array, min_max, spatial_resolution=0.5)
 
 # UNCOMMENT IF YOU WANT TO SAVE THE DISCRETIZED MAP AS AN PNG AND ITS VALUES.
-# array_to_png(discretized_pc, min_max)
+array_to_png(discretized_pc, min_max)
 
 '''
 # VISUALIZATION OF DISCRETIZED MAP 
