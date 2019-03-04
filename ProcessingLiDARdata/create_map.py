@@ -25,7 +25,7 @@ min_y_val = float("inf")
 i = 0
 
 
-for file in files_in_ply_folder[0::10]:  # the last number is how large steps to take
+for file in files_in_ply_folder[0::30]:  # the last number is how large steps to take
     try:
         # Create the path to the ply file
         path_to_ply = path_to_ply_folder + file
@@ -77,7 +77,7 @@ pc_super_array = np.delete(pc_super_array, 0, axis=0)
 min_max = np.array((min_x_val, max_x_val, min_y_val, max_y_val))
 
 # Discretize the point cloud. OBS Now we use spatial resolution 0.5!!!
-discretized_pc = discretize_pointcloud_map(pc_super_array, min_max, spatial_resolution=0.5)
+discretized_pc = discretize_pointcloud_map(pc_super_array, min_max, spatial_resolution=0.05)
 
 # UNCOMMENT IF YOU WANT TO SAVE THE DISCRETIZED MAP AS AN PNG AND ITS VALUES.
 array_to_png(discretized_pc, min_max)

@@ -24,11 +24,9 @@ def rounding(n, r=0.05):
 
     if n >= 0:
         rounded_number = round(n - math.fmod(n, r), 2)
-
     elif n < 0:
-        n = -n + (r + r/5) # The + 0.06 is for get the right interval when having negative number
+        n = -n + (r + r/5) # The + (r + r/5) is for get the right interval when having negative number
         rounded_number = -round(n - math.fmod(n, r), 2)
-
     return rounded_number
 
 
@@ -66,7 +64,7 @@ def get_cut_out(discretized_point_cloud_map, global_coordinate, max_min_values_m
     pad_size_low = cut_out_size // 2 - 1
     pad_size_high = cut_out_size // 2
 
-   # print('shape of map befor padding',np.shape(discretized_point_cloud_map))
+    # print('shape of map befor padding',np.shape(discretized_point_cloud_map))
     discretized_point_cloud_map = np.pad(discretized_point_cloud_map,
                                          [(0, 0), (pad_size_low, pad_size_high), (pad_size_low, pad_size_high)],
                                          mode='constant')
@@ -76,7 +74,7 @@ def get_cut_out(discretized_point_cloud_map, global_coordinate, max_min_values_m
     # Bounds must be fixed since the map now is bigger and have zeros! Lower bound of x is now (x_min - pad_size_low)
     # and Upper bound of x is (x_max + pad_size_high)
 
-    cell_check_x = rounding(x_min, spatial_resolution) - pad_size_low
+    cell_check_x = rounding(x_min, spatial_resolution) - pad_size_low*spatial_resolution
     # print('start_cell_check', cell_check_x)
     k = 0  # sice python starts at 0
     while cell_check_x < global_coordinate[0]:
@@ -89,7 +87,7 @@ def get_cut_out(discretized_point_cloud_map, global_coordinate, max_min_values_m
     # Bounds must be fixed since the map now is bigger and have zeros! Lower bound of y is now (y_min - pad_size_low)
     # and Upper bound of y is (y_max + pad_size_high)
 
-    cell_check_y = rounding(y_min, spatial_resolution) - pad_size_low
+    cell_check_y = rounding(y_min, spatial_resolution) - pad_size_low*spatial_resolution
     # print('start_cell_check', cell_check_y)
     k = 0  # since python starts at 0
     while cell_check_y < global_coordinate[1]:
@@ -102,8 +100,8 @@ def get_cut_out(discretized_point_cloud_map, global_coordinate, max_min_values_m
     deviation_from_cell_low = cut_out_size // 2 - 1
     deviation_from_cell_high = cut_out_size // 2
 
-    #print('deviation from cell low:', deviation_from_cell_low)
-    #print('deviation from cell high:', deviation_from_cell_high)
+    # print('deviation from cell low:', deviation_from_cell_low)
+    # print('deviation from cell high:', deviation_from_cell_high)
 
     # variable name change for clarifying row and column bounds.
     col_cell = x_cell
@@ -131,15 +129,15 @@ def get_cut_out(discretized_point_cloud_map, global_coordinate, max_min_values_m
 for i in range(1):  # range sets how many cut_outs to do.
 
     # load the global coordinates
-    path_to_csv = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/_out_Town02_190221_1/Town02_190221_1.csv'
+    path_to_csv = '/home/master04/Desktop/_out_Town02_190221_1/Town02_190221_1.csv'
     global_coordinates_pc = pd.read_csv(path_to_csv)
     global_coordinates_pc = global_coordinates_pc.values
     # load the map
-    discretized_pc_map = np.load('/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/map_190302_1/map.npy')
+    discretized_pc_map = np.load('/home/master04/Documents/master_thesis/ProcessingLiDARdata/map_190304_testing/map.npy')
 
     #load the max min values
-    max_min_values_map = np.load('/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/map_190302_1/max_min.npy')
-   # print( 'x_min:', max_min_values_map[0],'x_max:', max_min_values_map[1], 'y_min:', max_min_values_map[2], 'y_max:', max_min_values_map[3])
+    max_min_values_map = np.load('/home/master04/Documents/master_thesis/ProcessingLiDARdata/map_190304_testing/max_min.npy')
+    print( 'x_min:', max_min_values_map[0],'x_max:', max_min_values_map[1], 'y_min:', max_min_values_map[2], 'y_max:', max_min_values_map[3])
 
     # take a random global coordinate
     row = random.randint(0, len(global_coordinates_pc))
@@ -147,14 +145,12 @@ for i in range(1):  # range sets how many cut_outs to do.
     global_coordinates = global_coordinates_pc[row,1:4]
     global_coordinates[1] = -global_coordinates[1]
 
-    global_coordinates = np.array([-60, -400, 5])
-
     print('global coordninates: ', global_coordinates)
 
 
     # Since the spatial resolution of the map in the testing is 0.5 i.e 10 times smaller than the real map is going to
     # be the cut out must be 10 times smaller as well, there of 90 in stead of 900
-    cut_out = get_cut_out(discretized_pc_map, global_coordinates, max_min_values_map, spatial_resolution=0.5, cut_out_size=90)
+    cut_out = get_cut_out(discretized_pc_map, global_coordinates, max_min_values_map, spatial_resolution=0.05, cut_out_size=900)
     print('shape of the cut_out: ' , np.shape(cut_out))
 
     # VISUALIZATION OF DISCRETIZED CUT OUT
