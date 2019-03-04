@@ -10,12 +10,12 @@ import math
 
 
 # TODO: check that it works with the spatial resolution = 0.05.
-#  Change in discretized map: return the max and min values of the map.
 #  Test to use a discretized map and do a cut out that is 900x900 (show the map and the cut out).
 #  Annika code check
 
 def rounding(n, r=0.05):
     '''
+    Function for round down to nearest r.
 
     :param n: Number that is goint to be round
     :param r: The number that we want to round to Now it works only with 0.05
@@ -24,12 +24,10 @@ def rounding(n, r=0.05):
 
     if n >= 0:
         rounded_number = round(n - math.fmod(n, r), 2)
-        print(rounded_number)
 
     elif n < 0:
-        n = -n + 0.06  # The + 0.06 is for get the
+        n = -n + (r + r/5) # The + 0.06 is for get the right interval when having negative number
         rounded_number = -round(n - math.fmod(n, r), 2)
-        print(rounded_number)
 
     return rounded_number
 
@@ -37,6 +35,8 @@ def rounding(n, r=0.05):
 def get_cut_out(discretized_point_cloud_map, global_coordinate, max_min_values_map, spatial_resolution=0.05,
                 cut_out_size=900):
     '''
+    Function that creates a cut out from the discretized map.
+
     :param discretized_point_cloud_map: (np.array) The discretized point cloud map, the map is quadratic.
     :param global_coordinate: (np.array) The global coordinate representing the initial guess.
     :param max_min_values_map: (np.array) The maximum and minimum values map defining the corners of the map. (This should be an output from the discretize map function
@@ -44,79 +44,70 @@ def get_cut_out(discretized_point_cloud_map, global_coordinate, max_min_values_m
     :param cut_out_size: (int) The size of the cut_out. The cut_out should be quadratic, e.g 900x900
     :return: cut_out: (np.array) A cut out of the map at the initial guess.
     '''
-
     x_min, x_max, y_min, y_max = max_min_values_map
-    print('x_max:', x_max, 'x_min:', x_min, 'y_min:', y_min, 'y_max:', y_max)
 
     # check if we have a global coordinate that is outside the map coordinates. If that's the case stop execution.
     if global_coordinate[0] < x_min or x_max < global_coordinate[0] or global_coordinate[1] < y_min or y_max < \
             global_coordinate[1]:
         print('Global coordinate,', global_coordinate, ', is located outside the map boundaries.')
-        print(' ')
+
         print('Maximum x value:', x_max, '. Minimum x value:', x_min, '. Maximum y value:', y_max, '. Minimum y value:',
               y_min)
-        sys.exit(0)  # we do not want to exit we just want to brake try exept. leave the function!
+
+        print(' ')
+        return None
+        #sys.exit(0)  # we do not want to exit we just want to brake try exept. leave the function!
 
     # PAD THE MAP HERE!
     # Things that need to be considered is if padding the map here the new bounds must be considered!!!
-    # The padding is performed by adding image//2-1 zeros below column 0 and image//2 zeros after last column. image//2-1 zeros below row 0 and image//2 zeros after last row.
+    # The padding is performed by adding image//2-1 zeros below column 0 and image//2 zeros after last column.
+    # image//2-1 zeros below row 0 and image//2 zeros after last row.
 
     pad_size_low = cut_out_size // 2 - 1
     pad_size_high = cut_out_size // 2
 
-    print('pad size low', pad_size_low)
-    print('pad size high', pad_size_high)
-
+   # print('shape of map befor padding',np.shape(discretized_point_cloud_map))
     discretized_point_cloud_map = np.pad(discretized_point_cloud_map,
                                          [(0, 0), (pad_size_low, pad_size_high), (pad_size_low, pad_size_high)],
                                          mode='constant')
+    # print('shape of map after padding', np.shape(discretized_point_cloud_map))
 
-    # print('discretized pc map:', discretized_point_cloud_map)
-
-    # here I want to check which cell i want to cut out.
     # Check the x value and "put" it in the right cell of the map
-    # Now the bounds must be fixed since the map now is bigger and have zeros! Lower bound of x is now (x_min - pad_size_low) and Upper bound of x is (x_max + pad_size_high)
+    # Bounds must be fixed since the map now is bigger and have zeros! Lower bound of x is now (x_min - pad_size_low)
+    # and Upper bound of x is (x_max + pad_size_high)
 
-    cell_check_x = rounding(x_min) - pad_size_low
-    print('start_cell_check', cell_check_x)
-    # cell_check_x = (int(np.floor(x_min)) - pad_size_low) # we want to start at the nearest sppatial resolution.
+    cell_check_x = rounding(x_min, spatial_resolution) - pad_size_low
+    # print('start_cell_check', cell_check_x)
     k = 0  # sice python starts at 0
     while cell_check_x < global_coordinate[0]:
-        # print('cell_location: ', cell_location)
         x_cell = k
         k += 1
         cell_check_x += spatial_resolution
-        print('cell_check:', cell_check_x, ', x_cell:', x_cell)
-
-    print('x_cell: ', x_cell)
+    # print('x_cell: ', x_cell)
 
     # Check the y value and "put" it in the right cell of the map
-    # Now the bounds must be fixed since the map now is bigger and have zeros! Lower bound of y is now (y_min - pad_size_low) and Upper bound of y is (y_max + pad_size_high)
+    # Bounds must be fixed since the map now is bigger and have zeros! Lower bound of y is now (y_min - pad_size_low)
+    # and Upper bound of y is (y_max + pad_size_high)
 
-    # cell_check_y = int(np.floor(y_min)) - pad_size_low #
-    cell_check_y = rounding(y_min) - pad_size_low
-    print('start_cell_check', cell_check_y)
-    k = 0  # sice python starts at 0
+    cell_check_y = rounding(y_min, spatial_resolution) - pad_size_low
+    # print('start_cell_check', cell_check_y)
+    k = 0  # since python starts at 0
     while cell_check_y < global_coordinate[1]:
-        # print('cell_location: ', cell_location)
         y_cell = k
         k += 1
         cell_check_y += spatial_resolution
-        print('y_cell_check:', cell_check_y, ', y_cell:', y_cell)
-
-    print('y_cell: ', y_cell)
+    # print('y_cell: ', y_cell)
 
     # start to find deviation how to cut the map and then cut out a piece.
-
     deviation_from_cell_low = cut_out_size // 2 - 1
     deviation_from_cell_high = cut_out_size // 2
 
-    print('deviation from cell low:', deviation_from_cell_low)
-    print('deviation from cell high:', deviation_from_cell_high)
+    #print('deviation from cell low:', deviation_from_cell_low)
+    #print('deviation from cell high:', deviation_from_cell_high)
 
-    # for clarifying rox and column bounds.
-    row_cell = y_cell
+    # variable name change for clarifying row and column bounds.
     col_cell = x_cell
+    row_cell = y_cell
 
     lower_bound_row = row_cell - deviation_from_cell_low
     upper_bound_row = row_cell + deviation_from_cell_high + 1  # +1 to include upper bound
@@ -124,53 +115,82 @@ def get_cut_out(discretized_point_cloud_map, global_coordinate, max_min_values_m
     lower_bound_col = col_cell - deviation_from_cell_low
     upper_bound_col = col_cell + deviation_from_cell_high + 1  # +1 to include upper bound
 
-    print('low bound row:', lower_bound_row)
-    print('high bound row:', upper_bound_row)
+    # print('low bound row:', lower_bound_row)
+    # print('high bound row:', upper_bound_row)
 
-    print('low bound col:', lower_bound_col)
-    print('high bound col:', upper_bound_col)
+    # print('low bound col:', lower_bound_col)
+    # print('high bound col:', upper_bound_col)
 
-    print(discretized_point_cloud_map[0, :, :])
-
-    # Do the cut out
+    # Create the cut out
     cut_out = discretized_point_cloud_map[:, lower_bound_row:upper_bound_row, lower_bound_col:upper_bound_col]
-
-    print(np.shape(cut_out))
-
-    print(cut_out[0, :, :])
 
     return cut_out
 
+'''
+# Test the function with this section. 
+for i in range(1):  # range sets how many cut_outs to do.
 
-# TIME TO TEST ON A REAL MAP!
+    # load the global coordinates
+    path_to_csv = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/_out_Town02_190221_1/Town02_190221_1.csv'
+    global_coordinates_pc = pd.read_csv(path_to_csv)
+    global_coordinates_pc = global_coordinates_pc.values
+    # load the map
+    discretized_pc_map = np.load('/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/map_190302_1/map.npy')
+
+    #load the max min values
+    max_min_values_map = np.load('/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/map_190302_1/max_min.npy')
+   # print( 'x_min:', max_min_values_map[0],'x_max:', max_min_values_map[1], 'y_min:', max_min_values_map[2], 'y_max:', max_min_values_map[3])
+
+    # take a random global coordinate
+    row = random.randint(0, len(global_coordinates_pc))
+    print('row', row)
+    global_coordinates = global_coordinates_pc[row,1:4]
+    global_coordinates[1] = -global_coordinates[1]
+
+    global_coordinates = np.array([-60, -400, 5])
+
+    print('global coordninates: ', global_coordinates)
+
+
+    # Since the spatial resolution of the map in the testing is 0.5 i.e 10 times smaller than the real map is going to
+    # be the cut out must be 10 times smaller as well, there of 90 in stead of 900
+    cut_out = get_cut_out(discretized_pc_map, global_coordinates, max_min_values_map, spatial_resolution=0.5, cut_out_size=90)
+    print('shape of the cut_out: ' , np.shape(cut_out))
+
+    # VISUALIZATION OF DISCRETIZED CUT OUT
+    layer = 2
+    max_value = np.max(cut_out[layer, :, :])
+    print('Max max_value in array_to_png: ', max_value)
+
+    # avoid division with 0
+    if max_value == 0:
+        max_value = 1
+
+    scale = 255/max_value
+    cut_out[layer, :, :] = cut_out[layer, :, :] * scale
+    print('Largest pixel value (should be 255) : ', np.max(cut_out[layer, :, :]))
+
+    img = Image.fromarray(cut_out[layer, :, :])
+    new_img = img.convert("L")
+    new_img.rotate(180).show()
+
+
+# VISUALIZATION OF DISCRETIZED MAP
+# normalize the BEV image
+layer = 2
+max_value = np.max(discretized_pc_map[layer, :, :])
+print('Max max_value in array_to_png: ', max_value)
+
+# avoid division with 0
+if max_value == 0:
+    max_value = 1
+
+scale = 255/max_value
+discretized_pc_map[layer, :, :] = discretized_pc_map[layer, :, :] * scale
+print('Largest pixel value (should be 255) : ', np.max(discretized_pc_map[layer, :, :]))
+
+img = Image.fromarray(discretized_pc_map[layer, :, :])
+new_img = img.convert("L")
+new_img.rotate(180).show()
 
 '''
-max_min_values_map = np.array((0, 1, 0, 1))
-x_min, x_max, y_min, y_max = max_min_values_map
-spatial_resolution = 0.05
-number_x_cells = int(np.ceil((x_max - x_min) / spatial_resolution))  # should there be a +1 or -1 or something like that? Now Sabina has set 10 of some reason she can't explain.
-number_y_cells = int(np.ceil((y_max - y_min) / spatial_resolution))  # should there be a +1 or -1 or something like that?
-
-discretize_pointcloud_map = np.zeros([4, number_x_cells, number_y_cells])
-print(np.shape(discretize_pointcloud_map))
-# map 10x10
-#discretize_pointcloud_map[:,0:2,:] = 1
-#discretize_pointcloud_map[:,2:4,:] = 2
-#discretize_pointcloud_map[:,4:6,:] = 3
-#discretize_pointcloud_map[:,6:8,:] = 4
-#discretize_pointcloud_map[:,8:11,:] = 5
-
-# map 5x5
-discretize_pointcloud_map[:,0:4,:] = 1
-discretize_pointcloud_map[:,4:8,:] = 2
-discretize_pointcloud_map[:,8:10,:] = 3
-
-cut_out_size = 6
-
-global_coordinate = [0.01,0.63, 3]  # x,y,z
-#global_coordinate = [3.35, 8.32, 3.2, 1.3, 0.2, 0.0, 10]
-cut_out = get_cut_out(discretize_pointcloud_map, global_coordinate, max_min_values_map, spatial_resolution, cut_out_size)
-'''
-
-
-

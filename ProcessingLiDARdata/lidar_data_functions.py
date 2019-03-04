@@ -195,7 +195,7 @@ def discretize_pointcloud(trimmed_point_cloud, array_size=600, trim_range=15, sp
     return discretized_pointcloud
 
 
-def discretize_pointcloud_map(map_point_cloud, min_max_coordinates, spatial_resolution=0.50):
+def discretize_pointcloud_map(map_point_cloud, min_max_coordinates, spatial_resolution=0.05):
     '''
     Discretize into a grid structure with different channels.
     Create layers:
@@ -264,35 +264,38 @@ def discretize_pointcloud_map(map_point_cloud, min_max_coordinates, spatial_reso
 
 
 
-def array_to_png(discretized_pointcloud):
+def array_to_png(discretized_pointcloud, max_min_values):
     '''
     Create a png-image of a discretized pointcloud. Create one image per layer. This is mostly for visualizing purposes.
+    Also saves the map matrix and the max min values.
     :param
-        discretized_pointcloud:
+        discretized_pointcloud: The discretized point cloud map matrix
+        max_min_values: The max and min values of the point cloud map.
     :return:
     '''
 
     # Ask what the png files should be named and create a folder where to save them
-    input_folder_name = input('Type name of folder to store png files in: "png_date_number" :')
-
+    input_folder_name = input('Type name of folder to store png files in: "map_date_number" :')
 
     # create a folder name
-    folder_name = '/_out_' + input_folder_name
+    folder_name = input_folder_name
 
     # creates folder to store the png files
     current_path = os.getcwd()
-    folder_path = current_path + folder_name
-
+    folder_path = os.path.join(current_path,folder_name)
+    folder_path_png = folder_path + '/map_png/'
     try:
         os.mkdir(folder_path)
+        os.mkdir(folder_path_png)
     except OSError:
         print('Failed to create new directory.')
     else:
-        print('Successfully created new directory with path: ', folder_path)
+        print('Successfully created new directory with path: ', folder_path, 'and', folder_path_png)
 
+    discretized_pointcloud_BEV = discretized_pointcloud  # Save map in new variable to be scaled
     # NORMALIZE THE BEV IMAGE
-    for channel in range(np.shape(discretized_pointcloud)[0]):
-        max_value = np.max(discretized_pointcloud[channel, :, :])
+    for channel in range(np.shape(discretized_pointcloud_BEV)[0]):
+        max_value = np.max(discretized_pointcloud_BEV[channel, :, :])
         print('Max max_value inarray_to_png: ', max_value)
 
         # avoid division with 0
@@ -300,15 +303,19 @@ def array_to_png(discretized_pointcloud):
             max_value = 1
 
         scale = 255/max_value
-        discretized_pointcloud[channel, :, :] = discretized_pointcloud[channel, :, :] * scale
-        print('Largest pixel value (should be 255) : ', np.max(discretized_pointcloud[channel, :, :]))
+        discretized_pointcloud_BEV[channel, :, :] = discretized_pointcloud_BEV[channel, :, :] * scale
+        print('Largest pixel value (should be 255) : ', np.max(discretized_pointcloud_BEV[channel, :, :]))
         # create the png_path
-        png_path = folder_path + '/_channel' + str(channel)+'.png'
+        png_path = folder_path_png + 'channel_' + str(channel)+'.png'
 
     # Save images
-        img = Image.fromarray(discretized_pointcloud[channel, :, :])
+        img = Image.fromarray(discretized_pointcloud_BEV[channel, :, :])
         new_img = img.convert("L")
         new_img.rotate(180).save(png_path)
+
+    # Save the map array and the max and min values of the map in the same folder as the BEV image
+    np.save(os.path.join(folder_path, 'map.npy'), discretized_pointcloud)
+    np.save(os.path.join(folder_path, 'max_min.npy'), max_min_values)
 
 
 def random_rigid_transformation(bound_translation_meter, bound_rotation_degrees):

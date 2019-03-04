@@ -32,6 +32,7 @@ lidar_position = np.array((0,0))
 def main():
 
     input_folder_name = input('Type name of new folder: "TownXX_date_number" :')
+    number_of_waypoints = int(input('Number of waypoints to visit: '))
     #print(input_folder_name)
     #print(type(input_folder_name))
 
@@ -42,13 +43,11 @@ def main():
     folder_path = current_path + folder_name
 
     try:
-       os.mkdir(folder_path)
+        os.mkdir(folder_path)
     except OSError:
-       print('Failed to create new directory.')
+        print('Failed to create new directory.')
     else:
-       print('Successfully created new directory with path: ' , folder_path)
-
-
+        print('Successfully created new directory with path: ', folder_path)
 
     actor_list = []
 
@@ -84,7 +83,6 @@ def main():
         actor_list.append(camera)
         print('created %s' % camera.type_id)
 
-
         # Add LiDAR
         # transform we give here is now relative to the vehicle.
         lidar_bp = blueprint_library.find('sensor.lidar.ray_cast')
@@ -103,14 +101,12 @@ def main():
 
         ########################################## create csv-file ##########################################
 
-
         # Creates the csv file
         csv_path = folder_path + '/' + input_folder_name + '.csv'
         with open(csv_path , mode = 'w') as csv_file:
             fieldnames = ['frame_number', 'x', 'y', 'z', 'yaw']
             csv_writer = csv.writer(csv_file, delimiter = ',' , quotechar='"', quoting=csv.QUOTE_MINIMAL)
             csv_writer.writerow(fieldnames)
-
 
         ########################################## callback functions ##########################################
         def save_lidar_data(data):
@@ -130,7 +126,6 @@ def main():
                     csv_writer_2.writerow([data.frame_number, data.transform.location.x, data.transform.location.y, data.transform.location.z, data.transform.rotation.yaw])
             
                 lidar_position = current_position  # save globally for next lidar sweep
-            
 
         def save_rgb_data(image):
             global lidar_position
@@ -142,15 +137,15 @@ def main():
                 image.save_to_disk( rgb_path % image.frame_number)
                 
                 
-        camera.listen(lambda image: save_rgb_data(image))
+        # camera.listen(lambda image: save_rgb_data(image))
+
         myLidar.listen(lambda data: save_lidar_data(data)) # data is a LidarMeasurement object
         
         ########################################## main loops ##########################################
-        
 
         # Create a list with the waypoints that exists
         map = world.get_map()
-        waypoint_list = map.generate_waypoints(100)
+        waypoint_list = map.generate_waypoints(number_of_waypoints)
         print('waypoint list length:', len(waypoint_list))
         print(' ')
 
@@ -164,16 +159,12 @@ def main():
                 print(text)
             num_waypoints = num_waypoints + 1
 
-        
-        
-
     finally:
 
         print('destroying actors')
         for actor in actor_list:
             actor.destroy()
         print('done.')
-
 
 
 if __name__ == '__main__':

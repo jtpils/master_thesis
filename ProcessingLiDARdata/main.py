@@ -4,11 +4,11 @@ from PIL import Image
 import time
 import matplotlib.pyplot as plt
 
-# path_to_ply = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/_out_Town03_190207_18/pc/173504.ply'
-# path_to_csv = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/_out_Town03_190207_18/Town03_190207_18.csv'
+path_to_ply = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/_out_Town02_190221_1'
+path_to_csv = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/_out_Town02_190221_1/Town02_190221_1.csv'
 
-path_to_ply = '/home/master04/Documents/master_thesis/ProcessingLiDARdata/_out_Town02_190221_1/005449.ply'
-path_to_csv = '/home/master04/Documents/master_thesis/ProcessingLiDARdata/_out_Town02_190221_1/Town02_190221_1.csv'
+# path_to_ply = '/home/master04/Documents/master_thesis/ProcessingLiDARdata/_out_Town02_190221_1/005449.ply'
+# path_to_csv = '/home/master04/Documents/master_thesis/ProcessingLiDARdata/_out_Town02_190221_1/Town02_190221_1.csv'
 
 
 # Load data:
@@ -27,7 +27,7 @@ plt.show()
 '''
 
 # Trim point cloud:
-trimmed_pc = trim_pointcloud(pc, range=30, roof=10, floor=0.1)
+trimmed_pc = trim_pointcloud(pc, range=30, roof=10, floor=0.5)
 print('Shape of trimmed pointcloud: ', np.shape(trimmed_pc))
 
 '''# PLOT TRIMMED POINTCLOUD:

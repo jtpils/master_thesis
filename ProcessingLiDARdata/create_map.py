@@ -1,14 +1,16 @@
 import numpy as np
 from lidar_data_functions import *
-#from map_functions import *
 from matplotlib import pyplot as plt
+from get_cut_out_function import *
 
 
-path_to_ply_folder = '/home/master04/Documents/master_thesis/ProcessingLiDARdata/_out_Town02_190221_1/pc/'
-path_to_csv = '/home/master04/Documents/master_thesis/ProcessingLiDARdata/_out_Town02_190221_1/Town02_190221_1.csv'
+#path_to_ply_folder = '/home/master04/Desktop/_out_town2/pc/'
+#path_to_csv = '/home/master04/Desktop/_out_town2/town2.csv'
+#path_to_ply_folder = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/_out_Town02_190221_1/pc/'
+#path_to_csv = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/_out_Town02_190221_1/Town02_190221_1.csv'
 
-# path_to_ply_folder = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/_out_Town02_190221_1/pc/'
-# path_to_csv = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/_out_Town02_190221_1/Town02_190221_1.csv'
+path_to_ply_folder = input('Type path to ply folder:')
+path_to_csv = input('Type path to csv folder:')
 
 
 files_in_ply_folder = os.listdir(path_to_ply_folder)
@@ -74,14 +76,13 @@ pc_super_array = np.delete(pc_super_array, 0, axis=0)
 # save the max and min values in an array. This is used to decide the size of the map
 min_max = np.array((min_x_val, max_x_val, min_y_val, max_y_val))
 
-# Discretize the point cloud.
-discretized_pc = discretize_pointcloud_map(pc_super_array, min_max)
-np.save('map.npy', discretized_pc)
+# Discretize the point cloud. OBS Now we use spatial resolution 0.5!!!
+discretized_pc = discretize_pointcloud_map(pc_super_array, min_max, spatial_resolution=0.5)
 
-# UNCOMMENT IF YOU WANT TO SAVE THE DISCRETIZED MAP.
-array_to_png(discretized_pc)
+# UNCOMMENT IF YOU WANT TO SAVE THE DISCRETIZED MAP AS AN PNG AND ITS VALUES.
+array_to_png(discretized_pc, min_max)
 
-
+'''
 # VISUALIZATION OF DISCRETIZED MAP 
 # normalize the BEV image
 layer = 2
@@ -99,3 +100,6 @@ print('Largest pixel value (should be 255) : ', np.max(discretized_pc[layer, :, 
 img = Image.fromarray(discretized_pc[layer, :, :])
 new_img = img.convert("L")
 new_img.rotate(180).show()
+'''
+
+
