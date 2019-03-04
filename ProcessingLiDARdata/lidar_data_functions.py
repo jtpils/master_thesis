@@ -100,11 +100,11 @@ def trim_pointcloud(point_cloud, range=15, roof=10, floor=-3): # the hard coded 
     point_cloud = point_cloud[points_in_range]
 
     z_coordinates = point_cloud[:, -1]
-    # Remove points that are more then loor and roof meters above ground coordinate
+    # Remove points that are more then floor and roof meters above ground coordinate
     ground_coordinate = min(z_coordinates)
 
     floor = ground_coordinate + floor
-    roof =  ground_coordinate + roof
+    roof = ground_coordinate + roof
 
     coordinate_rows = list(map(lambda x: floor <= x <= roof, z_coordinates))
 
@@ -243,7 +243,7 @@ def array_to_png(discretized_pointcloud):
 def random_rigid_transformation(bound_translation_meter, bound_rotation_degrees):
     '''
     This functions return an array with values for translation and rotation from ground truth. The values are drawn from
-    a distribution given by the user. This rotation/translation should be used to transform the LiDAR sweep to create a
+    a uniform distribution given by the user. This rotation/translation should be used to transform the LiDAR sweep to create a
     training sample. Yields equally probable values around 0, both negative and positive up to the given bound.
     Should be used before discretizing the sweep.
     :param bound_translation_meter: scalar, the largest translation value that is acceptable in meters
@@ -261,7 +261,7 @@ def random_rigid_transformation(bound_translation_meter, bound_rotation_degrees)
 
 def training_sample_rotation_translation(pointcloud, rigid_transformation):
     '''
-    Rotate and translate a pointcloud according to the random rigid transform. Use this when creating training samples.
+    Rotate and translate a pointcloud according to the random rigid transform. Use this when creating fake training samples.
     :param pointcloud: a lidar sweep that is to be rotated/translated in order to create training sample.
 
     Do this BEFORE trimming the sweep!
