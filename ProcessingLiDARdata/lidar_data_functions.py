@@ -222,7 +222,7 @@ def discretize_pointcloud_map(map_point_cloud, min_max_coordinates, spatial_reso
 
     # sort the point cloud by x in increasing order
     x_sorted_point_cloud = np.asarray(sorted(map_point_cloud, key=lambda row: row[0]))
-
+    i = 0
     for x_cell in range(number_x_cells):
 
         # get the x-values in the spatial resolution interval
@@ -255,6 +255,10 @@ def discretize_pointcloud_map(map_point_cloud, min_max_coordinates, spatial_reso
                 # if there are not any detections
                 else:
                     discretized_pointcloud[0, x_cell, y_cell] = 0
+        i += 1
+
+        if i%100 == 0:
+            print('Number of x cells checked:', i, 'of:', number_x_cells)
 
     return discretized_pointcloud
 
