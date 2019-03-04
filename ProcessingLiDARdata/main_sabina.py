@@ -1,139 +1,171 @@
 import numpy as np
 from lidar_data_functions import *
+import random
 from PIL import Image
 import time
 import matplotlib.pyplot as plt
 import os
+import sys
+import random
+import math
+
+
+# TODO: check that it works with the spatial resolution = 0.05.
+#  Change in discretized map: return the max and min values of the map.
+#  Test to use a discretized map and do a cut out that is 900x900 (show the map and the cut out).
+#  Annika code check
+
+def rounding(n, r=0.05):
+    '''
+
+    :param n: Number that is goint to be round
+    :param r: The number that we want to round to Now it works only with 0.05
+    :return: rounded_number: The value of the rounded number
+    '''
+
+    if n >= 0:
+        rounded_number = round(n - math.fmod(n, r),2)
+        print(rounded_number)
+
+    elif n < 0:
+        n = -n + 0.06  # The + 0.06 is for get the
+        rounded_number = -round(n - math.fmod(n, r),2)
+        print(rounded_number)
+
+    return rounded_number
 
 
 
+def get_cut_out(discretized_point_cloud_map, global_coordinate, max_min_values_map, spatial_resolution=0.05, cut_out_size=900):
+    '''
+    :param discretized_point_cloud_map: (np.array) The discretized point cloud map, the map is quadratic.
+    :param global_coordinate: (np.array) The global coordinate representing the initial guess.
+    :param max_min_values_map: (np.array) The maximum and minimum values map defining the corners of the map. (This should be an output from the discretize map function
+    :param spatial_resolution: (int) The spatial resolution of the map, how large a cell is. , should be an output from the map.
+    :param cut_out_size: (int) The size of the cut_out. The cut_out should be quadratic, e.g 900x900
+    :return: cut_out: (np.array) A cut out of the map at the initial guess.
+    '''
 
-path_to_ply = '/home/master04/Desktop/_out/_out_Town02_190208_1/pc/004179.ply'
-path_to_csv = '/home/master04/Desktop/_out/_out_Town02_190208_1/Town02_190208_1.csv'
+    x_min, x_max, y_min, y_max = max_min_values_map
+    print('x_max:', x_max, 'x_min:', x_min, 'y_min:', y_min, 'y_max:', y_max)
+
+    # check if we have a global coordinate that is outside the map coordinates. If that's the case stop execution.
+    if global_coordinate[0] < x_min or x_max < global_coordinate[0] or global_coordinate[1] < y_min or y_max < global_coordinate[1]:
+        print('Global coordinate,', global_coordinate, ', is located outside the map boundaries.')
+        print(' ')
+        print('Maximum x value:', x_max, '. Minimum x value:', x_min, '. Maximum y value:', y_max, '. Minimum y value:', y_min)
+        sys.exit(0) # we do not want to exit we just want to brake try exept. leave the function!
+
+    # PAD THE MAP HERE!
+    # Things that need to be considered is if padding the map here the new bounds must be considered!!!
+    # The padding is performed by adding image//2-1 zeros below column 0 and image//2 zeros after last column. image//2-1 zeros below row 0 and image//2 zeros after last row.
+
+    pad_size_low = cut_out_size//2 - 1
+    pad_size_high = cut_out_size//2
+
+    print('pad size low', pad_size_low)
+    print('pad size high', pad_size_high)
+
+    discretized_point_cloud_map = np.pad(discretized_point_cloud_map, [(0, 0), (pad_size_low, pad_size_high), (pad_size_low, pad_size_high)], mode='constant')
+
+    #print('discretized pc map:', discretized_point_cloud_map)
+
+    # here I want to check which cell i want to cut out.
+    # Check the x value and "put" it in the right cell of the map
+    # Now the bounds must be fixed since the map now is bigger and have zeros! Lower bound of x is now (x_min - pad_size_low) and Upper bound of x is (x_max + pad_size_high)
+
+    cell_check_x = rounding(x_min) - pad_size_low
+    print('start_cell_check', cell_check_x)
+    #cell_check_x = (int(np.floor(x_min)) - pad_size_low) # we want to start at the nearest sppatial resolution.
+    k = 0 # sice python starts at 0
+    while cell_check_x < global_coordinate[0]:
+        #print('cell_location: ', cell_location)
+        x_cell = k
+        k += 1
+        cell_check_x += spatial_resolution
+        print('cell_check:', cell_check_x, ', x_cell:', x_cell)
+
+    print('x_cell: ', x_cell)
+
+    # Check the y value and "put" it in the right cell of the map
+    # Now the bounds must be fixed since the map now is bigger and have zeros! Lower bound of y is now (y_min - pad_size_low) and Upper bound of y is (y_max + pad_size_high)
+
+    #cell_check_y = int(np.floor(y_min)) - pad_size_low #
+    cell_check_y = rounding(y_min) - pad_size_low
+    print('start_cell_check', cell_check_y)
+    k = 0 # sice python starts at 0
+    while cell_check_y < global_coordinate[1]:
+        #print('cell_location: ', cell_location)
+        y_cell = k
+        k += 1
+        cell_check_y += spatial_resolution
+        print('y_cell_check:', cell_check_y, ', y_cell:', y_cell)
+
+    print('y_cell: ', y_cell)
 
 
-point_cloud, global_coordinates = load_data(path_to_ply, path_to_csv)
-# testing rotate and translate
+    # start to find deviation how to cut the map and then cut out a piece. 
+    
+    deviation_from_cell_low = cut_out_size//2 - 1
+    deviation_from_cell_high = cut_out_size//2 
+    
+    print('deviation from cell low:', deviation_from_cell_low)
+    print('deviation from cell high:', deviation_from_cell_high)
 
-#discretized_pc_not_rot = discretize_pointcloud(point_cloud, spatial_resolution=0.05)
+    # for clarifying rox and column bounds.
+    row_cell = y_cell
+    col_cell = x_cell
 
-#show img
+    lower_bound_row = row_cell - deviation_from_cell_low
+    upper_bound_row = row_cell + deviation_from_cell_high + 1  # +1 to include upper bound
 
-# NORMALIZE THE BEV IMAGE
-#for channel in range(np.shape(discretized_pc_not_rot)[0]):
-#    max_value = np.max(discretized_pc_not_rot[channel, :, :])
-#    print('Max max_value inarray_to_png: ', max_value)
-#    # avoid division with 0
-#    if max_value == 0:
-#        max_value = 1
-#    scale = 255/max_value
-#    discretized_pc_not_rot[channel, :, :] = discretized_pc_not_rot[channel, :, :] * scale
-#    print('Largest pixel value (should be 255) : ', np.max(discretized_pc_not_rot[channel, :, :]))
+    lower_bound_col = col_cell - deviation_from_cell_low
+    upper_bound_col = col_cell + deviation_from_cell_high + 1 # +1 to include upper bound
 
-# show img
-#img = Image.fromarray(discretized_pc_not_rot[1, :, :])
-#img.show()
+    print('low bound row:' , lower_bound_row)
+    print('high bound row:' , upper_bound_row)
 
-#ax1 = plt.subplot(121)
-#x = point_cloud[:, 0]
-#y = point_cloud[:, 1]
-#ax1.plot(x, y, 'r.')
-#ax1.axis('equal')
-#ax1.set_title('raw point cloud')
-#ax1.show()
+    print('low bound col:', lower_bound_col)
+    print('high bound col:', upper_bound_col)
 
-number_of_points = len(point_cloud)  # number of points in the pointcloud
+    print(discretized_point_cloud_map[0,:,:])
 
+    # Do the cut out
+    cut_out = discretized_point_cloud_map[:, lower_bound_row:upper_bound_row, lower_bound_col:upper_bound_col]
 
-#New
-yaw = np.radians(90)
-c, s = np.cos(yaw), np.sin(yaw)
-Rz = np.array(([c, -s, 0], [s, c, 0], [0, 0, 1]))  # Rotation matrix
-rotated_pointcloud_new = np.matmul(Rz, np.transpose(point_cloud)) # rotate each vector with coordinates, transpose to get dimensions correctly
-rotated_pointcloud_new = np.transpose(np.reshape(rotated_pointcloud_new, (3, number_of_points)))  # reshape and transpose back
-print(global_coordinates[0, :3])
-translated_pc_new = rotated_pointcloud_new + global_coordinates[0, :3]
-#discretized_pc_new = discretize_pointcloud(translated_pc_new, spatial_resolution=0.05)
+    print(np.shape(cut_out))
 
-#ax2 = plt.subplot(122)
-#x = translated_pc_new[:, 0]
-#y = translated_pc_new[:, 1]
-#ax2.plot(x, y, 'r.')
-#ax2.axis('equal')
-#ax2.set_title('translated and rotated pc')
-#plt.show()
+    print(cut_out[0,:,:])
+
+    return cut_out
 
 
-#show img
+# TIME TO TEST ON A REAL MAP!
 
-# NORMALIZE THE BEV IMAGE
-#for channel in range(np.shape(discretized_pc_new)[0]):
-#    max_value = np.max(discretized_pc_new[channel, :, :])
-#    print('Max max_value inarray_to_png: ', max_value)
-#    # avoid division with 0
-#    if max_value == 0:
-#        max_value = 1
-#    scale = 255/max_value
-#    discretized_pc_new[channel, :, :] = discretized_pc_new[channel, :, :] * scale
-#    print('Largest pixel value (should be 255) : ', np.max(discretized_pc_new[channel, :, :]))
-
-## show img
-#img = Image.fromarray(discretized_pc_new[1, :, :])
-#img.show()
 '''
+max_min_values_map = np.array((0, 1, 0, 1))
+x_min, x_max, y_min, y_max = max_min_values_map
+spatial_resolution = 0.05
+number_x_cells = int(np.ceil((x_max - x_min) / spatial_resolution))  # should there be a +1 or -1 or something like that? Now Sabina has set 10 of some reason she can't explain.
+number_y_cells = int(np.ceil((y_max - y_min) / spatial_resolution))  # should there be a +1 or -1 or something like that?
 
-#old
-yaw = np.deg2rad(90)  # convert yaw in degrees to radians
-c, s = np.cos(yaw), np.sin(yaw)
-Rz = np.array(([c, -s, 0], [s, c, 0], [0, 0, 1]))  # Rotation matrix
-rotated_pointcloud = Rz @ np.transpose(point_cloud) # rotate each vector with coordinates, transpose to get dimensions correctly
-rotated_pointcloud = np.transpose(np.reshape(rotated_pointcloud, (3, number_of_points)))  # reshape and transpose back
-print(global_coordinates[0, :3])
-translated_pc_new = rotated_pointcloud + global_coordinates[0, :3]
+discretize_pointcloud_map = np.zeros([4, number_x_cells, number_y_cells])
+print(np.shape(discretize_pointcloud_map))
+# map 10x10
+#discretize_pointcloud_map[:,0:2,:] = 1
+#discretize_pointcloud_map[:,2:4,:] = 2
+#discretize_pointcloud_map[:,4:6,:] = 3
+#discretize_pointcloud_map[:,6:8,:] = 4
+#discretize_pointcloud_map[:,8:11,:] = 5
 
-print(point_cloud[:30])
-print(global_coordinates[0, :])
-print(global_coordinates[0, 3])
+# map 5x5
+discretize_pointcloud_map[:,0:4,:] = 1
+discretize_pointcloud_map[:,4:8,:] = 2
+discretize_pointcloud_map[:,8:10,:] = 3
 
-discretized_pc_old = discretize_pointcloud(translated_pc_new, spatial_resolution=0.05)
+cut_out_size = 6
 
-#show img
-
-# NORMALIZE THE BEV IMAGE
-for channel in range(np.shape(discretized_pc_old)[0]):
-    max_value = np.max(discretized_pc_old[channel, :, :])
-    print('Max max_value inarray_to_png: ', max_value)
-    # avoid division with 0
-    if max_value == 0:
-        max_value = 1
-    scale = 255/max_value
-    discretized_pc_old[channel, :, :] = discretized_pc_old[channel, :, :] * scale
-    print('Largest pixel value (should be 255) : ', np.max(discretized_pc_old[channel, :, :]))
-
-# show img
-img = Image.fromarray(discretized_pc_old[1, :, :])
-img.show()
-
-
-
-
-
-
-# PLOT TRIMMED POINTCLOUD:
-x = trimmed_pc[:, 0]
-y = trimmed_pc[:, 1]
-plt.plot(x, y, 'r.')
-plt.axis('equal')
-plt.title('Trimmed pointcloud')
-plt.show()
-
-
-rigid_trans = random_rigid_transformation(10, 10)
-print('rigid trans: ', rigid_trans)
-train_pc = training_sample_rotation_translation(trimmed_pc, rigid_trans)
-
-x_train = train_pc[:, 0]
-y_train = train_pc[:, 1]
-plt.plot(x, y, 'r.', x_train, y_train, 'b.')
-plt.axis('equal')
-plt.show() '''
+global_coordinate = [0.01,0.63, 3]  # x,y,z
+#global_coordinate = [3.35, 8.32, 3.2, 1.3, 0.2, 0.0, 10]
+cut_out = get_cut_out(discretize_pointcloud_map, global_coordinate, max_min_values_map, spatial_resolution, cut_out_size)
+'''

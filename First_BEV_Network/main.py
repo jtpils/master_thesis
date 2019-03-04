@@ -32,15 +32,13 @@ device = torch.device("cuda" if use_cuda else "cpu")
 print('Device: ', device)
 
 
-# use_gpu = int(input('Enter 0 for cpu, 1 for gpu:'))  # check that the user really provides 0 or 1
-
-# Create network instance
-#CNN = FirstBEVNet().to(device)
 CNN = SuperSimpleCNN().to(device)
-# if use_gpu:
-#     CNN = CNN.cuda()
 print('Are model parameters on CUDA? ', next(CNN.parameters()).is_cuda)
 print(' ')
+
+pytorch_total_params = sum(p.numel() for p in CNN.parameters() if p.requires_grad)
+print(pytorch_total_params)
+
 
 # Load weights
 if load_weights:
@@ -76,3 +74,4 @@ loss_path = os.path.join(model_path, 'train_loss.npy')
 np.save(loss_path, train_loss)
 loss_path = os.path.join(model_path, 'val_loss.npy')
 np.save(loss_path, val_loss)
+

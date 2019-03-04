@@ -2,6 +2,7 @@ import numpy as np
 from PIL import Image
 import os
 import sys
+import pandas as pd
 
 
 def load_data(path_to_ply, path_to_csv):
@@ -19,9 +20,9 @@ def load_data(path_to_ply, path_to_csv):
     '''
 
     # load pointcloud
-    point_cloud = np.loadtxt(path_to_ply, skiprows=7)
-    point_cloud[:, 1] = - point_cloud[:, 1]
-    point_cloud[:, -1] = - point_cloud[:, -1]
+    point_cloud = pd.read_csv(path_to_ply, delimiter=' ', skiprows=7, header=None, names=('x','y','z'))
+    point_cloud = point_cloud.values
+    point_cloud[:, -1] = - point_cloud[:, -1]  # z = -z
 
     # check if ply file is empty. Stop execution if it is.
     if np.shape(point_cloud)[0] == 0:
@@ -31,15 +32,19 @@ def load_data(path_to_ply, path_to_csv):
     # extract frame_number from filename
     file_name = path_to_ply.split('/')[-1]  # keep the last part of the path, i.e. the file name
     frame_number = int(file_name[:-4])  # remove the part '.ply' and convert to int
-    #print('frame number', frame_number)
+
     # load csv-file with global coordinates
-    global_coordinates = np.loadtxt(path_to_csv, skiprows=1, delimiter=',')
+    global_coordinates = pd.read_csv(path_to_csv)
+    global_coordinates = global_coordinates.values
 
     # extract information from csv at given frame_number
     row = np.where(global_coordinates == frame_number)[0]  # returns which row the frame number is located on
-    #print('row where to find frame number', row)
     global_lidar_coordinates = global_coordinates[row, 1:5]
-    global_lidar_coordinates[0][3] = global_lidar_coordinates[0][3] + 90
+    if global_lidar_coordinates[0][3] < 0:
+        global_lidar_coordinates[0][3] = global_lidar_coordinates[0][3] + 360  # change to interval [0,360]
+    global_lidar_coordinates[0][3] = global_lidar_coordinates[0][3] + 90  # add 90
+
+    global_lidar_coordinates[0][1] = -global_lidar_coordinates[0][1]  # y = -y
 
     return point_cloud, global_lidar_coordinates #, frame_number
 
@@ -52,14 +57,13 @@ def rotate_pointcloud_to_global(pointcloud, global_coordinates):
     :return: rotated_pointcloud: rotated pointcloud, but coordinates are stil relative to LiDAR (not global)
     '''
 
-    number_of_points = len(pointcloud)  # number of points in the pointcloud
-
-    yaw = np.deg2rad(global_coordinates[0, 3])  # convert yaw in degrees to radians
+    yaw = np.deg2rad(global_coordinates[0, 3]) # convert yaw in degrees to radians
     c, s = np.cos(yaw), np.sin(yaw)
     Rz = np.array(((c, -s, 0), (s, c, 0), (0, 0, 1))) # Rotation matrix
-
     rotated_pointcloud = Rz @ np.transpose(pointcloud) # rotate each vector with coordinates, transpose to get dimensions correctly
-    rotated_pointcloud = np.transpose(np.reshape(rotated_pointcloud, (3, number_of_points)))  # reshape and transpose back
+    rotated_pointcloud = np.transpose(rotated_pointcloud)
+
+    rotated_pointcloud[:,1] = -rotated_pointcloud[:,1]  # y = -y
 
     return rotated_pointcloud
 
@@ -73,7 +77,7 @@ def translate_pointcloud_to_global(pointcloud, global_coordinates):
     :return: global_pointcloud
     '''
 
-    global_pointcloud = pointcloud + global_coordinates[0, :3]  #only add xyz (not yaw)
+    global_pointcloud = pointcloud + global_coordinates[0, :3]  # only add xyz (not yaw)
 
     return global_pointcloud
 
@@ -180,7 +184,6 @@ def discretize_pointcloud(trimmed_point_cloud, array_size=600, trim_range=15, sp
     # Normalize the channels. The values should be between 0 and 1
     for channel in range(np.shape(discretized_pointcloud)[0]):
         max_value = np.max(discretized_pointcloud[channel, :, :])
-        # print('Max max_value inarray_to_png: ', max_value)
 
         # avoid division with 0
         if max_value == 0:
@@ -188,40 +191,111 @@ def discretize_pointcloud(trimmed_point_cloud, array_size=600, trim_range=15, sp
 
         scale = 1/max_value
         discretized_pointcloud[channel, :, :] = discretized_pointcloud[channel, :, :] * scale
-        # print('Largest pixel value (should be 1) : ', np.max(discretized_pointcloud[channel, :, :]))
 
     return discretized_pointcloud
 
 
-def array_to_png(discretized_pointcloud):
+def discretize_pointcloud_map(map_point_cloud, min_max_coordinates, spatial_resolution=0.05):
+    '''
+    Discretize into a grid structure with different channels.
+    Create layers:
+    1 layer with number of detections (normalise at the end), 1 layer with mean height, max height, min height. other layers?
+    :param
+        pointcloud_dict:
+        min_max_coordinates: array with [xmin, xmax, ymin, ymax]
+        spatial_resolution: size of grid cell in m
+    :return:
+        discretized_pointcloud: 3d-array with multiple "layers"
+        layer 0 = number of detections
+        layer 1 = mean evaluation
+        layer 2 = maximum evaluation
+        layer 3 = minimum evaluation
+    '''
+
+    # calculate the dimension of the array needed to store all the loaded ply-files
+    x_min, x_max, y_min, y_max = min_max_coordinates
+    number_x_cells = int(np.ceil((x_max - x_min) / spatial_resolution))  # should there be a +1 or -1 or something like that? Now Sabina has set 10 of some reason she can't explain.
+    number_y_cells = int(np.ceil((y_max - y_min) / spatial_resolution))  # should there be a +1 or -1 or something like that?
+    # print('number of cells', number_x_cells)
+
+    discretized_pointcloud = np.zeros([4, number_x_cells, number_y_cells])
+
+    # sort the point cloud by x in increasing order
+    x_sorted_point_cloud = np.asarray(sorted(map_point_cloud, key=lambda row: row[0]))
+    i = 0
+    for x_cell in range(number_x_cells):
+
+        # get the x-values in the spatial resolution interval
+        lower_bound = x_min + spatial_resolution * x_cell
+        upper_bound = x_min + (x_cell + 1) * spatial_resolution
+        x_interval = list(map(lambda x: lower_bound < x <= upper_bound, x_sorted_point_cloud[:, 0]))
+
+        x_interval = x_sorted_point_cloud[x_interval]
+        # sort the x-interval by increasing y
+        x_sorted_by_y = np.asarray(sorted(x_interval, key=lambda row: row[1]))
+
+        # loop through the y coordinates in the current x_interval and store values in the output_channel
+        for y_cell in range(number_y_cells):
+
+            # if len(sorted_y) is 0:
+            if len(x_sorted_by_y) is 0:
+                discretized_pointcloud[0, x_cell, y_cell] = 0
+            else:
+                lower_bound = y_min + spatial_resolution * y_cell
+                upper_bound = y_min + (y_cell + 1) * spatial_resolution
+                y_interval = np.asarray(x_sorted_by_y[list(map(lambda x: lower_bound < x <= upper_bound, x_sorted_by_y[:, 1]))])
+
+                # if there are detections save these in right channel
+                if np.shape(y_interval)[0] is not 0:
+                    discretized_pointcloud[0, x_cell, y_cell] = np.shape(y_interval)[0]
+                    discretized_pointcloud[1, x_cell, y_cell] = np.mean(y_interval[:, 2])
+                    discretized_pointcloud[2, x_cell, y_cell] = np.max(y_interval[:, 2])
+                    discretized_pointcloud[3, x_cell, y_cell] = np.min(y_interval[:, 2])
+
+                # if there are not any detections
+                else:
+                    discretized_pointcloud[0, x_cell, y_cell] = 0
+        i += 1
+
+        if i%100 == 0:
+            print('Number of x cells checked:', i, 'of:', number_x_cells)
+
+    return discretized_pointcloud
+
+
+
+def array_to_png(discretized_pointcloud, max_min_values):
     '''
     Create a png-image of a discretized pointcloud. Create one image per layer. This is mostly for visualizing purposes.
+    Also saves the map matrix and the max min values.
     :param
-        discretized_pointcloud:
+        discretized_pointcloud: The discretized point cloud map matrix
+        max_min_values: The max and min values of the point cloud map.
     :return:
     '''
 
     # Ask what the png files should be named and create a folder where to save them
-    input_folder_name = input('Type name of folder to store png files in: "png_date_number" :')
-
+    input_folder_name = input('Type name of folder to store png files in: "map_date_number" :')
 
     # create a folder name
-    folder_name = '/_out_' + input_folder_name
+    folder_name = input_folder_name
 
     # creates folder to store the png files
     current_path = os.getcwd()
-    folder_path = current_path + folder_name
-
+    folder_path = os.path.join(current_path,folder_name)
+    folder_path_png = folder_path + '/map_png/'
     try:
         os.mkdir(folder_path)
+        os.mkdir(folder_path_png)
     except OSError:
         print('Failed to create new directory.')
     else:
-        print('Successfully created new directory with path: ', folder_path)
+        print('Successfully created new directory with path: ', folder_path, 'and', folder_path_png)
 
+    discretized_pointcloud_BEV = discretized_pointcloud  # Save map in new variable to be scaled
     # NORMALIZE THE BEV IMAGE
-    for channel in range(np.shape(discretized_pointcloud)[0]):
-        max_value = np.max(discretized_pointcloud[channel, :, :])
+    for channel in range(np.shape(discretized_pointcloud_BEV)[0]):
+        max_value = np.max(discretized_pointcloud_BEV[channel, :, :])
         print('Max max_value inarray_to_png: ', max_value)
 
         # avoid division with 0
@@ -229,15 +303,19 @@ def array_to_png(discretized_pointcloud):
             max_value = 1
 
         scale = 255/max_value
-        discretized_pointcloud[channel, :, :] = discretized_pointcloud[channel, :, :] * scale
-        print('Largest pixel value (should be 255) : ', np.max(discretized_pointcloud[channel, :, :]))
+        discretized_pointcloud_BEV[channel, :, :] = discretized_pointcloud_BEV[channel, :, :] * scale
+        print('Largest pixel value (should be 255) : ', np.max(discretized_pointcloud_BEV[channel, :, :]))
         # create the png_path
-        png_path = folder_path + '/_channel' + str(channel)+'.png'
+        png_path = folder_path_png + 'channel_' + str(channel)+'.png'
 
     # Save images
-        img = Image.fromarray(discretized_pointcloud[channel, :, :])
+        img = Image.fromarray(discretized_pointcloud_BEV[channel, :, :])
         new_img = img.convert("L")
         new_img.rotate(180).save(png_path)
+
+    # Save the map array and the max and min values of the map in the same folder as the BEV image
+    np.save(os.path.join(folder_path, 'map.npy'), discretized_pointcloud)
+    np.save(os.path.join(folder_path, 'max_min.npy'), max_min_values)
 
 
 def random_rigid_transformation(bound_translation_meter, bound_rotation_degrees):

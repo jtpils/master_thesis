@@ -32,15 +32,13 @@ for file in dir_list:
         path_to_csv = os.path.join(path_to_lidar_data, file)
 
 
-translation = int(input('Translation in meters:'))
-rotation = int(input('Rotation in degrees:'))
+translation = float(input('Translation in meters:'))
+rotation = float(input('Rotation in degrees:'))
 number_of_files_to_load = int(input('How many training samples do you want to create:'))
 print(' ')
 ########################################################################################################
-
 # create a list of all ply-files in a directory
 ply_files = os.listdir(path_to_pc)
-
 # create csv-file with header: frame_number, x, y, angle (i.e. the labels)
 csv_labels_path = folder_path + '/labels.csv'
 with open(csv_labels_path, mode='w') as csv_file:
@@ -48,10 +46,14 @@ with open(csv_labels_path, mode='w') as csv_file:
     csv_writer = csv.writer(csv_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
     csv_writer.writerow(fieldnames)
 
-
 i = 0
 # shuffle order of ply-files
 random.shuffle(ply_files)
+
+if number_of_files_to_load > len(ply_files):
+    number_additional_files = number_of_files_to_load-len(ply_files)
+    additional_files = np.random.choice(ply_files, number_additional_files)
+    ply_files = np.concatenate((ply_files, additional_files))
 
 for file_name in ply_files[:number_of_files_to_load]:
     
