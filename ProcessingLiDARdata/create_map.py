@@ -1,7 +1,6 @@
 import numpy as np
 from lidar_data_functions import *
 from matplotlib import pyplot as plt
-from get_cut_out_function import *
 
 
 #path_to_ply_folder = '/home/master04/Desktop/_out_town2/pc/'
@@ -25,7 +24,7 @@ min_y_val = float("inf")
 i = 0
 
 
-for file in files_in_ply_folder[0::30]:  # the last number is how large steps to take
+for file in files_in_ply_folder:#[0::30]:  # the last number is how large steps to take
     try:
         # Create the path to the ply file
         path_to_ply = path_to_ply_folder + file
@@ -34,8 +33,6 @@ for file in files_in_ply_folder[0::30]:  # the last number is how large steps to
     except:
         print('Failed to load file ', file, '. Moving on to next file.')
         continue
-
-    point_cloud, global_coordinates = load_data(path_to_ply, path_to_csv)
 
     # rotate, translate the point cloud to global coordinates and trim the point cloud
     trimmed_pc = trim_pointcloud(point_cloud, range=25, roof=100, floor=0.5)
