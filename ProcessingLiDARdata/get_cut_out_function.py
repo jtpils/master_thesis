@@ -126,9 +126,9 @@ def get_cut_out(discretized_point_cloud_map, global_coordinate, max_min_values_m
 
     return cut_out
 
-'''
+
 # Test the function with this section. 
-for i in range(1):  # range sets how many cut_outs to do.
+for i in range(10):  # range sets how many cut_outs to do.
 
     # load the global coordinates
     path_to_csv = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/_out_Town02_190221_1/Town02_190221_1.csv'
@@ -146,8 +146,6 @@ for i in range(1):  # range sets how many cut_outs to do.
     print('row', row)
     global_coordinates = global_coordinates_pc[row,1:4]
     global_coordinates[1] = -global_coordinates[1]
-
-    global_coordinates = np.array([-60, -400, 5])
 
     print('global coordninates: ', global_coordinates)
 
@@ -193,4 +191,3 @@ img = Image.fromarray(discretized_pc_map[layer, :, :])
 new_img = img.convert("L")
 new_img.rotate(180).show()
 
-'''
