@@ -72,16 +72,16 @@ def main():
 
         ########################################## add sensors ##########################################
         # Add camera
-        '''# Find the blueprint of the sensor
-        # camera_bp = blueprint_library.find('sensor.camera.rgb')
+        # Find the blueprint of the sensor
+        camera_bp = blueprint_library.find('sensor.camera.rgb')
         # Modify attributes of the blueprint to set image resolution and field of view.
-        # camera_bp.set_attribute('image_size_x', '1920')
+        camera_bp.set_attribute('image_size_x', '1920')
         camera_bp.set_attribute('image_size_y', '1080')
         camera_bp.set_attribute('fov', '110')
         camera_transform = carla.Transform(carla.Location(x=0.8, z=1.7))
         camera = world.spawn_actor(camera_bp, camera_transform, attach_to=vehicle)
         actor_list.append(camera)
-        print('created %s' % camera.type_id)'''
+        print('created %s' % camera.type_id)
 
         # Add LiDAR
         # transform we give here is now relative to the vehicle.
@@ -114,7 +114,9 @@ def main():
             current_position = np.array((data.transform.location.x, data.transform.location.y))
             moved_distance = np.linalg.norm(current_position - lidar_position)
         
-            if moved_distance > 1:# and data.frame_number % 10 == 0:  # moved at least 0.5 m, and has passed 1 second (so that we don't save sweeps when the car is dropped)
+        
+            # ######### CHANGE DISTANCE HERE #########
+            if moved_distance > 10:# and data.frame_number % 10 == 0:  # moved at least 0.5 m, and has passed 1 second (so that we don't save sweeps when the car is dropped)
                 point_cloud_path = folder_path + '/pc/%06d'
                 data.save_to_disk( point_cloud_path % data.frame_number)
 
@@ -125,14 +127,18 @@ def main():
             
                 lidar_position = current_position  # save globally for next lidar sweep
 
-        '''
         def save_rgb_data(image):
-            if image.frame_number % 100 == 0:  # every 100th frame, i.e. once every 10 second
+            global lidar_position
+            current_position = np.array((image.transform.location.x, image.transform.location.y))
+            moved_distance = np.linalg.norm(current_position - lidar_position)
+            
+            if moved_distance > 10:
                 rgb_path = folder_path + '/rgb/%06d'
-                data.save_to_disk( rgb_path % image.frame_number)
-        '''
-
+                image.save_to_disk( rgb_path % image.frame_number)
+                
+                
         # camera.listen(lambda image: save_rgb_data(image))
+
         myLidar.listen(lambda data: save_lidar_data(data)) # data is a LidarMeasurement object
         
         ########################################## main loops ##########################################

@@ -1,36 +1,54 @@
 import numpy as np
 from lidar_data_functions import *
-from map_functions import *
 from matplotlib import pyplot as plt
 import pandas as pd
 
 
-path_to_ply = '/home/master04/Desktop/_out_town2/pc/059176.ply'
-path_to_csv = '/home/master04/Desktop/_out_town2/town2.csv'
+#path_to_ply = '/home/master04/Desktop/_out_town2/pc/059176.ply'
+#path_to_csv = '/home/master04/Desktop/_out_town2/town2.csv'
+
+################################# CHANGE HERE ###########################################################
+'''print(' ')
+path_to_lidar_data = '/Users/annikal/Documents/master_thesis/ProcessingLiDARdata/_out_Town02_190221_1'
+dir_list = os.listdir(path_to_lidar_data)
+path_to_pc = os.path.join(path_to_lidar_data, 'pc/')  # we assume we follow the structure of creating lidar data folder with a pc folder for ply
+for file in dir_list:
+    if '.csv' in file:  # find csv-file
+        path_to_csv = os.path.join(path_to_lidar_data, file)
 
 
-point_cloud, global_coordinates = load_data(path_to_ply, path_to_csv)
+# create a list of all ply-files in a directory
+ply_files = os.listdir(path_to_pc)
 
-# rotate, translate the point cloud to global coordinates and trim the point cloud
-trimmed_pc = trim_pointcloud(point_cloud, range=20, roof=100, floor=0.5)
+i = 0
 
-rotated_pc = rotate_pointcloud_to_global(trimmed_pc, global_coordinates)
+number_of_files_to_load = 1
+for file_name in ply_files[:number_of_files_to_load]:
 
-rotated_and_translated_pc = translate_pointcloud_to_global(rotated_pc, global_coordinates)
-
-# global_coordinates_plot = np.loadtxt(path_to_csv, skiprows=1, delimiter=',')
-global_coordinates_plot = pd.read_csv(path_to_csv)
-global_coordinates_plot = global_coordinates_plot.values
-global_coordinates_plot[:,2] = - global_coordinates_plot[:,2]
-
-x = rotated_and_translated_pc[:, 0]
-y = rotated_and_translated_pc[:, 1]
-#print(x)
-
-plt.plot(x , y,  'b.')
-plt.plot(global_coordinates_plot[:, 1],global_coordinates_plot[:, 2],'kd')
-plt.ylabel('y')
-plt.xlabel('x')
-plt.show()
+    # Load data:
+    try:
+        path_to_ply = path_to_pc + file_name
+        pc, global_lidar_coordinates = load_data(path_to_ply, path_to_csv)
+        i = i + 1
+        print('Creating training sample ', i, ' of ', number_of_files_to_load)
+        print(file_name)
+    except:
+        print('Failed to load file ', file_name, '. Moving on to next file.')
+        continue
 
 
+    sweep = trim_pointcloud(pc)
+    sweep = discretize_pointcloud(sweep, array_size=600, trim_range=15, spatial_resolution=1, padding=False, pad_size=150)
+    sweep_and_sweep = np.concatenate((sweep, sweep))
+    sweep_and_sweep = normalize_sample(sweep_and_sweep)
+'''
+
+
+test_array = np.zeros((8,3,3))
+for i in np.arange(8):
+    test_array[i, :, :] = np.ones((3,3)) * i
+
+test_array = normalize_sample(test_array)
+
+
+print(test_array)

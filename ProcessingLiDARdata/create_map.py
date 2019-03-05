@@ -1,7 +1,6 @@
 import numpy as np
 from lidar_data_functions import *
 from matplotlib import pyplot as plt
-from get_cut_out_function import *
 
 
 #path_to_ply_folder = '/home/master04/Desktop/_out_town2/pc/'
@@ -25,7 +24,7 @@ min_y_val = float("inf")
 i = 0
 
 
-for file in files_in_ply_folder:#[0:10]:  # the last number is how large steps to take
+for file in files_in_ply_folder:#[0::30]:  # the last number is how large steps to take
     try:
         # Create the path to the ply file
         path_to_ply = path_to_ply_folder + file
@@ -34,8 +33,6 @@ for file in files_in_ply_folder:#[0:10]:  # the last number is how large steps t
     except:
         print('Failed to load file ', file, '. Moving on to next file.')
         continue
-
-    point_cloud, global_coordinates = load_data(path_to_ply, path_to_csv)
 
     # rotate, translate the point cloud to global coordinates and trim the point cloud
     trimmed_pc = trim_pointcloud(point_cloud, range=25, roof=100, floor=0.5)
@@ -76,8 +73,8 @@ pc_super_array = np.delete(pc_super_array, 0, axis=0)
 # save the max and min values in an array. This is used to decide the size of the map
 min_max = np.array((min_x_val, max_x_val, min_y_val, max_y_val))
 
-# Discretize the point cloud. OBS Now we use spatial resolution 0.5!!!
-discretized_pc = discretize_pointcloud_map(pc_super_array, min_max, spatial_resolution=0.5)
+# Discretize the point cloud
+discretized_pc = discretize_pointcloud_map(pc_super_array, min_max, spatial_resolution=0.05)
 
 # UNCOMMENT IF YOU WANT TO SAVE THE DISCRETIZED MAP AS AN PNG AND ITS VALUES.
 array_to_png(discretized_pc, min_max)
