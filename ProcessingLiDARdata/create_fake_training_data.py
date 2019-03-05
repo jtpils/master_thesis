@@ -77,10 +77,11 @@ for file_name in ply_files[:number_of_files_to_load]:
 
     # fake a map cutout
     cutout = trim_pointcloud(pc, range=1.5*15)
-    cutout_image = discretize_pointcloud(cutout, array_size=600*1.5, trim_range=1.5*15)
+    cutout_image = discretize_pointcloud(cutout, array_size=600*1.5, trim_range=1.5*15, padding=False)
 
     # concatenate the sweep and the cutout image into one image and save.
     sweep_and_cutout_image = np.concatenate((sweep_image, cutout_image))
+    sweep_and_cutout_image = normalize_sample(sweep_and_cutout_image)
     path = path_samples + '/' + str(i)
     np.save(path, sweep_and_cutout_image)
 
