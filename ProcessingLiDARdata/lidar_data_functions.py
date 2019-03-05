@@ -393,10 +393,8 @@ def normalize_sample(discretized_pc):
     max_height = 0
     for layer in (2, 6):  # max height in sweep and cutout
         max_height_temp = np.max(discretized_pc[layer, :, :])
-        print('max height temp: ', max_height_temp)
         if max_height_temp > max_height:
             max_height = max_height_temp
-            print('max height: ', max_height)
 
     # avoid division with 0
     if max_height == 0:
@@ -405,6 +403,5 @@ def normalize_sample(discretized_pc):
     scale = 1 / max_height
     for layer in (1, 2, 3, 5, 6, 7):  # all height channels normalized wrt to the same max value
         discretized_pc[layer, :, :] = discretized_pc[layer, :, :] * scale
-        print('Largest value after normalization: ', layer, np.max(discretized_pc))
 
     return discretized_pc

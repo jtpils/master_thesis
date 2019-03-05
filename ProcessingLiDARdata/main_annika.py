@@ -48,6 +48,7 @@ test_array = np.zeros((8,3,3))
 for i in np.arange(8):
     test_array[i, :, :] = np.ones((3,3)) * i
 
-print(np.shape(test_array))
 test_array = normalize_sample(test_array)
 
+
+print(test_array)
