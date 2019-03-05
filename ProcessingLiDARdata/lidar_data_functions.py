@@ -14,9 +14,6 @@ def load_data(path_to_ply, path_to_csv):
     :return:
         pointcloud: nd-array with xyz-coordinates for all detections in the .ply-file. Shape (N,3).
         global_lidar_coordinates: global xyz-coordinates and yaw in degrees for LiDAR position, [x y z yaw]
-
-    TO DO IN THE FUTURE:
-    Maybe its unnecessary to read the csv every time. Perhaps do this part once outside the function only once for every ply-file.
     '''
 
     # load pointcloud
@@ -40,13 +37,15 @@ def load_data(path_to_ply, path_to_csv):
     # extract information from csv at given frame_number
     row = np.where(global_coordinates == frame_number)[0]  # returns which row the frame number is located on
     global_lidar_coordinates = global_coordinates[row, 1:5]
+
+    # Fix yaw angle:
     if global_lidar_coordinates[0][3] < 0:
         global_lidar_coordinates[0][3] = global_lidar_coordinates[0][3] + 360  # change to interval [0,360]
     global_lidar_coordinates[0][3] = global_lidar_coordinates[0][3] + 90  # add 90
 
     global_lidar_coordinates[0][1] = -global_lidar_coordinates[0][1]  # y = -y
 
-    return point_cloud, global_lidar_coordinates #, frame_number
+    return point_cloud, global_lidar_coordinates
 
 
 def rotate_pointcloud_to_global(pointcloud, global_coordinates):
@@ -59,11 +58,11 @@ def rotate_pointcloud_to_global(pointcloud, global_coordinates):
 
     yaw = np.deg2rad(global_coordinates[0, 3]) # convert yaw in degrees to radians
     c, s = np.cos(yaw), np.sin(yaw)
-    Rz = np.array(((c, -s, 0), (s, c, 0), (0, 0, 1))) # Rotation matrix
-    rotated_pointcloud = Rz @ np.transpose(pointcloud) # rotate each vector with coordinates, transpose to get dimensions correctly
+    Rz = np.array(((c, -s, 0), (s, c, 0), (0, 0, 1)))  # Rotation matrix
+    rotated_pointcloud = Rz @ np.transpose(pointcloud)  # rotate each vector with coordinates, transpose to get dimensions correctly
     rotated_pointcloud = np.transpose(rotated_pointcloud)
 
-    rotated_pointcloud[:,1] = -rotated_pointcloud[:,1]  # y = -y
+    rotated_pointcloud[:, 1] = -rotated_pointcloud[:,1]  # y = -y
 
     return rotated_pointcloud
 
@@ -82,7 +81,7 @@ def translate_pointcloud_to_global(pointcloud, global_coordinates):
     return global_pointcloud
 
 
-def trim_pointcloud(point_cloud, range=15, roof=10, floor=-3): # the hard coded numbers are not absolute.
+def trim_pointcloud(point_cloud, range=15, roof=10, floor=0):  # the hard coded numbers are not absolute.
     '''
     Trim pointcloud to a range given by range_of_interest. Trim detections that are more than (roof) meters above LiDAR,
     and more than (floor) meters below LiDAR. After this, remove z.
@@ -116,7 +115,8 @@ def trim_pointcloud(point_cloud, range=15, roof=10, floor=-3): # the hard coded 
 
     return point_cloud
 
-def discretize_pointcloud(trimmed_point_cloud, array_size=600, trim_range=15, spatial_resolution=0.05, padding=False, pad_size=150):
+
+def discretize_pointcloud(trimmed_point_cloud, array_size=600, trim_range=15, spatial_resolution=0.05, padding=True, pad_size=150):
     '''
     Discretize into a grid structure with different channels.
     Create layers:
@@ -126,7 +126,7 @@ def discretize_pointcloud(trimmed_point_cloud, array_size=600, trim_range=15, sp
         array_size: number of cells in each channel in the discretized point cloud (default=600)
         trim_range: move coordinate system such that it matches the range of the trimmed point cloud (default=15)
         spatial_resolution: size of grid cell in m (default=0.05)
-        padding: True if padding should be performed False otherwise (default=false)
+        padding: True if padding should be performed False otherwise (default=True)
         pad_size: size of padding (default=150)
     :return:
         discretized_pointcloud: 3d-array with multiple "layers"
@@ -135,8 +135,10 @@ def discretize_pointcloud(trimmed_point_cloud, array_size=600, trim_range=15, sp
         layer 2 = maximum evaluation
         layer 3 = minimum evaluation
     '''
+
     array_size = int(array_size)
     discretized_pointcloud = np.zeros([4, array_size, array_size])
+
     if len(trimmed_point_cloud) is 0:
 
         discretized_pointcloud[0, :, :] = 0
@@ -174,15 +176,18 @@ def discretize_pointcloud(trimmed_point_cloud, array_size=600, trim_range=15, sp
                         discretized_pointcloud[2, x_cell, y_cell] = np.max(y_interval[:, 2])
                         discretized_pointcloud[3, x_cell, y_cell] = np.min(y_interval[:, 2])
 
-                    # if there are not any detections
-                    else:
-                        discretized_pointcloud[0, x_cell, y_cell] = 0
+                    # if there are no detections not necessary already initialized to zero
+                    #else:
+                    #    discretized_pointcloud[0, x_cell, y_cell] = 0
 
     # pad the discretized point cloud
     if padding:
         discretized_pointcloud = np.pad(discretized_pointcloud, [(0, 0), (pad_size, pad_size), (pad_size, pad_size)], mode='constant')
+
+
+    # THIS IS DONE IN A SEPARAT FUNCTION INSTEAD
     # Normalize the channels. The values should be between 0 and 1
-    for channel in range(np.shape(discretized_pointcloud)[0]):
+    '''for channel in range(np.shape(discretized_pointcloud)[0]):
         max_value = np.max(discretized_pointcloud[channel, :, :])
 
         # avoid division with 0
@@ -190,7 +195,7 @@ def discretize_pointcloud(trimmed_point_cloud, array_size=600, trim_range=15, sp
             max_value = 1
 
         scale = 1/max_value
-        discretized_pointcloud[channel, :, :] = discretized_pointcloud[channel, :, :] * scale
+        discretized_pointcloud[channel, :, :] = discretized_pointcloud[channel, :, :] * scale'''
 
     return discretized_pointcloud
 
@@ -362,3 +367,44 @@ def training_sample_rotation_translation(pointcloud, rigid_transformation):
     training_pointcloud = rotated_pointcloud + translation # add translation to every coordinate vector
 
     return training_pointcloud
+
+
+def normalize_sample(discretized_pc):
+    '''
+    Normalize the first layer (channel 0 and 4) wrt to the highest number of detections in the whole image. This is done
+    separately for sweep and cut-out.
+    Normalize all height channels wrt to mac height in the whole sample
+    :param discretized_pc:
+    :return:
+    '''
+
+    # Normalize number of detections:
+    for layer in (0, 4):  # normalize number of detections in layer 0 and layer 4
+        max_value = np.max(discretized_pc[layer, :, :])
+
+        # avoid division with 0
+        if max_value == 0:
+            max_value = 1
+
+        scale = 1 / max_value
+        discretized_pc[layer, :, :] = discretized_pc[layer, :, :] * scale
+
+    # Normalize height wrt to max value of both map and sweep:
+    max_height = 0
+    for layer in (2, 6):  # max height in sweep and cutout
+        max_height_temp = np.max(discretized_pc[layer, :, :])
+        print('max height temp: ', max_height_temp)
+        if max_height_temp > max_height:
+            max_height = max_height_temp
+            print('max height: ', max_height)
+
+    # avoid division with 0
+    if max_height == 0:
+        max_height = 1  # nothing happens when we normalize
+
+    scale = 1 / max_height
+    for layer in (1, 2, 3, 5, 6, 7):  # all height channels normalized wrt to the same max value
+        discretized_pc[layer, :, :] = discretized_pc[layer, :, :] * scale
+        print('Largest value after normalization: ', layer, np.max(discretized_pc))
+
+    return discretized_pc
