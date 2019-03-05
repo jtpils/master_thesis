@@ -23,6 +23,7 @@ patience = int(input('Input patience for EarlyStopping: ')) # Threshold for earl
 
 path_training_data = input('Path to data set folder: ')
 batch_size = int(input('Input batch size: '))
+plot_flag = input('Plot results? y / n: ')
 
 print(' ')
 print('Number of GPUs available: ', torch.cuda.device_count())
@@ -60,18 +61,18 @@ os.mkdir(parameter_path)
 # train!
 train_loss, val_loss = train_network(CNN, train_loader, val_loader, n_epochs, learning_rate, patience, parameter_path, use_cuda)
 
+if plot_flag is 'y':
+    # plot loss
+    np.shape(train_loss)
+    epochs_vec = np.arange(1, np.shape(train_loss)[0] + 1) # uses the shape of the train loss to plot to be the same of epochs before early stopping did its work.
+    plt.plot(epochs_vec, train_loss, label='train loss')
+    plt.plot(epochs_vec, val_loss, label='val loss')
+    plt.legend()
+    plt.show()
 
-# plot loss
-np.shape(train_loss)
-epochs_vec = np.arange(1, np.shape(train_loss)[0] + 1) # uses the shape of the train loss to plot to be the same of epochs before early stopping did its work.
-plt.plot(epochs_vec, train_loss, label='train loss')
-plt.plot(epochs_vec, val_loss, label='val loss')
-plt.legend()
-plt.show()
-
-# save loss
-loss_path = os.path.join(model_path, 'train_loss.npy')
-np.save(loss_path, train_loss)
-loss_path = os.path.join(model_path, 'val_loss.npy')
-np.save(loss_path, val_loss)
+    # save loss
+    loss_path = os.path.join(model_path, 'train_loss.npy')
+    np.save(loss_path, train_loss)
+    loss_path = os.path.join(model_path, 'val_loss.npy')
+    np.save(loss_path, val_loss)
 
