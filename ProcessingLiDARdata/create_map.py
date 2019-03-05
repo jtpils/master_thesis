@@ -1,7 +1,6 @@
 import numpy as np
 from lidar_data_functions import *
 from matplotlib import pyplot as plt
-from get_cut_out_function import *
 
 
 #path_to_ply_folder = '/home/master04/Desktop/_out_town2/pc/'
@@ -25,7 +24,7 @@ min_y_val = float("inf")
 i = 0
 
 
-for file in files_in_ply_folder[0::30]:  # the last number is how large steps to take
+for file in files_in_ply_folder:#[0::30]:  # the last number is how large steps to take
     try:
         # Create the path to the ply file
         path_to_ply = path_to_ply_folder + file

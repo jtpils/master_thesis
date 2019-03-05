@@ -2,10 +2,6 @@ import numpy as np
 from lidar_data_functions import *
 import random
 from PIL import Image
-import time
-import matplotlib.pyplot as plt
-import os
-import sys
 import math
 
 
@@ -74,9 +70,9 @@ def get_cut_out(discretized_point_cloud_map, global_coordinate, max_min_values_m
     # Bounds must be fixed since the map now is bigger and have zeros! Lower bound of x is now (x_min - pad_size_low)
     # and Upper bound of x is (x_max + pad_size_high)
 
-    cell_check_x = rounding(x_min, spatial_resolution) - pad_size_low*spatial_resolution
+    cell_check_x = rounding(x_min, spatial_resolution) #- pad_size_low*spatial_resolution
     # print('start_cell_check', cell_check_x)
-    k = 0  # sice python starts at 0
+    k = pad_size_low  
     while cell_check_x < global_coordinate[0]:
         x_cell = k
         k += 1
@@ -87,9 +83,9 @@ def get_cut_out(discretized_point_cloud_map, global_coordinate, max_min_values_m
     # Bounds must be fixed since the map now is bigger and have zeros! Lower bound of y is now (y_min - pad_size_low)
     # and Upper bound of y is (y_max + pad_size_high)
 
-    cell_check_y = rounding(y_min, spatial_resolution) - pad_size_low*spatial_resolution
+    cell_check_y = rounding(y_min, spatial_resolution)
     # print('start_cell_check', cell_check_y)
-    k = 0  # since python starts at 0
+    k = pad_size_low
     while cell_check_y < global_coordinate[1]:
         y_cell = k
         k += 1
@@ -126,7 +122,7 @@ def get_cut_out(discretized_point_cloud_map, global_coordinate, max_min_values_m
 
 '''
 # Test the function with this section. 
-for i in range(1):  # range sets how many cut_outs to do.
+for i in range(2):  # range sets how many cut_outs to do.
 
     # load the global coordinates
     path_to_csv = '/home/master04/Desktop/_out_Town02_190221_1/Town02_190221_1.csv'
@@ -188,5 +184,4 @@ print('Largest pixel value (should be 255) : ', np.max(discretized_pc_map[layer,
 img = Image.fromarray(discretized_pc_map[layer, :, :])
 new_img = img.convert("L")
 new_img.rotate(180).show()
-
 '''
