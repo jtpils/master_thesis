@@ -90,6 +90,8 @@ for file_name in ply_files[:number_of_files_to_load]:
     # max_min_values = np.load(os.path.join(map_path, 'max_min_values.npy'))
     # cut_out = get_cutout()
 
+    # WE SHOULD NORMALIZE BOTH MAP AND SWEEP HERE?!
+
     # concatenate the sweep and the cut-out into one image and save.
     sweep_and_cutout = np.concatenate((sweep, cut_out))
     path = path_samples + '/' + str(i)
