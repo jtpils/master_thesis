@@ -72,7 +72,7 @@ def get_cut_out(discretized_point_cloud_map, global_coordinate, max_min_values_m
 
     cell_check_x = rounding(x_min, spatial_resolution) #- pad_size_low*spatial_resolution
     # print('start_cell_check', cell_check_x)
-    k = pad_size_low  
+    k = pad_size_low
     while cell_check_x < global_coordinate[0]:
         x_cell = k
         k += 1
