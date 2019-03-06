@@ -9,7 +9,7 @@ import sys
 import random
 import math
 
-
+'''
 def ReLU(x):
 
     return x * (x > 0)
@@ -36,4 +36,14 @@ plt.ylabel('y')
 plt.title("Activation functions")
 plt.legend()
 plt.show()
+'''
+
+path_array = ['path_to_map_1', 'path_to_map_2']
+
+for i in path_array:
+    print(i)
+
+
+
+
 
