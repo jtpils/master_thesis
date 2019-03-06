@@ -57,6 +57,14 @@ with open(csv_labels_path, mode='w') as csv_file:
 i = 0
 # shuffle order of ply-files
 random.shuffle(ply_files)
+
+# if wanting more training data than the map with ply files contains.
+if number_of_files_to_load > len(ply_files):
+    number_additional_files = number_of_files_to_load-len(ply_files)
+    additional_files = np.random.choice(ply_files, number_additional_files)
+    ply_files = np.concatenate((ply_files, additional_files))
+
+
 for file_name in ply_files[:number_of_files_to_load]:
 
     # Load data:
@@ -86,16 +94,18 @@ for file_name in ply_files[:number_of_files_to_load]:
 
     # get the map cut-out
     cut_out_coordinates = global_lidar_coordinates + rand_trans
-    # map = np.load(os.path.join(map_path, 'map.npy'))
-    # max_min_values = np.load(os.path.join(map_path, 'max_min_values.npy'))
-    # cut_out = get_cutout()
-
-    # WE SHOULD NORMALIZE BOTH MAP AND SWEEP HERE?!
+    map = np.load(os.path.join(map_path, 'map.npy'))
+    max_min_values = np.load(os.path.join(map_path, 'max_min_values.npy'))
+    cut_out = get_cut_out(map, cut_out_coordinates, max_min_values)
 
     # concatenate the sweep and the cut-out into one image and save.
     sweep_and_cutout = np.concatenate((sweep, cut_out))
     path = path_samples + '/' + str(i)
     np.save(path, sweep_and_cutout)
+    # WE SHOULD NORMALIZE BOTH MAP AND SWEEP HERE?!
+
+    nomalized_sample = normalize_sample(sweep_and_cutout)
+
 
     # Create labels for each sample:
     # write sample number in column 1, and the transformation in the next columns
