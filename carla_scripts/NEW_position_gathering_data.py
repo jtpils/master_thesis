@@ -32,6 +32,7 @@ lidar_position = np.array((0,0))
 def main():
 
     input_folder_name = input('Type name of new folder: "TownXX_date_number" :')
+    number_of_waypoints = int(input('Number of waypoints to visit: '))
     #print(input_folder_name)
     #print(type(input_folder_name))
 
@@ -42,13 +43,11 @@ def main():
     folder_path = current_path + folder_name
 
     try:
-       os.mkdir(folder_path)
+        os.mkdir(folder_path)
     except OSError:
-       print('Failed to create new directory.')
+        print('Failed to create new directory.')
     else:
-       print('Successfully created new directory with path: ' , folder_path)
-
-
+        print('Successfully created new directory with path: ', folder_path)
 
     actor_list = []
 
@@ -65,8 +64,8 @@ def main():
         actor_list.append(vehicle)
         print(' ')
         print('created %s' % vehicle.type_id)
-        #vehicle.set_autopilot(True)
-        #print('Auto pilot')
+        vehicle.set_autopilot(True)
+        print('Auto pilot')
         time.sleep(3) # let the car have some fun
         print(' ')
 
@@ -83,7 +82,6 @@ def main():
         camera = world.spawn_actor(camera_bp, camera_transform, attach_to=vehicle)
         actor_list.append(camera)
         print('created %s' % camera.type_id)
-
 
         # Add LiDAR
         # transform we give here is now relative to the vehicle.
@@ -103,7 +101,6 @@ def main():
 
         ########################################## create csv-file ##########################################
 
-
         # Creates the csv file
         csv_path = folder_path + '/' + input_folder_name + '.csv'
         with open(csv_path , mode = 'w') as csv_file:
@@ -111,14 +108,15 @@ def main():
             csv_writer = csv.writer(csv_file, delimiter = ',' , quotechar='"', quoting=csv.QUOTE_MINIMAL)
             csv_writer.writerow(fieldnames)
 
-
         ########################################## callback functions ##########################################
         def save_lidar_data(data):
             global lidar_position
             current_position = np.array((data.transform.location.x, data.transform.location.y))
             moved_distance = np.linalg.norm(current_position - lidar_position)
         
-            if moved_distance > 0.5 and data.frame_number % 10 == 0:  # moved at least 0.5 m, and has passed 1 second (so that we don't save sweeps when the car is dropped)
+        
+            # ######### CHANGE DISTANCE HERE #########
+            if moved_distance > 10:# and data.frame_number % 10 == 0:  # moved at least 0.5 m, and has passed 1 second (so that we don't save sweeps when the car is dropped)
                 point_cloud_path = folder_path + '/pc/%06d'
                 data.save_to_disk( point_cloud_path % data.frame_number)
 
@@ -128,38 +126,38 @@ def main():
                     csv_writer_2.writerow([data.frame_number, data.transform.location.x, data.transform.location.y, data.transform.location.z, data.transform.rotation.yaw])
             
                 lidar_position = current_position  # save globally for next lidar sweep
-            
 
-        '''def save_rgb_data(image):
-            if image.frame_number % 100 == 0:  # every 100th frame, i.e. once every 10 second
+        def save_rgb_data(image):
+            global lidar_position
+            current_position = np.array((image.transform.location.x, image.transform.location.y))
+            moved_distance = np.linalg.norm(current_position - lidar_position)
+            
+            if moved_distance > 10:
                 rgb_path = folder_path + '/rgb/%06d'
-                data.save_to_disk( rgb_path % image.frame_number)'''
+                image.save_to_disk( rgb_path % image.frame_number)
                 
                 
-        #camera.listen(lambda image: save_rgb_data(image))
+        # camera.listen(lambda image: save_rgb_data(image))
+
         myLidar.listen(lambda data: save_lidar_data(data)) # data is a LidarMeasurement object
         
         ########################################## main loops ##########################################
-        
 
         # Create a list with the waypoints that exists
         map = world.get_map()
-        waypoint_list = map.generate_waypoints(1) 
+        waypoint_list = map.generate_waypoints(number_of_waypoints)
         print('waypoint list length:', len(waypoint_list))
         print(' ')
 
         num_waypoints = 1
-        for waypoint in waypoint_list:  ###### CHANGED HERE
+        for waypoint in waypoint_list:
             vehicle.set_transform(waypoint.transform)
-            time.sleep(2) # seconds to move 
+            time.sleep(20) # seconds to move
 
             if num_waypoints%5 == 0:
                 text = 'number of waypoints visited: ' + str(num_waypoints) + ' of ' + str(len(waypoint_list))
                 print(text)
             num_waypoints = num_waypoints + 1
-
-        
-        
 
     finally:
 
@@ -167,7 +165,6 @@ def main():
         for actor in actor_list:
             actor.destroy()
         print('done.')
-
 
 
 if __name__ == '__main__':
