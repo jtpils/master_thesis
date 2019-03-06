@@ -11,9 +11,10 @@ input_folder_name = input('Type name of new folder to save data:')
 print(' ')
 
 current_path = os.getcwd()
-# folder_path = current_path + '/fake_training_data_' + input_folder_name
-folder_path = os.path.join(current_path, 'training_data_', input_folder_name)
-# path_samples = folder_path + '/samples'
+
+folder_name = 'training_data_' + input_folder_name
+folder_path = os.path.join(current_path,folder_name)
+
 path_samples = os.path.join(folder_path, 'samples')
 
 
@@ -38,8 +39,9 @@ for file in dir_list:
 
 map_path = input('Type complete path to the map folder: ')
 
-translation = int(input('Translation in meters: '))
-rotation = int(input('Rotation in degrees: '))
+
+translation = float(input('Translation in meters: '))
+rotation = float(input('Rotation in degrees: '))
 number_of_files_to_load = int(input('How many training samples do you want to create: '))
 print(' ')
 ########################################################################################################
@@ -93,19 +95,19 @@ for file_name in ply_files[:number_of_files_to_load]:
     sweep = discretize_pointcloud(sweep, array_size=600, trim_range=15, spatial_resolution=0.05, padding=True, pad_size=150)
 
     # get the map cut-out
-    cut_out_coordinates = global_lidar_coordinates + rand_trans
+    cut_out_coordinates = global_lidar_coordinates[0, :3] + rand_trans
+
     map = np.load(os.path.join(map_path, 'map.npy'))
-    max_min_values = np.load(os.path.join(map_path, 'max_min_values.npy'))
+    max_min_values = np.load(os.path.join(map_path, 'max_min.npy'))
     cut_out = get_cut_out(map, cut_out_coordinates, max_min_values)
 
     # concatenate the sweep and the cut-out into one image and save.
     sweep_and_cutout = np.concatenate((sweep, cut_out))
     path = path_samples + '/' + str(i)
     np.save(path, sweep_and_cutout)
-    # WE SHOULD NORMALIZE BOTH MAP AND SWEEP HERE?!
 
+    # Normalize the sample
     nomalized_sample = normalize_sample(sweep_and_cutout)
-
 
     # Create labels for each sample:
     # write sample number in column 1, and the transformation in the next columns
@@ -114,5 +116,37 @@ for file_name in ply_files[:number_of_files_to_load]:
         csv_writer.writerow([i, rand_trans[0], rand_trans[1], rand_trans[2]])
 
 
+    '''Uncomment for visualisation of the sweep and cut_out
+    layer = 2
+    max_value = np.max(sweep[layer, :, :])
+    print('Max max_value in array_to_png: ', max_value)
 
+    # avoid division with 0
+    if max_value == 0:
+        max_value = 1
+
+    scale = 255 / max_value
+    sweep[layer, :, :] = sweep[layer, :, :] * scale
+    print('Largest pixel value (should be 255) : ', np.max(sweep[layer, :, :]))
+
+    img = Image.fromarray(sweep[layer, :, :])
+    new_img = img.convert("L")
+    new_img.rotate(180).show()
+
+    layer = 2
+    max_value = np.max(cut_out[layer, :, :])
+    print('Max max_value in array_to_png: ', max_value)
+
+    # avoid division with 0
+    if max_value == 0:
+        max_value = 1
+
+    scale = 255 / max_value
+    cut_out[layer, :, :] = cut_out[layer, :, :] * scale
+    print('Largest pixel value (should be 255) : ', np.max(cut_out[layer, :, :]))
+
+    img = Image.fromarray(cut_out[layer, :, :])
+    new_img = img.convert("L")
+    new_img.rotate(180).show()
+    '''
 

@@ -3,6 +3,7 @@ from PIL import Image
 import os
 import sys
 import pandas as pd
+import math
 
 
 def load_data(path_to_ply, path_to_csv):
