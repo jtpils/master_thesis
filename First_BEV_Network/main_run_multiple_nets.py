@@ -12,6 +12,7 @@ learning_rate = 0.001
 patience = int(input('patience: '))
 batch_size = 4
 path_training_data = input('path to training data set:') # /home/master04/Desktop/Dataset/fake_training_data_small_set
+path_validation_data = input('path to validation data set:')
 plot_flag = input('Plot results? y / n: ')
 
 # create directory for model weights
@@ -29,7 +30,7 @@ print(' ')
 
 # get data loaders
 kwargs = {'pin_memory': True} if use_cuda else {}
-train_loader, val_loader, test_loader = get_loaders(path_training_data, batch_size, kwargs)
+train_loader, val_loader, test_loader = get_loaders(path_training_data, path_validation_data, batch_size, kwargs)
 
 '''net1 = SuperSimpleCNN().to(device)
 net2 = MoreConv().to(device)
