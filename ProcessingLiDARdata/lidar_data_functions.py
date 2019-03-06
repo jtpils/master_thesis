@@ -4,6 +4,7 @@ import os
 import sys
 import pandas as pd
 import math
+from matplotlib import pyplot as plt
 
 
 def load_data(path_to_ply, path_to_csv):
@@ -519,3 +520,19 @@ def get_cut_out(discretized_point_cloud_map, global_coordinate, max_min_values_m
     cut_out = discretized_point_cloud_map[:, lower_bound_row:upper_bound_row, lower_bound_col:upper_bound_col]
 
     return cut_out
+
+
+def visualize_detections(discretized_point_cloud, fig_num=1):
+    '''
+    takes as input a discretized point cloud (all channels) and visualizes the detections in channel 0. Every cell with
+    at least one detection is assigned the value 255. When showing the image, all detections will appear as white pixels.
+    Call plt.show() after this function! Can plot multiple figures.
+    :param discretized_point_cloud: pointcloud with 4 channels
+           fig_num: figure number
+    :return:
+    '''
+    detection_layer = discretized_point_cloud[0, :, :]
+    detection_layer[detection_layer > 0] = 255
+
+    plt.figure(fig_num)
+    plt.imshow(detection_layer, cmap='gray')
