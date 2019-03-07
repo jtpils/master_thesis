@@ -116,7 +116,9 @@ for file_name in ply_files[:number_of_files_to_load]:
         csv_writer.writerow([i, rand_trans[0], rand_trans[1], rand_trans[2]])
 
 
-    '''Uncomment for visualisation of the sweep and cut_out
+
+    visualize_detections()
+    '''# Uncomment for visualisation of the sweep and cut_out
     layer = 2
     max_value = np.max(sweep[layer, :, :])
     print('Max max_value in array_to_png: ', max_value)
@@ -148,5 +150,4 @@ for file_name in ply_files[:number_of_files_to_load]:
     img = Image.fromarray(cut_out[layer, :, :])
     new_img = img.convert("L")
     new_img.rotate(180).show()
-    '''
-
+'''
