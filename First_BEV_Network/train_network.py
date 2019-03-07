@@ -43,7 +43,7 @@ def train_network(net, train_loader, val_loader, n_epochs, learning_rate, patien
 
     # Create our loss and optimizer functions
     loss, optimizer = create_loss_and_optimizer(net, learning_rate)
-    scheduler = StepLR(optimizer, step_size=15, gamma=0.5)
+    scheduler = StepLR(optimizer, step_size=20, gamma=0.5)
 
     # Time for printing
     training_start_time = time.time()
@@ -55,7 +55,7 @@ def train_network(net, train_loader, val_loader, n_epochs, learning_rate, patien
         print('learning rate: ', params[0]['lr'])
 
         running_loss = 0.0
-        print_every = n_batches // 3  # how many mini-batches iw we want to print stats 3 times per epoch
+        print_every = n_batches // 5  # how many mini-batches if we want to print stats x times per epoch
         start_time = time.time()
         total_train_loss = 0
 

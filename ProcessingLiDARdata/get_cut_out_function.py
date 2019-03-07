@@ -72,7 +72,7 @@ def get_cut_out(discretized_point_cloud_map, global_coordinate, max_min_values_m
 
     cell_check_x = rounding(x_min, spatial_resolution) #- pad_size_low*spatial_resolution
     # print('start_cell_check', cell_check_x)
-    k = pad_size_low  
+    k = pad_size_low
     while cell_check_x < global_coordinate[0]:
         x_cell = k
         k += 1
@@ -120,8 +120,7 @@ def get_cut_out(discretized_point_cloud_map, global_coordinate, max_min_values_m
 
     return cut_out
 
-'''
-# Test the function with this section. 
+
 for i in range(2):  # range sets how many cut_outs to do.
 
     # load the global coordinates
@@ -184,4 +183,4 @@ print('Largest pixel value (should be 255) : ', np.max(discretized_pc_map[layer,
 img = Image.fromarray(discretized_pc_map[layer, :, :])
 new_img = img.convert("L")
 new_img.rotate(180).show()
-'''
+
