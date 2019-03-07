@@ -32,7 +32,6 @@ lidar_position = np.array((0,0))
 def main():
 
     input_folder_name = input('Type name of new folder: "TownXX_date_number" :')
-    number_of_waypoints = int(input('Number of waypoints to visit: '))
     #print(input_folder_name)
     #print(type(input_folder_name))
 
@@ -116,7 +115,7 @@ def main():
         
         
             # ######### CHANGE DISTANCE HERE #########
-            if moved_distance > 10:# and data.frame_number % 10 == 0:  # moved at least 0.5 m, and has passed 1 second (so that we don't save sweeps when the car is dropped)
+            if moved_distance > 5:# and data.frame_number % 10 == 0:  # moved at least 0.5 m, and has passed 1 second (so that we don't save sweeps when the car is dropped)
                 point_cloud_path = folder_path + '/pc/%06d'
                 data.save_to_disk( point_cloud_path % data.frame_number)
 
@@ -127,7 +126,7 @@ def main():
             
                 lidar_position = current_position  # save globally for next lidar sweep
 
-        def save_rgb_data(image):
+        '''def save_rgb_data(image):
             global lidar_position
             current_position = np.array((image.transform.location.x, image.transform.location.y))
             moved_distance = np.linalg.norm(current_position - lidar_position)
@@ -137,7 +136,7 @@ def main():
                 image.save_to_disk( rgb_path % image.frame_number)
                 
                 
-        # camera.listen(lambda image: save_rgb_data(image))
+        # camera.listen(lambda image: save_rgb_data(image))'''
 
         myLidar.listen(lambda data: save_lidar_data(data)) # data is a LidarMeasurement object
         
@@ -145,14 +144,15 @@ def main():
 
         # Create a list with the waypoints that exists
         map = world.get_map()
-        waypoint_list = map.generate_waypoints(number_of_waypoints)
+        length_between_waypoints = 50
+        waypoint_list = map.generate_waypoints(length_between_waypoints)
         print('waypoint list length:', len(waypoint_list))
         print(' ')
 
         num_waypoints = 1
         for waypoint in waypoint_list:
             vehicle.set_transform(waypoint.transform)
-            time.sleep(20) # seconds to move
+            time.sleep(15) # seconds to move
 
             if num_waypoints%5 == 0:
                 text = 'number of waypoints visited: ' + str(num_waypoints) + ' of ' + str(len(waypoint_list))
