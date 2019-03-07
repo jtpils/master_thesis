@@ -5,6 +5,7 @@ from simple_nets_iteration3 import *
 import matplotlib.pyplot as plt
 import os
 import torch
+from loaders_only_sweeps import *
 
 
 # training folder:
@@ -14,7 +15,7 @@ import torch
 # /Users/annikal/Desktop/fake_training_data_trans2
 
 # load old weights! change here manually
-load_weights = True
+load_weights = False
 load_weights_path = '/home/master04/Desktop/networks_plots_190305/test_multiple_networks_6/parameters_net2/epoch_9_checkpoint.pt'
 
 model_name = input('Type name of new folder: ')
@@ -52,7 +53,13 @@ if load_weights:
 
 # get data loaders
 kwargs = {'pin_memory': True} if use_cuda else {}
-train_loader, val_loader, test_loader = get_loaders(path_training_data, path_validation_data, batch_size, kwargs)
+map_path = '/Users/annikal/Documents/master_thesis/ProcessingLiDARdata/_out_map_190302_1/map.npy'
+map_minmax_values_path = '/Users/annikal/Documents/master_thesis/ProcessingLiDARdata/_out_map_190302_1/max_min.npy'
+#train_loader, val_loader, test_loader = get_loaders(path_training_data, path_validation_data, batch_size, kwargs) #########################
+train_loader, val_loader, test_loader = get_sweep_loaders(path_training_data, map_path, map_minmax_values_path,
+                                                          path_validation_data, batch_size, kwargs)
+
+
 
 # create directory for model weights
 current_path = os.getcwd()
