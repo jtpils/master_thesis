@@ -3,14 +3,10 @@ from lidar_data_functions import *
 from matplotlib import pyplot as plt
 
 
-#path_to_ply_folder = '/home/master04/Desktop/_out_town2/pc/'
-#path_to_csv = '/home/master04/Desktop/_out_town2/town2.csv'
-#path_to_ply_folder = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/_out_Town02_190221_1/pc/'
-#path_to_csv = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/_out_Town02_190221_1/Town02_190221_1.csv'
+path_to_ply_folder = input('Type path to ply folder:')
+path_to_csv = input('Type path to csv folder:')
+map_resolution = input('Type spatial resolution of map (default=0.05):')
 
-path_to_ply_folder = '/home/master04/Desktop/Ply_files/_out_Town02_190306_1/pc/'  # input('Type path to ply folder:')
-path_to_csv = '/home/master04/Desktop/Ply_files/_out_Town02_190306_1/Town02_190306_1.csv'  # input('Type path to csv folder:')
-map_resolution = 0.05
 
 files_in_ply_folder = os.listdir(path_to_ply_folder)
 number_of_files_to_load = len(files_in_ply_folder)
@@ -23,8 +19,7 @@ min_x_val = float("inf")
 min_y_val = float("inf")
 i = 0
 
-
-for file in files_in_ply_folder[:50]:#[0::100]:  # the last number is how large steps to take
+for file in files_in_ply_folder:  # [0::100]:  # the last number is how large steps to take
 
     try:
         # Create the path to the ply file
@@ -81,12 +76,12 @@ min_max = np.array((min_x_val, max_x_val, min_y_val, max_y_val))
 
 
 # Discretize the point cloud
-discretized_pc = discretize_pointcloud_map(pc_super_array, min_max, spatial_resolution=map_resolution) ############
+
+discretized_pc = discretize_pointcloud_map(pc_super_array, min_max, spatial_resolution=map_resolution) 
+
 
 # UNCOMMENT IF YOU WANT TO SAVE THE DISCRETIZED MAP AS AN PNG AND ITS VALUES.
 #array_to_png(discretized_pc, min_max)
-
-
 
 # Ask what the png files should be named and create a folder where to save them
 # input_folder_name = ''
