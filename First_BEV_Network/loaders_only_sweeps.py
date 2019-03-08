@@ -38,8 +38,10 @@ class LiDARDataSet_onthego(Dataset):
         cut_out_coordinates = self.cut_out_coordinates.iloc[idx-1, :].values
 
         cut_out = get_cut_out(self.map, cut_out_coordinates, self.map_minmax_values)
+        cut_out = torch.from_numpy(cut_out).float()
 
-        sample = np.concatenate((sweep, cut_out))
+        #sample = np.concatenate((sweep, cut_out))
+        sample = torch.cat((sweep, cut_out))
 
         training_sample = {'sample': sample, 'labels': labels}  # .values}  #  This worked on Sabinas Mac.
 
