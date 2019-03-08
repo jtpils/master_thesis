@@ -15,11 +15,11 @@ folder_path = os.path.join(current_path, input_folder_name)
 
 # Path to the validation set
 path_validation = os.path.join(folder_path, 'validation_set')
-path_validation_ply = os.path.join(path_validation,'ply')
+path_validation_ply = os.path.join(path_validation,'pc')
 
 # Path to the test set
 path_test = os.path.join(folder_path, 'test_set')
-path_test_ply = os.path.join(path_test,'ply')
+path_test_ply = os.path.join(path_test,'pc')
 
 # Path to csv that is going to be filled
 csv_labels_path_val = os.path.join(path_validation,'validation_set.csv')
