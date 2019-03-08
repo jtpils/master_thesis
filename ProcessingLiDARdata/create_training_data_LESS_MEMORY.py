@@ -51,7 +51,7 @@ ply_files = os.listdir(path_to_pc)
 # create csv-file with header: frame_number, x, y, angle (i.e. the labels)
 csv_labels_path = folder_path + '/labels.csv'
 with open(csv_labels_path, mode='w') as csv_file:
-    fieldnames = ['frame_number', 'x', 'y', 'angle']
+    fieldnames = ['frame_number', 'x', 'y', 'angle', 'x_map', 'y_map']
     csv_writer = csv.writer(csv_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
     csv_writer.writerow(fieldnames)
 
@@ -119,7 +119,7 @@ for file_name in ply_files[:10]:  # [:number_of_files_to_load]:
     with open(csv_labels_path, mode='a') as csv_file:
         csv_writer = csv.writer(csv_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
         csv_writer.writerow([i, rand_trans[0], rand_trans[1], rand_trans[2], cut_out_coordinates[0],
-                            cut_out_coordinates[1], cut_out_coordinates[2]])
+                            cut_out_coordinates[1]])
 
 
 
