@@ -26,7 +26,7 @@ patience = int(input('Input patience for EarlyStopping: ')) # Threshold for earl
 path_training_data = input('Path to training data set folder: ')
 path_validation_data = input('Path to validation data set folder: ')
 
-batch_size = 1  # int(input('Input batch size: '))
+batch_size = int(input('Input batch size: '))
 plot_flag = input('Plot results? y / n: ')
 
 
