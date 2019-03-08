@@ -34,22 +34,14 @@ class LiDARDataSet_onthego(Dataset):
         sweep_file = os.path.join(self.sweep_dir, str(idx))
         sweep = torch.from_numpy(np.load(sweep_file + '.npy')).float()
 
-        labels = self.csv_labels.iloc[idx-1, :]
-        cut_out_coordinates = self.cut_out_coordinates.iloc[idx-1, :]
-
-        print('cut_out_coordinates: ', cut_out_coordinates)
-        print('shape cut_out_coordinates: ', np.shape(cut_out_coordinates))
+        labels = self.csv_labels.iloc[idx-1, :].values
+        cut_out_coordinates = self.cut_out_coordinates.iloc[idx-1, :].values
 
         cut_out = get_cut_out(self.map, cut_out_coordinates, self.map_minmax_values)
 
-        print('shape sweep', np.shape(sweep))
-        print('shape cut out', np.shape(cut_out))
-
         sample = np.concatenate((sweep, cut_out))
 
-        training_sample = {'sample': sample, 'labels': labels.values}  #  This worked on Sabinas Mac.
-        # training_sample = {'sample': sample, 'labels': labels.to_numpy()}
-        type(training_sample)
+        training_sample = {'sample': sample, 'labels': labels}  # .values}  #  This worked on Sabinas Mac.
 
         return training_sample
 
@@ -66,14 +58,6 @@ def get_sweep_loaders(path_training_data, map_path, map_minmax_values_path, path
     val_size = int(0.8 * len(validation_data_set))
     val_dataset = torch.utils.data.dataset.Subset(validation_data_set, np.arange(1, val_size+1))
     test_dataset = torch.utils.data.dataset.Subset(validation_data_set, np.arange(val_size+1, len(validation_data_set)+1))
-
-    # Old stuff
-    # lidar_data_set = LiDARDataSet(csv_file, sample_dir)
-    # train_size = int(0.7 * len(lidar_data_set))
-    # val_size = int(0.2 * len(lidar_data_set))
-    # train_dataset = torch.utils.data.dataset.Subset(lidar_data_set, np.arange(1, train_size+1))
-    # val_dataset = torch.utils.data.dataset.Subset(lidar_data_set, np.arange(train_size+1, train_size+val_size+1))
-    # test_dataset = torch.utils.data.dataset.Subset(lidar_data_set, np.arange(train_size+val_size+1, len(lidar_data_set)+1))
 
     # Training
     n_training_samples = len(training_data_set)
