@@ -53,8 +53,8 @@ if load_weights:
 
 # get data loaders
 kwargs = {'pin_memory': True} if use_cuda else {}
-map_path = '/Users/annikal/Documents/master_thesis/ProcessingLiDARdata/_out_map_190302_1/map.npy'
-map_minmax_values_path = '/Users/annikal/Documents/master_thesis/ProcessingLiDARdata/_out_map_190302_1/max_min.npy'
+map_path = input('path to map.npy ')#'/Users/annikal/Documents/master_thesis/ProcessingLiDARdata/_out_map_190302_1/map.npy'
+map_minmax_values_path = input('path to max_min values ')#'/Users/annikal/Documents/master_thesis/ProcessingLiDARdata/_out_map_190302_1/max_min.npy'
 #train_loader, val_loader, test_loader = get_loaders(path_training_data, path_validation_data, batch_size, kwargs) #########################
 train_loader, val_loader, test_loader = get_sweep_loaders(path_training_data, map_path, map_minmax_values_path,
                                                           path_validation_data, batch_size, kwargs)
