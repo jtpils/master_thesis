@@ -8,9 +8,9 @@ from matplotlib import pyplot as plt
 #path_to_ply_folder = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/_out_Town02_190221_1/pc/'
 #path_to_csv = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/_out_Town02_190221_1/Town02_190221_1.csv'
 
-path_to_ply_folder = input('Type path to ply folder:')
-path_to_csv = input('Type path to csv folder:')
-
+path_to_ply_folder = '/home/master04/Desktop/Ply_files/old/_out_Town2_190304_1/pc/'  # input('Type path to ply folder:')
+path_to_csv = '/home/master04/Desktop/Ply_files/old/_out_Town2_190304_1/Town2_190304_1.csv'  # input('Type path to csv folder:')
+map_resolution = 1
 
 files_in_ply_folder = os.listdir(path_to_ply_folder)
 number_of_files_to_load = len(files_in_ply_folder)
@@ -24,7 +24,8 @@ min_y_val = float("inf")
 i = 0
 
 
-for file in files_in_ply_folder:#[0::100]:  # the last number is how large steps to take
+for file in files_in_ply_folder[:10]:#[0::100]:  # the last number is how large steps to take
+
     try:
         # Create the path to the ply file
         path_to_ply = path_to_ply_folder + file
@@ -33,6 +34,7 @@ for file in files_in_ply_folder:#[0::100]:  # the last number is how large steps
     except:
         print('Failed to load file ', file, '. Moving on to next file.')
         continue
+
 
     # rotate, translate the point cloud to global coordinates and trim the point cloud
     trimmed_pc = trim_pointcloud(point_cloud, range=30, roof=100, floor=0)
@@ -66,15 +68,20 @@ for file in files_in_ply_folder:#[0::100]:  # the last number is how large steps
         min_y_val = min_y_val_tmp
 
 
+print(min_x_val, max_x_val, max_y_val, min_y_val)
+
+
 print('Done loading files. Creating map.')
 # delete the zeros in the first row in the super array that was used at the initalization of the array.
 pc_super_array = np.delete(pc_super_array, 0, axis=0)
 
 # save the max and min values in an array. This is used to decide the size of the map
 min_max = np.array((min_x_val, max_x_val, min_y_val, max_y_val))
+print(min_max)
+
 
 # Discretize the point cloud
-discretized_pc = discretize_pointcloud_map(pc_super_array, min_max, spatial_resolution=0.05) ############
+discretized_pc = discretize_pointcloud_map(pc_super_array, min_max, spatial_resolution=map_resolution) ############
 
 # UNCOMMENT IF YOU WANT TO SAVE THE DISCRETIZED MAP AS AN PNG AND ITS VALUES.
 #array_to_png(discretized_pc, min_max)
@@ -85,7 +92,7 @@ discretized_pc = discretize_pointcloud_map(pc_super_array, min_max, spatial_reso
 # input_folder_name = ''
 
 # create a folder name
-folder_name = 'map_3_190306'
+folder_name = 'map_testing'
 
 # creates folder to store the png files
 current_path = os.getcwd()
