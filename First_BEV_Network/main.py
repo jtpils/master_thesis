@@ -50,10 +50,10 @@ kwargs = {'pin_memory': True} if use_cuda else {}
 if data_flag == 'fake':
     train_loader, val_loader, test_loader = get_loaders(path_training_data, path_validation_data, batch_size, kwargs)
 elif data_flag == 'real':
-    map_folder_path = input('Type path to map folder: ')
+    map_folder_path = input('Type path to map folder (no slash at the end...): ')
 
-    map_path = os.path.join(map_folder_path, '/map.npy')
-    map_minmax_values_path = os.path.join(map_folder_path, '/max_min.npy')
+    map_path = map_folder_path + '/map.npy' #os.path.join(map_folder_path, '/map.npy')
+    map_minmax_values_path = map_folder_path + '/max_min.npy' #os.path.join(map_folder_path, '/max_min.npy')
     train_loader, val_loader, test_loader = get_sweep_loaders(path_training_data, map_path, map_minmax_values_path,
                                                               path_validation_data, batch_size, kwargs)
 else:
