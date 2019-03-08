@@ -47,9 +47,9 @@ print(' ')
 
 data_flag = input('Real or fake training data? ( real / fake ): ')
 kwargs = {'pin_memory': True} if use_cuda else {}
-if data_flag == 'real':
+if data_flag == 'fake':
     train_loader, val_loader, test_loader = get_loaders(path_training_data, path_validation_data, batch_size, kwargs)
-elif data_flag == 'fake':
+elif data_flag == 'real':
     map_folder_path = input('Type path to map folder: ')
 
     map_path = os.path.join(map_folder_path, '/map.npy')
