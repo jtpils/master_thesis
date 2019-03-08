@@ -65,19 +65,19 @@ def get_sweep_loaders(path_training_data, map_path, map_minmax_values_path, path
     n_training_samples = len(training_data_set)
     print('Number of training samples: ', n_training_samples)
     train_sampler = SubsetRandomSampler(np.arange(1, n_training_samples, dtype=np.int64))
-    train_loader = torch.utils.data.DataLoader(training_data_set, batch_size=batch_size, sampler=train_sampler, num_workers=4, **kwargs)
+    train_loader = torch.utils.data.DataLoader(training_data_set, batch_size=batch_size, sampler=train_sampler, num_workers=2, **kwargs)
 
     # Validation
     n_val_samples = len(val_dataset)
     print('Number of validation samples: ', n_val_samples)
     val_sampler = SubsetRandomSampler(np.arange(n_val_samples, dtype=np.int64))
-    val_loader = torch.utils.data.DataLoader(val_dataset, batch_size=batch_size, sampler=val_sampler, num_workers=4, **kwargs)
+    val_loader = torch.utils.data.DataLoader(val_dataset, batch_size=batch_size, sampler=val_sampler, num_workers=2, **kwargs)
 
     # Test
     n_test_samples = len(test_dataset)
     print('Number of test samples: ', n_test_samples)
     print(' ')
     test_sampler = SubsetRandomSampler(np.arange(n_test_samples, dtype=np.int64))
-    test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=batch_size, sampler=test_sampler, num_workers=4, **kwargs)
+    test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=batch_size, sampler=test_sampler, num_workers=2, **kwargs)
 
     return train_loader, val_loader, test_loader
