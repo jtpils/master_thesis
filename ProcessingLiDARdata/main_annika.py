@@ -4,51 +4,46 @@ from matplotlib import pyplot as plt
 import pandas as pd
 
 
-#path_to_ply = '/home/master04/Desktop/_out_town2/pc/059176.ply'
-#path_to_csv = '/home/master04/Desktop/_out_town2/town2.csv'
-
-################################# CHANGE HERE ###########################################################
-'''print(' ')
-path_to_lidar_data = '/Users/annikal/Documents/master_thesis/ProcessingLiDARdata/_out_Town02_190221_1'
-dir_list = os.listdir(path_to_lidar_data)
-path_to_pc = os.path.join(path_to_lidar_data, 'pc/')  # we assume we follow the structure of creating lidar data folder with a pc folder for ply
-for file in dir_list:
-    if '.csv' in file:  # find csv-file
-        path_to_csv = os.path.join(path_to_lidar_data, file)
+path_to_ply = '/home/master04/Desktop/Ply_files/_out_Town02_190306_1/pc/002198.ply'
+path_to_csv = '/home/master04/Desktop/Ply_files/_out_Town02_190306_1/Town02_190306_1.csv'
 
 
-# create a list of all ply-files in a directory
-ply_files = os.listdir(path_to_pc)
+pc, global_lidar_coordinates = load_data(path_to_ply, path_to_csv)
 
-i = 0
+# trim the point cloud
+pc = trim_pointcloud(pc, range=15, roof=20, floor=0)
 
-number_of_files_to_load = 1
-for file_name in ply_files[:number_of_files_to_load]:
+#plt.plot(pc[:,0], pc[:,1], '.')
+#plt.show()
 
-    # Load data:
-    try:
-        path_to_ply = path_to_pc + file_name
-        pc, global_lidar_coordinates = load_data(path_to_ply, path_to_csv)
-        i = i + 1
-        print('Creating training sample ', i, ' of ', number_of_files_to_load)
-        print(file_name)
-    except:
-        print('Failed to load file ', file_name, '. Moving on to next file.')
-        continue
+# discretize the sweep with padding
+pc = discretize_pointcloud(pc, array_size=600, trim_range=15, spatial_resolution=0.05, padding=False, pad_size=150)
+
+visualize_detections(pc,1)
+
+visualize_detections(pc,2)
+plt.show()
+
+#plt.imshow(pc[0,:,:], cmap='gray')
+#plt.show()
+'''
+# Uncomment for visualisation of the sweep and cut_out
+layer = 2
+max_value = np.max(pc[layer, :, :])
+print('Max max_value in array_to_png: ', max_value)
+
+# avoid division with 0
+if max_value == 0:
+    max_value = 1
+
+scale = 255 / max_value
+pc[layer, :, :] = pc[layer, :, :] * scale
+print('Largest pixel value (should be 255) : ', np.max(pc[layer, :, :]))
 
 
-    sweep = trim_pointcloud(pc)
-    sweep = discretize_pointcloud(sweep, array_size=600, trim_range=15, spatial_resolution=1, padding=False, pad_size=150)
-    sweep_and_sweep = np.concatenate((sweep, sweep))
-    sweep_and_sweep = normalize_sample(sweep_and_sweep)
+img = Image.fromarray(pc[layer, :, :])
+new_img = img.convert("L")
+new_img.rotate(180).show()
 '''
 
 
-test_array = np.zeros((8,3,3))
-for i in np.arange(8):
-    test_array[i, :, :] = np.ones((3,3)) * i
-
-test_array = normalize_sample(test_array)
-
-
-print(test_array)

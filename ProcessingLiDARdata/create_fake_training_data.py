@@ -1,18 +1,18 @@
 from lidar_data_functions import *
 import csv
 import random
+import os
 
+###############################################################################
+# CREATE FAKE TRAINING SAMPLES (of one single sweep) WITHOUT A NEED FOR A MAP #
+###############################################################################
 
-########################################################################################################
-# A FIRST SKETCH ON HOW TO CREATE FAKE TRAINING SAMPLES (of one single sweep) WITHOUT A NEED FOR A MAP #
-########################################################################################################
-
-input_folder_name = input('Type name of new folder to save data:')
+input_folder_name = 'fake_training_data_' + input('Type name of new folder to save data:')
 print(' ')
 
 current_path = os.getcwd()
-folder_path = current_path + '/fake_training_data_' + input_folder_name
-path_samples = folder_path + '/samples'
+folder_path = os.path.join(current_path, input_folder_name)
+path_samples = os.path.join(folder_path, 'samples')
 
 try:
    os.mkdir(folder_path)
@@ -22,8 +22,8 @@ except OSError:
 else:
     print('Successfully created new directory with subdirectory, at ', folder_path)
 
-################################# CHANGE HERE ###########################################################
 print(' ')
+
 path_to_lidar_data = input('Type complete path to the folder that contains "pc"-folder with LiDAR data and a csv file, e.g. Town02_190222_1 :')
 dir_list = os.listdir(path_to_lidar_data) # this should return a list where only one object is our csv_file
 path_to_pc = os.path.join(path_to_lidar_data, 'pc/')  # we assume we follow the structure of creating lidar data folder with a pc folder for ply
@@ -32,45 +32,37 @@ for file in dir_list:
         path_to_csv = os.path.join(path_to_lidar_data, file)
 
 
-#path_to_csv = '/home/master04/Desktop/_out/_out_Town02_190208_1/Town02_190208_1.csv'
-#path_to_pc = '/home/master04/Desktop/_out/_out_Town02_190208_1/pc/'
-
-#path_to_csv = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/_out_Town03_190207_18/Town03_190207_18.csv'
-#path_to_pc = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/_out_Town03_190207_18/pc/'
-
 translation = float(input('Translation in meters:'))
 rotation = float(input('Rotation in degrees:'))
 number_of_files_to_load = int(input('How many training samples do you want to create:'))
 print(' ')
+
+
 ########################################################################################################
+
 # create a list of all ply-files in a directory
 ply_files = os.listdir(path_to_pc)
+
 # create csv-file with header: frame_number, x, y, angle (i.e. the labels)
-csv_labels_path = folder_path + '/labels.csv'
+csv_labels_path = os.path.join(folder_path, 'labels.csv')
 with open(csv_labels_path, mode='w') as csv_file:
     fieldnames = ['frame_number', 'x', 'y', 'angle']
     csv_writer = csv.writer(csv_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
     csv_writer.writerow(fieldnames)
 
 i = 0
-# shuffle order of ply-files
 random.shuffle(ply_files)
-
 if number_of_files_to_load > len(ply_files):
     number_additional_files = number_of_files_to_load-len(ply_files)
     additional_files = np.random.choice(ply_files, number_additional_files)
     ply_files = np.concatenate((ply_files, additional_files))
 
-#i=0
-#for file_name in ply_files[:2]:
-#    i = i+1
-#    # print('Creating training sample ', i, ' of ', int(len(ply_files)/10))
-
 for file_name in ply_files[:number_of_files_to_load]:
     
     # Load data:
     try:
-        path_to_ply = path_to_pc + file_name
+        #path_to_ply = path_to_pc + file_name
+        path_to_ply = os.path.join(path_to_pc, file_name)
         pc, global_lidar_coordinates = load_data(path_to_ply, path_to_csv)
         i = i + 1
         print('Creating training sample ', i, ' of ', number_of_files_to_load)

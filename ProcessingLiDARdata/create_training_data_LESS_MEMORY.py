@@ -17,7 +17,6 @@ folder_path = os.path.join(current_path,folder_name)
 
 path_samples = os.path.join(folder_path, 'samples')
 
-
 try:
     os.mkdir(folder_path)
     os.mkdir(path_samples)
@@ -37,17 +36,17 @@ for file in dir_list:
     if '.csv' in file:  # find csv-file
         path_to_csv = os.path.join(path_to_lidar_data, file)
 
-map_path = input('Type complete path to the map folder: ')
-
 
 translation = float(input('Translation in meters: '))
 rotation = float(input('Rotation in degrees: '))
 number_of_files_to_load = int(input('How many training samples do you want to create: '))
 print(' ')
+
 ########################################################################################################
 
 # create a list of all ply-files in a directory
 ply_files = os.listdir(path_to_pc)
+
 
 # create csv-file with header: frame_number, x, y, angle (i.e. the labels)
 csv_labels_path = folder_path + '/labels.csv'
@@ -56,9 +55,11 @@ with open(csv_labels_path, mode='w') as csv_file:
     csv_writer = csv.writer(csv_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
     csv_writer.writerow(fieldnames)
 
+
 i = 0
 # shuffle order of ply-files
 random.shuffle(ply_files)
+
 
 # if wanting more training data than the map with ply files contains.
 if number_of_files_to_load > len(ply_files):
@@ -67,7 +68,7 @@ if number_of_files_to_load > len(ply_files):
     ply_files = np.concatenate((ply_files, additional_files))
 
 
-for file_name in ply_files[:number_of_files_to_load]:
+for file_name in ply_files[:10]:  # [:number_of_files_to_load]:
 
     # Load data:
     try:
@@ -93,31 +94,37 @@ for file_name in ply_files[:number_of_files_to_load]:
 
     # discretize the sweep with padding
     sweep = discretize_pointcloud(sweep, array_size=600, trim_range=15, spatial_resolution=0.05, padding=True, pad_size=150)
+    save_path = path_samples + '/' + str(i)
+    np.save(save_path, sweep)
 
-    # get the map cut-out
+    # get the map cut-out coordinates
     cut_out_coordinates = global_lidar_coordinates[0, :3] + rand_trans
 
-    map = np.load(os.path.join(map_path, 'map.npy'))
-    max_min_values = np.load(os.path.join(map_path, 'max_min.npy'))
-    cut_out = get_cut_out(map, cut_out_coordinates, max_min_values)
+
+    # TODO; this below to be done when loading the samples instead!
+    #map = np.load(os.path.join(map_path, 'map.npy'))
+    #max_min_values = np.load(os.path.join(map_path, 'max_min.npy'))
+    #cut_out = get_cut_out(map, cut_out_coordinates, max_min_values)
 
     # concatenate the sweep and the cut-out into one image and save.
-    sweep_and_cutout = np.concatenate((sweep, cut_out))
-    path = path_samples + '/' + str(i)
-    np.save(path, sweep_and_cutout)
+    #sweep_and_cutout = np.concatenate((sweep, cut_out))
+    #path = path_samples + '/' + str(i)
+    #np.save(path, sweep_and_cutout)
 
     # Normalize the sample
-    nomalized_sample = normalize_sample(sweep_and_cutout)
+    #nomalized_sample = normalize_sample(sweep_and_cutout)
 
     # Create labels for each sample:
     # write sample number in column 1, and the transformation in the next columns
     with open(csv_labels_path, mode='a') as csv_file:
         csv_writer = csv.writer(csv_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-        csv_writer.writerow([i, rand_trans[0], rand_trans[1], rand_trans[2]])
+        csv_writer.writerow([i, rand_trans[0], rand_trans[1], rand_trans[2], cut_out_coordinates[0],
+                            cut_out_coordinates[1], cut_out_coordinates[2]])
 
 
 
-    visualize_detections()
+    #visualize_detections()
+
     '''# Uncomment for visualisation of the sweep and cut_out
     layer = 2
     max_value = np.max(sweep[layer, :, :])
