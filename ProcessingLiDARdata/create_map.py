@@ -5,7 +5,7 @@ from matplotlib import pyplot as plt
 
 path_to_ply_folder = input('Type path to ply folder:')
 path_to_csv = input('Type path to csv folder:')
-
+spatial_resolution = input('Type spatial resolution of map (default=0.05):')
 
 files_in_ply_folder = os.listdir(path_to_ply_folder)
 number_of_files_to_load = len(files_in_ply_folder)
@@ -69,12 +69,10 @@ pc_super_array = np.delete(pc_super_array, 0, axis=0)
 min_max = np.array((min_x_val, max_x_val, min_y_val, max_y_val))
 
 # Discretize the point cloud
-discretized_pc = discretize_pointcloud_map(pc_super_array, min_max, spatial_resolution=0.05) ############
+discretized_pc = discretize_pointcloud_map(pc_super_array, min_max, spatial_resolution)
 
 # UNCOMMENT IF YOU WANT TO SAVE THE DISCRETIZED MAP AS AN PNG AND ITS VALUES.
 #array_to_png(discretized_pc, min_max)
-
-
 
 # Ask what the png files should be named and create a folder where to save them
 # input_folder_name = ''
