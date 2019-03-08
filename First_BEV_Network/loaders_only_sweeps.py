@@ -37,6 +37,9 @@ class LiDARDataSet_onthego(Dataset):
         labels = self.csv_labels.iloc[idx-1, :]
         cut_out_coordinates = self.cut_out_coordinates.iloc[idx-1, :]
 
+        print('cut_out_coordinates: ', cut_out_coordinates)
+        print('shape cut_out_coordinates: ', np.shape(cut_out_coordinates))
+
         cut_out = get_cut_out(self.map, cut_out_coordinates, self.map_minmax_values)
 
         print('shape sweep', np.shape(sweep))
