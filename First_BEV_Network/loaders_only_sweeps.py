@@ -54,7 +54,6 @@ class LiDARDataSet_onthego(Dataset):
 def get_sweep_loaders(path_training_data, map_path, map_minmax_values_path, path_validation_data, batch_size, kwargs):
     csv_file = path_training_data + '/labels.csv'
     sample_dir = path_training_data + '/samples/'
-    print(csv_file)
     training_data_set = LiDARDataSet_onthego(csv_file, sample_dir, map_path, map_minmax_values_path)
 
     csv_file = path_validation_data + '/labels.csv'
@@ -88,6 +87,7 @@ def get_sweep_loaders(path_training_data, map_path, map_minmax_values_path, path
     # Test
     n_test_samples = len(test_dataset)
     print('Number of test samples: ', n_test_samples)
+    print(' ')
     test_sampler = SubsetRandomSampler(np.arange(n_test_samples, dtype=np.int64))
     test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=batch_size, sampler=test_sampler, num_workers=4, **kwargs)
 
