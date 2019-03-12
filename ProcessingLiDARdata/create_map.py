@@ -3,12 +3,34 @@ from lidar_data_functions import *
 from matplotlib import pyplot as plt
 
 
-path_to_ply_folder = input('Type path to ply folder:')
-path_to_csv = input('Type path to csv folder:')
-map_resolution = input('Type spatial resolution of map (default=0.05):')
+path_to_lidar_data = input(
+    'Type complete path to the folder that contains "pc"-folder with LiDAR data and a csv file, e.g. Town02_190222_1 :')
+dir_list = os.listdir(path_to_lidar_data)  # this should return a list where only one object is our csv_file
+path_to_pc = os.path.join(path_to_lidar_data,
+                          'pc/')  # we assume we follow the structure of creating lidar data folder with a pc folder for ply
+for file in dir_list:
+    if '.csv' in file:  # find csv-file
+        path_to_csv = os.path.join(path_to_lidar_data, file)
+
+map_resolution = float(input('Type spatial resolution of map (default=0.05):'))
+
+# create a folder name
+folder_name = input('Enter a name for the new folder: ')#'map_Town01_190311'
+
+# creates folder to store the png files
+current_path = os.getcwd()
+folder_path = os.path.join(current_path, folder_name)
+folder_path_png = folder_path + '/map_png/'
+try:
+    os.mkdir(folder_path)
+    os.mkdir(folder_path_png)
+except OSError:
+    print('Failed to create new directory.')
+else:
+    print('Successfully created new directory with path: ', folder_path, 'and', folder_path_png)
 
 
-files_in_ply_folder = os.listdir(path_to_ply_folder)
+files_in_ply_folder = os.listdir(path_to_pc)
 number_of_files_to_load = len(files_in_ply_folder)
 
 pc_super_array = np.zeros((1, 3))
@@ -23,13 +45,15 @@ for file in files_in_ply_folder:  # [0::100]:  # the last number is how large st
 
     try:
         # Create the path to the ply file
-        path_to_ply = path_to_ply_folder + file
+        path_to_ply = path_to_pc + file
         point_cloud, global_coordinates = load_data(path_to_ply, path_to_csv)
         i = i + 1
     except:
         print('Failed to load file ', file, '. Moving on to next file.')
         continue
 
+    if i%100 == 0:
+        print('Loaded ', i, 'files of ', len(files_in_ply_folder))
 
     # rotate, translate the point cloud to global coordinates and trim the point cloud
     trimmed_pc = trim_pointcloud(point_cloud, range=30, roof=100, floor=0)
@@ -72,34 +96,16 @@ pc_super_array = np.delete(pc_super_array, 0, axis=0)
 
 # save the max and min values in an array. This is used to decide the size of the map
 min_max = np.array((min_x_val, max_x_val, min_y_val, max_y_val))
+np.save(os.path.join(folder_path, 'max_min.npy'), min_max)
 #print(min_max)
 
 
 # Discretize the point cloud
 
 discretized_pc = discretize_pointcloud_map(pc_super_array, min_max, spatial_resolution=map_resolution) 
-
+np.save(os.path.join(folder_path, 'map.npy'), discretized_pc)
 
 # UNCOMMENT IF YOU WANT TO SAVE THE DISCRETIZED MAP AS AN PNG AND ITS VALUES.
-#array_to_png(discretized_pc, min_max)
-
-# Ask what the png files should be named and create a folder where to save them
-# input_folder_name = ''
-
-# create a folder name
-folder_name = 'map_testing2'
-
-# creates folder to store the png files
-current_path = os.getcwd()
-folder_path = os.path.join(current_path,folder_name)
-folder_path_png = folder_path + '/map_png/'
-try:
-    os.mkdir(folder_path)
-    os.mkdir(folder_path_png)
-except OSError:
-    print('Failed to create new directory.')
-else:
-    print('Successfully created new directory with path: ', folder_path, 'and', folder_path_png)
 
 discretized_pointcloud_BEV = discretized_pc  # Save map in new variable to be scaled
 # NORMALIZE THE BEV IMAGE
@@ -121,10 +127,6 @@ for channel in range(np.shape(discretized_pointcloud_BEV)[0]):
     img = Image.fromarray(discretized_pointcloud_BEV[channel, :, :])
     new_img = img.convert("L")
     new_img.rotate(180).save(png_path)
-
-# Save the map array and the max and min values of the map in the same folder as the BEV image
-np.save(os.path.join(folder_path, 'map.npy'), discretized_pc)
-np.save(os.path.join(folder_path, 'max_min.npy'), min_max)
 
 
 
