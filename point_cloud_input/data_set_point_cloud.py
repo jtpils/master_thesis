@@ -118,7 +118,7 @@ class PointCloudDataSet(Dataset):
         sweep = rotate_pointcloud_to_global(sweep, ply_coordinates)
         # transform with random yaw
         sweep = rotate_point_cloud(sweep, self.labels[idx][2])
-
+        sweep = trim_pointcloud(sweep)
 
         # load all the files in range of our sweep.
         pc_super_array = np.zeros((1, 3))
@@ -137,12 +137,12 @@ class PointCloudDataSet(Dataset):
                 pc_super_array = np.concatenate((pc_super_array, pc))
 
         # our initial guess in the map
-        initial_guess = np.array((ply_coordinates[0]+self.labels[idx][0], ply_coordinates[1]+self.labels[idx][1]))
+        initial_guess = np.array((ply_coordinates[0]+self.labels[idx][0], ply_coordinates[1]+self.labels[idx][1], 0))
         # translate all the points in the super_array such that the initial guess becomes the origin
+        pc_super_array = pc_super_array - initial_guess
+        map = trim_pointcloud(pc_super_array, range=22)
 
-
-        # get a label
-
+        del pc_super_array, initial_guess, pc
 
         training_sample = {'sweep': sweep, 'map': map, 'labels': self.labels[idx]}
         type(training_sample)
