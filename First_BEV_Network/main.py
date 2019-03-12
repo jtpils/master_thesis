@@ -39,28 +39,28 @@ print('CUDA available: ', use_cuda)
 device = torch.device("cuda" if use_cuda else "cpu")
 print('Device: ', device)
 
-# CNN = SuperSimpleCNN().to(device)
-CNN = MyBestNetwork().to(device)
+CNN = SuperSimpleCNN().to(device)
+#CNN = MyBestNetwork().to(device)
 print('Are model parameters on CUDA? ', next(CNN.parameters()).is_cuda)
 print(' ')
 
 
 
-data_flag = input('Real or fake training data? ( real / fake ): ')
-print(' ')
+#data_flag = input('Real or fake training data? ( real / fake ): ')
+#print(' ')
 
 kwargs = {'pin_memory': True} if use_cuda else {}
-if data_flag == 'fake':
-    train_loader, val_loader, test_loader = get_loaders(path_training_data, path_validation_data, path_test_data, batch_size, kwargs)
-elif data_flag == 'real':
-    map_folder_path = input('Type path to map folder (no slash at the end...): ')
-
-    map_path = map_folder_path + '/map.npy' #os.path.join(map_folder_path, '/map.npy')
-    map_minmax_values_path = map_folder_path + '/max_min.npy' #os.path.join(map_folder_path, '/max_min.npy')
-    train_loader, val_loader, test_loader = get_sweep_loaders(path_training_data, map_path, map_minmax_values_path,
-                                                              path_validation_data, path_test_data, batch_size, kwargs)
-else:
-    print('You did not type real or fake. Follow the instructions next time, please (:')
+#if data_flag == 'fake':
+train_loader, val_loader, test_loader = get_loaders(path_training_data, path_validation_data, path_test_data, batch_size, kwargs)
+#elif data_flag == 'real':
+#    map_folder_path = input('Type path to map folder (no slash at the end...): ')
+#
+#    map_path = map_folder_path + '/map.npy' #os.path.join(map_folder_path, '/map.npy')
+#    map_minmax_values_path = map_folder_path + '/max_min.npy' #os.path.join(map_folder_path, '/max_min.npy')
+#    train_loader, val_loader, test_loader = get_sweep_loaders(path_training_data, map_path, map_minmax_values_path,
+#                                                              path_validation_data, path_test_data, batch_size, kwargs)
+#else:
+#    print('You did not type real or fake. Follow the instructions next time, please (:')
 
 
 # Load weights
