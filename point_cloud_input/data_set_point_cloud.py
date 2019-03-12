@@ -7,6 +7,7 @@ from torch.utils.data.sampler import SubsetRandomSampler
 from lidar_processing_functions import *
 import matplotlib.pyplot as plt
 
+
 def get_file_name_from_frame_number(frame_number_array):
     '''
     return a file name as a string given the file's frame number.
@@ -28,7 +29,7 @@ def get_file_name_from_frame_number(frame_number_array):
 
 def get_grid(x, y, edges):
     k = 0
-    for edge in edges[0]: # loop trough the x edges
+    for edge in edges[0]:  # loop trough the x edges
         if x > edge:
             x_grid = k
         k = k + 1
@@ -43,6 +44,7 @@ def get_grid(x, y, edges):
 
 
 def get_neighbouring_grids(x_grid, y_grid):
+    # some grids will be outside the scope, as in negative or too large, but we will handle that with try/except in the script
     x_grids = [x_grid-1, x_grid, x_grid+1]
     y_grids = [y_grid-1, y_grid, y_grid+1]
     grid_name_list = list()
@@ -66,21 +68,20 @@ class PointCloudDataSet(Dataset):
 
         self.data_set_path = data_set_path
 
-
-        # maybe we should do all the hard work here and generate a list where we can check where our coordinates should be
+        # save the edge values of the grids, both x and y, from file
         edges = np.load(os.path.join(data_set_path, 'edges.npy'))
         self.edges = edges
 
+        # load all global coordinates for all ply-files
         global_coordinates_path = os.path.join(data_set_path, 'global_coordinates.csv')
         self.global_coordinates_path = global_coordinates_path
         global_coordinates = pd.read_csv(global_coordinates_path)
 
-
-        # generate list of which ply-files we will use in this data set. Chosen randomly from all available files.
+        # generate a list of which ply-files we will use in this data set. Chosen randomly from all available files.
         array_of_frame_numbers = global_coordinates['frame_number'].values  # which files exist
         number_of_available_ply_files = len(array_of_frame_numbers)  # how many exist
 
-        # get random indices so that we can select our files
+        # get indices so that we can select our files
         selection_rule = np.random.choice(np.arange(number_of_available_ply_files), number_of_samples)  # consider what happens if we want more samples than there are ply-files
         array_of_frame_numbers = array_of_frame_numbers[selection_rule]
         list_of_ply_file_names = get_file_name_from_frame_number(array_of_frame_numbers)
@@ -88,7 +89,6 @@ class PointCloudDataSet(Dataset):
 
         # keep a copy of the global coordinates that are JUST for the training sweeps
         self.sweeps_global_coordinates = global_coordinates.values[selection_rule, :]
-
 
         # create list with array of labels
         self.labels = [random_rigid_transformation(1, 2.5) for x in np.arange(number_of_samples)]
@@ -106,13 +106,12 @@ class PointCloudDataSet(Dataset):
         ply_coordinates = self.sweeps_global_coordinates[idx, :]  # get global coordinates for the sweep at row idx
 
         # find in which grid this ply-file exist
-        x = ply_coordinates[1]
-        y = ply_coordinates[2]
-        x_grid, y_grid = get_grid(x, y, self.edges)  # global x, y
+        x_grid, y_grid = get_grid(ply_coordinates[1], ply_coordinates[2], self.edges)  # global x, y
         grid_directory = self.data_set_path + '/grid_' + str(x_grid) + '_' + str(y_grid)
 
         # load the specific ply-file as our sweep.
         sweep, sweep_coordinates = load_data(os.path.join(grid_directory, ply_file_name), self.global_coordinates_path)
+        # WE SHOULD DO THE TWO ROTATIONS AT THE SAME TIME, eg yaw+rand
         # transform with global yaw
         sweep = rotate_pointcloud_to_global(sweep, sweep_coordinates)
         # transform with random yaw
@@ -120,7 +119,7 @@ class PointCloudDataSet(Dataset):
         sweep = trim_pointcloud(sweep)
 
         # load all the files in range of our sweep.
-        pc_super_array = np.zeros((1, 3))
+        pc_super_array = np.zeros((1, 3))  # REMOVE THE ZEROS LATER?
         # get the neighbouring grids
         grids_to_load = get_neighbouring_grids(x_grid, y_grid)
         for grid in grids_to_load:

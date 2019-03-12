@@ -24,3 +24,4 @@ print(' ')
 print('Creating png: ')
 array_to_png(cutout, 'map_png')
 del cutout
+
