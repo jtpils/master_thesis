@@ -5,6 +5,7 @@ import torch
 from torch.utils.data import Dataset
 from torch.utils.data.sampler import SubsetRandomSampler
 from lidar_processing_functions import *
+import matplotlib.pyplot as plt
 
 def get_file_name_from_frame_number(frame_number_array):
     '''
@@ -33,7 +34,7 @@ def get_grid(x, y, edges):
         k = k + 1
 
     k = 0
-    for edge in edges[0]:  # loop through the y edges
+    for edge in edges[1]:  # loop through the y edges
         if y > edge:
             y_grid = k
         k = k + 1
@@ -69,8 +70,6 @@ class PointCloudDataSet(Dataset):
         # maybe we should do all the hard work here and generate a list where we can check where our coordinates should be
         edges = np.load(os.path.join(data_set_path, 'edges.npy'))
         self.edges = edges
-        del edges
-
 
         global_coordinates_path = os.path.join(data_set_path, 'global_coordinates.csv')
         self.global_coordinates_path = global_coordinates_path
@@ -84,20 +83,18 @@ class PointCloudDataSet(Dataset):
         # get random indices so that we can select our files
         selection_rule = np.random.choice(np.arange(number_of_available_ply_files), number_of_samples)  # consider what happens if we want more samples than there are ply-files
         array_of_frame_numbers = array_of_frame_numbers[selection_rule]
-        list_of_ply_file_names =  get_file_name_from_frame_number(array_of_frame_numbers)
+        list_of_ply_file_names = get_file_name_from_frame_number(array_of_frame_numbers)
         self.list_of_sweeps_to_load = list_of_ply_file_names
 
         # keep a copy of the global coordinates that are JUST for the training sweeps
-        self.sweeps_global_coordinates = global_coordinates[selection_rule]
+        self.sweeps_global_coordinates = global_coordinates.values[selection_rule, :]
 
 
         # create list with array of labels
         self.labels = [random_rigid_transformation(1, 2.5) for x in np.arange(number_of_samples)]
 
         del array_of_frame_numbers, number_of_available_ply_files, selection_rule, list_of_ply_file_names, global_coordinates
-
-
-        del global_coordinates_path
+        del number_of_samples, global_coordinates_path, data_set_path, edges
 
     def __len__(self):
         return len(self.list_of_sweeps_to_load)
@@ -106,16 +103,18 @@ class PointCloudDataSet(Dataset):
 
         # get the sweep we are looking for
         ply_file_name = self.list_of_sweeps_to_load[idx]
-        ply_coordinates = self.sweeps_global_coordinates.iloc[idx].values  # get global coordinates for the sweep at row idx
+        ply_coordinates = self.sweeps_global_coordinates[idx, :]  # get global coordinates for the sweep at row idx
 
         # find in which grid this ply-file exist
-        x_grid, y_grid = get_grid(ply_coordinates[0], ply_coordinates[1], self.edges)  # global x, y
+        x = ply_coordinates[1]
+        y = ply_coordinates[2]
+        x_grid, y_grid = get_grid(x, y, self.edges)  # global x, y
         grid_directory = self.data_set_path + '/grid_' + str(x_grid) + '_' + str(y_grid)
 
         # load the specific ply-file as our sweep.
         sweep, sweep_coordinates = load_data(os.path.join(grid_directory, ply_file_name), self.global_coordinates_path)
         # transform with global yaw
-        sweep = rotate_pointcloud_to_global(sweep, ply_coordinates)
+        sweep = rotate_pointcloud_to_global(sweep, sweep_coordinates)
         # transform with random yaw
         sweep = rotate_point_cloud(sweep, self.labels[idx][2])
         sweep = trim_pointcloud(sweep)
@@ -126,26 +125,27 @@ class PointCloudDataSet(Dataset):
         grids_to_load = get_neighbouring_grids(x_grid, y_grid)
         for grid in grids_to_load:
             grid_path = os.path.join(self.data_set_path, grid)
-            try: # we might be trying to look into grid directories that do not exits, like grid_-1_2, or grid_1000_1
+            try:  # we might be trying to look into grid directories that do not exits, like grid_-1_2, or grid_1000_1, or empty grids
                 list_ply_files = os.listdir(grid_path)
             except:
                 continue
 
             for ply_file in list_ply_files:
-                pc, global_coordinates = load_data(ply_file, self.global_coordinates_path)
+                path = os.path.join(grid_path, ply_file)
+                pc, global_coordinates = load_data(path, self.global_coordinates_path)
                 pc = rotate_pointcloud_to_global(pc, global_coordinates)
+                pc = translate_pointcloud_to_global(pc, global_coordinates)
                 pc_super_array = np.concatenate((pc_super_array, pc))
 
         # our initial guess in the map
-        initial_guess = np.array((ply_coordinates[0]+self.labels[idx][0], ply_coordinates[1]+self.labels[idx][1], 0))
+        initial_guess = np.array((ply_coordinates[1]+self.labels[idx][0], -(ply_coordinates[2]+self.labels[idx][1]), 0))
         # translate all the points in the super_array such that the initial guess becomes the origin
         pc_super_array = pc_super_array - initial_guess
-        map = trim_pointcloud(pc_super_array, range=22)
+        map_cutout = trim_pointcloud(pc_super_array, range=22)
 
         del pc_super_array, initial_guess, pc
 
-        training_sample = {'sweep': sweep, 'map': map, 'labels': self.labels[idx]}
-        type(training_sample)
+        training_sample = {'sweep': sweep, 'map': map_cutout, 'labels': self.labels[idx]}
 
         return training_sample
 
