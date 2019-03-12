@@ -34,61 +34,51 @@ class LiDARDataSet_onthego(Dataset):
         sweep_file = os.path.join(self.sweep_dir, str(idx))
         sweep = torch.from_numpy(np.load(sweep_file + '.npy')).float()
 
-        labels = self.csv_labels.iloc[idx-1, :]
-        cut_out_coordinates = self.cut_out_coordinates.iloc[idx-1, :]
+        labels = self.csv_labels.iloc[idx-1, :].values
+        cut_out_coordinates = self.cut_out_coordinates.iloc[idx-1, :].values
 
         cut_out = get_cut_out(self.map, cut_out_coordinates, self.map_minmax_values)
+        cut_out = torch.from_numpy(cut_out).float()
 
-        print('shape sweep', np.shape(sweep))
-        print('shape cut out', np.shape(cut_out))
+        #sample = np.concatenate((sweep, cut_out))
+        sample = torch.cat((sweep, cut_out))
 
-        sample = np.concatenate((sweep, cut_out))
-
-        training_sample = {'sample': sample, 'labels': labels.values}  #  This worked on Sabinas Mac.
-        # training_sample = {'sample': sample, 'labels': labels.to_numpy()}
-        type(training_sample)
+        training_sample = {'sample': sample, 'labels': labels}  # .values}  #  This worked on Sabinas Mac.
 
         return training_sample
 
 
-def get_sweep_loaders(path_training_data, map_path, map_minmax_values_path, path_validation_data, batch_size, kwargs):
+def get_sweep_loaders(path_training_data, map_path, map_minmax_values_path, path_validation_data, path_test_data, batch_size, kwargs):
     csv_file = path_training_data + '/labels.csv'
     sample_dir = path_training_data + '/samples/'
-    print(csv_file)
     training_data_set = LiDARDataSet_onthego(csv_file, sample_dir, map_path, map_minmax_values_path)
 
     csv_file = path_validation_data + '/labels.csv'
     sample_dir = path_validation_data + '/samples/'
     validation_data_set = LiDARDataSet_onthego(csv_file, sample_dir, map_path, map_minmax_values_path)
 
-    val_size = int(0.8 * len(validation_data_set))
-    val_dataset = torch.utils.data.dataset.Subset(validation_data_set, np.arange(1, val_size+1))
-    test_dataset = torch.utils.data.dataset.Subset(validation_data_set, np.arange(val_size+1, len(validation_data_set)+1))
+    csv_file = path_test_data + '/labels.csv'
+    sample_dir = path_test_data + '/samples/'
+    test_data_set = LiDARDataSet_onthego(csv_file, sample_dir)
 
-    # Old stuff
-    # lidar_data_set = LiDARDataSet(csv_file, sample_dir)
-    # train_size = int(0.7 * len(lidar_data_set))
-    # val_size = int(0.2 * len(lidar_data_set))
-    # train_dataset = torch.utils.data.dataset.Subset(lidar_data_set, np.arange(1, train_size+1))
-    # val_dataset = torch.utils.data.dataset.Subset(lidar_data_set, np.arange(train_size+1, train_size+val_size+1))
-    # test_dataset = torch.utils.data.dataset.Subset(lidar_data_set, np.arange(train_size+val_size+1, len(lidar_data_set)+1))
 
     # Training
     n_training_samples = len(training_data_set)
     print('Number of training samples: ', n_training_samples)
     train_sampler = SubsetRandomSampler(np.arange(1, n_training_samples, dtype=np.int64))
-    train_loader = torch.utils.data.DataLoader(training_data_set, batch_size=batch_size, sampler=train_sampler, num_workers=4, **kwargs)
+    train_loader = torch.utils.data.DataLoader(training_data_set, batch_size=batch_size, sampler=train_sampler, num_workers=2, **kwargs)
 
     # Validation
-    n_val_samples = len(val_dataset)
+    n_val_samples = len(validation_data_set)
     print('Number of validation samples: ', n_val_samples)
-    val_sampler = SubsetRandomSampler(np.arange(n_val_samples, dtype=np.int64))
-    val_loader = torch.utils.data.DataLoader(val_dataset, batch_size=batch_size, sampler=val_sampler, num_workers=4, **kwargs)
+    val_sampler = SubsetRandomSampler(np.arange(1, n_val_samples, dtype=np.int64))
+    val_loader = torch.utils.data.DataLoader(validation_data_set, batch_size=batch_size, sampler=val_sampler, num_workers=2, **kwargs)
 
     # Test
-    n_test_samples = len(test_dataset)
+    n_test_samples = len(test_data_set)
     print('Number of test samples: ', n_test_samples)
-    test_sampler = SubsetRandomSampler(np.arange(n_test_samples, dtype=np.int64))
-    test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=batch_size, sampler=test_sampler, num_workers=4, **kwargs)
+    print(' ')
+    test_sampler = SubsetRandomSampler(1, np.arange(n_test_samples, dtype=np.int64))
+    test_loader = torch.utils.data.DataLoader(test_data_set, batch_size=batch_size, sampler=test_sampler, num_workers=2, **kwargs)
 
     return train_loader, val_loader, test_loader

@@ -1,12 +1,4 @@
-import numpy as np
 from lidar_data_functions import *
-from matplotlib import pyplot as plt
-
-
-#path_to_ply_folder = '/home/master04/Desktop/_out_town2/pc/'
-#path_to_csv = '/home/master04/Desktop/_out_town2/town2.csv'
-#path_to_ply_folder = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/_out_Town02_190221_1/pc/'
-#path_to_csv = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/_out_Town02_190221_1/Town02_190221_1.csv'
 
 
 path_to_ply_folder_list = ['/home/master04/Desktop/Ply_files/_out_Town02_190306_1/pc/',
@@ -133,3 +125,4 @@ for folder in path_to_ply_folder_list:
     # Save the map array and the max and min values of the map in the same folder as the BEV image
     np.save(os.path.join(folder_path, 'map.npy'), discretized_pc)
     np.save(os.path.join(folder_path, 'max_min.npy'), discretized_pc)
+

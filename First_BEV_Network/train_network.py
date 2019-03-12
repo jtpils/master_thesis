@@ -5,12 +5,14 @@ from torch.optim.lr_scheduler import StepLR
 import numpy as np
 import os
 from early_stopping import EarlyStopping
+import torch
 
 
 def create_loss_and_optimizer(net, learning_rate=0.001):
     # Loss function
     # loss = torch.nn.CrossEntropyLoss()
-    loss = torch.nn.MSELoss()
+    # loss = torch.nn.MSELoss()
+    loss = torch.nn.SmoothL1Loss()
 
     # Optimizer
     optimizer = optim.Adam(net.parameters(), lr=learning_rate, weight_decay=1e-5)
@@ -55,7 +57,7 @@ def train_network(net, train_loader, val_loader, n_epochs, learning_rate, patien
         print('learning rate: ', params[0]['lr'])
 
         running_loss = 0.0
-        print_every = n_batches // 5  # how many mini-batches if we want to print stats x times per epoch
+        print_every = n_batches // 10  # how many mini-batches if we want to print stats x times per epoch
         start_time = time.time()
         total_train_loss = 0
 
@@ -83,14 +85,6 @@ def train_network(net, train_loader, val_loader, n_epochs, learning_rate, patien
             # Print statistics
             running_loss += loss_size.item()
             total_train_loss += loss_size.item()
-
-            # Print every batch of an epoch
-            '''if i % print_every == 0:
-                print("Epoch {}, {:d}% \t train_loss: {:.2f} took: {:.2f}s".format(
-                    epoch + 1, int(100 * i / n_batches), running_loss / print_every, time.time() - start_time))
-                # Reset running loss and time
-                running_loss = 0.0
-                start_time = time.time()'''
     
             if (i+1) % print_every == 0:
                 print('Epoch [{}/{}], Batch [{}/{}], Loss: {:.4f}'

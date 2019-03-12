@@ -1,7 +1,7 @@
 from data_loader import *
 from train_network import *
 from super_simple_cnn import SuperSimpleCNN
-from simple_nets_iteration3 import *
+from nets_regularization import *
 import matplotlib.pyplot as plt
 import os
 import torch
@@ -25,9 +25,12 @@ patience = int(input('Input patience for EarlyStopping: ')) # Threshold for earl
 
 path_training_data = input('Path to training data set folder: ')
 path_validation_data = input('Path to validation data set folder: ')
+path_test_data = input('Path to test data set folder: ')
 
-batch_size = 4  # int(input('Input batch size: '))
+batch_size = int(input('Input batch size: '))
 plot_flag = input('Plot results? y / n: ')
+
+
 
 print(' ')
 print('Number of GPUs available: ', torch.cuda.device_count())
@@ -36,30 +39,34 @@ print('CUDA available: ', use_cuda)
 device = torch.device("cuda" if use_cuda else "cpu")
 print('Device: ', device)
 
-
-CNN = SimpleNet3_single_channel().to(device)
+CNN = SuperSimpleCNN().to(device)
+#CNN = MyBestNetwork().to(device)
 print('Are model parameters on CUDA? ', next(CNN.parameters()).is_cuda)
 print(' ')
 
-# pytorch_total_params = sum(p.numel() for p in CNN.parameters() if p.requires_grad)
-# print(pytorch_total_params)
+
+
+#data_flag = input('Real or fake training data? ( real / fake ): ')
+#print(' ')
+
+kwargs = {'pin_memory': True} if use_cuda else {}
+#if data_flag == 'fake':
+train_loader, val_loader, test_loader = get_loaders(path_training_data, path_validation_data, path_test_data, batch_size, kwargs)
+#elif data_flag == 'real':
+#    map_folder_path = input('Type path to map folder (no slash at the end...): ')
+#
+#    map_path = map_folder_path + '/map.npy' #os.path.join(map_folder_path, '/map.npy')
+#    map_minmax_values_path = map_folder_path + '/max_min.npy' #os.path.join(map_folder_path, '/max_min.npy')
+#    train_loader, val_loader, test_loader = get_sweep_loaders(path_training_data, map_path, map_minmax_values_path,
+#                                                              path_validation_data, path_test_data, batch_size, kwargs)
+#else:
+#    print('You did not type real or fake. Follow the instructions next time, please (:')
 
 
 # Load weights
 if load_weights:
     network_param = torch.load(load_weights_path)
     CNN.load_state_dict(network_param['model_state_dict'])
-#CNN.train()
-
-# get data loaders
-kwargs = {'pin_memory': True} if use_cuda else {}
-map_path = '/Users/annikal/Documents/master_thesis/ProcessingLiDARdata/_out_map_190302_1/map.npy'
-map_minmax_values_path = '/Users/annikal/Documents/master_thesis/ProcessingLiDARdata/_out_map_190302_1/max_min.npy'
-#train_loader, val_loader, test_loader = get_loaders(path_training_data, path_validation_data, batch_size, kwargs) #########################
-train_loader, val_loader, test_loader = get_sweep_loaders(path_training_data, map_path, map_minmax_values_path,
-                                                          path_validation_data, batch_size, kwargs)
-
-
 
 # create directory for model weights
 current_path = os.getcwd()

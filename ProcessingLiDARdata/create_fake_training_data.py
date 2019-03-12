@@ -79,28 +79,16 @@ for file_name in ply_files[:number_of_files_to_load]:
     sweep_image = discretize_pointcloud(sweep, array_size=600, trim_range=15, spatial_resolution=0.05, padding=True, pad_size=150)
 
     # fake a map cutout
-
-    '''print('creating sweep...')
-    rand_trans = random_rigid_transformation(1, 10)
-    sweep = training_sample_rotation_translation(pc, rand_trans)
-    sweep = trim_pointcloud(sweep)
-    sweep_image = discretize_pointcloud(sweep)
-
-    # padd the sweep with zeros to get a 900x900 grid.
-
-    np.pad(sweep_image, ((150, 150), (150, 150)), 'constant')
-
-
-    path = path_sweeps + '/' + str(i)
-    np.save(path, sweep_image)
-
-    # fake a map cutout
-    print('creating cutout...')'''
     cutout = trim_pointcloud(pc, range=1.5*15)
     cutout_image = discretize_pointcloud(cutout, array_size=600*1.5, trim_range=1.5*15, padding=False)
 
     # concatenate the sweep and the cutout image into one image and save.
     sweep_and_cutout_image = np.concatenate((sweep_image, cutout_image))
+
+    #visualize_detections(sweep_and_cutout_image, layer=0, fig_num=1)
+    #visualize_detections(sweep_and_cutout_image, layer=4, fig_num=2)
+    #plt.show()
+
     sweep_and_cutout_image = normalize_sample(sweep_and_cutout_image)
     path = path_samples + '/' + str(i)
     np.save(path, sweep_and_cutout_image)
@@ -110,3 +98,5 @@ for file_name in ply_files[:number_of_files_to_load]:
         csv_writer = csv.writer(csv_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
         csv_writer.writerow([i, rand_trans[0], rand_trans[1], rand_trans[2]])
 
+
+print('Done.')
