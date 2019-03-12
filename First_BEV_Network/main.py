@@ -39,8 +39,8 @@ print('CUDA available: ', use_cuda)
 device = torch.device("cuda" if use_cuda else "cpu")
 print('Device: ', device)
 
-CNN = SuperSimpleCNN().to(device)
-#CNN = MyBestNetwork().to(device)
+#CNN = SuperSimpleCNN().to(device)
+CNN = MyBestNetwork().to(device)
 print('Are model parameters on CUDA? ', next(CNN.parameters()).is_cuda)
 print(' ')
 
