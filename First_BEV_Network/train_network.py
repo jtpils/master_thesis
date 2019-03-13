@@ -68,10 +68,10 @@ def train_network(net, train_loader, val_loader, n_epochs, learning_rate, patien
             labels = data['labels']
 
             # Wrap them in a Variable object
-            #if use_cuda:
-            #    sample, labels = Variable(sample).cuda(), Variable(labels).cuda()  # maybe we should use # .to(deveice) here?
-            #else:
-            #    sample, labels = Variable(sample), Variable(labels)
+            if use_cuda:
+                sample, labels = Variable(sample).cuda(), Variable(labels).cuda()  # maybe we should use # .to(deveice) here?
+            else:
+                sample, labels = Variable(sample), Variable(labels)
 
 
             # Set the parameter gradients to zero
@@ -102,10 +102,17 @@ def train_network(net, train_loader, val_loader, n_epochs, learning_rate, patien
                 labels = data['labels']
 
                 # Wrap them in a Variable object
-                #if use_cuda:
-                #    sample, labels = Variable(sample).cuda(), Variable(labels).cuda()
-                #else:
-                #    sample, labels = Variable(sample), Variable(labels)
+                if use_cuda:
+                    t1 = time.time()
+                    sample, labels = Variable(sample).cuda(), Variable(labels).cuda()
+                    t2 = time.time()
+                    sample2, labels2 = Variable(sample), Variable(labels)
+                    t3 = time.time()
+                    print('to gpu: ', t2-t1)
+                    print('to cpu: ', t3-t2)
+                    print(' ')
+                else:
+                    sample, labels = Variable(sample), Variable(labels)
 
                 # Forward pass
                 val_outputs = net.forward(sample)
