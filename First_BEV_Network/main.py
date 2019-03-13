@@ -40,12 +40,12 @@ print(' ')
 print('Number of GPUs available: ', torch.cuda.device_count())
 use_cuda = torch.cuda.is_available()
 print('CUDA available: ', use_cuda)
-device = torch.device("cuda" if use_cuda else "cpu")
+device = torch.device("cuda:0" if use_cuda else "cpu")
 print('Device: ', device)
 
 ##########
-use_cuda = False
-device = "cpu"
+#use_cuda = False
+#device = "cpu"
 ##########
 
 if use_cuda:
