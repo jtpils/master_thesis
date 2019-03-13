@@ -41,7 +41,7 @@ print('Device: ', device)
 
 
 ##########
-#use_cuda = False
+use_cuda = False
 ##########
 
 CNN = SuperSimpleCNN()
