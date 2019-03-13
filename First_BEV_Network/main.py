@@ -47,8 +47,8 @@ device = torch.device("cuda:0" if use_cuda else "cpu")
 print('Device: ', device)
 
 ##########
-#use_cuda = False
-#device = "cpu"
+use_cuda = False
+device = "cpu"
 ##########
 
 
