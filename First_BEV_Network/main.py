@@ -20,8 +20,8 @@ load_weights_path = '/home/master04/Desktop/networks_plots_190305/test_multiple_
 
 model_name = input('Type name of new folder: ')
 n_epochs = int(input('Number of epochs: '))
-learning_rate = float(input('Learning rate: '))
-patience = int(input('Input patience for EarlyStopping: ')) # Threshold for early stopping. Number of epochs that we will wait until brake
+learning_rate = 0.001 #float(input('Learning rate: '))
+patience = n_epochs #int(input('Input patience for EarlyStopping: ')) # Threshold for early stopping. Number of epochs that we will wait until brake
 
 #path_training_data = '/home/master04/Desktop/Dataset/fake_training_set' #
 #path_validation_data = '/home/master04/Desktop/Dataset/fake_validation_set' #
@@ -32,7 +32,7 @@ path_validation_data = '/home/annika_lundqvist144/Dataset/fake_validation_set' #
 path_test_data = '/home/annika_lundqvist144/Dataset/fake_test_set' #input('Path to test data set folder: ')
 
 batch_size = int(input('Input batch size: '))
-plot_flag = input('Plot results? y / n: ')
+plot_flag = 'n' #input('Plot results? y / n: ')
 
 
 
