@@ -39,9 +39,14 @@ print('CUDA available: ', use_cuda)
 device = torch.device("cuda" if use_cuda else "cpu")
 print('Device: ', device)
 
-#CNN = SuperSimpleCNN().to(device)
-#CNN = MyBestNetwork().to(device)
-CNN = MyBestNetwork()
+
+##########
+use_cuda = False
+##########
+
+CNN = SuperSimpleCNN()
+#CNN = MyBestNetwork()
+#CNN = MyBestNetwork()
 if use_cuda:
     CNN.cuda()
 
