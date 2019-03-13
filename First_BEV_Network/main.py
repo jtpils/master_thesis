@@ -58,33 +58,17 @@ if use_cuda:
 #use_cuda = False
 ##########
 
-CNN = Network_March2()#.to(device)
-#CNN = MyBestNetwork()
-#CNN = MyBestNetwork()
-if use_cuda:
-    CNN.cuda()
+CNN = Network_March2().to(device)
+#if use_cuda:
+#    CNN.cuda()
 
 print('Are model parameters on CUDA? ', next(CNN.parameters()).is_cuda)
 print(' ')
 
 
 
-#data_flag = input('Real or fake training data? ( real / fake ): ')
-#print(' ')
-
 kwargs = {'pin_memory': True} if use_cuda else {}
-#if data_flag == 'fake':
 train_loader, val_loader, test_loader = get_loaders(path_training_data, path_validation_data, path_test_data, batch_size, use_cuda, kwargs)
-#elif data_flag == 'real':
-#    map_folder_path = input('Type path to map folder (no slash at the end...): ')
-#
-#    map_path = map_folder_path + '/map.npy' #os.path.join(map_folder_path, '/map.npy')
-#    map_minmax_values_path = map_folder_path + '/max_min.npy' #os.path.join(map_folder_path, '/max_min.npy')
-#    train_loader, val_loader, test_loader = get_sweep_loaders(path_training_data, map_path, map_minmax_values_path,
-#                                                              path_validation_data, path_test_data, batch_size, kwargs)
-#else:
-#    print('You did not type real or fake. Follow the instructions next time, please (:')
-
 
 # Load weights
 if load_weights:
@@ -98,8 +82,15 @@ os.mkdir(model_path)
 parameter_path = os.path.join(model_path, 'parameters')
 os.mkdir(parameter_path)
 
+
+
 # train!
 train_loss, val_loss = train_network(CNN, train_loader, val_loader, n_epochs, learning_rate, patience, parameter_path, use_cuda)
+
+
+
+
+
 
 if plot_flag is 'y':
     # plot loss
