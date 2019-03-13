@@ -41,7 +41,7 @@ print('Device: ', device)
 
 
 ##########
-use_cuda = False
+#use_cuda = False
 ##########
 
 CNN = SuperSimpleCNN()
@@ -64,7 +64,7 @@ print('device name', torch.cuda.get_device_name(id))
 
 kwargs = {'pin_memory': True} if use_cuda else {}
 #if data_flag == 'fake':
-train_loader, val_loader, test_loader = get_loaders(path_training_data, path_validation_data, path_test_data, batch_size, kwargs)
+train_loader, val_loader, test_loader = get_loaders(path_training_data, path_validation_data, path_test_data, batch_size, use_cuda, kwargs)
 #elif data_flag == 'real':
 #    map_folder_path = input('Type path to map folder (no slash at the end...): ')
 #

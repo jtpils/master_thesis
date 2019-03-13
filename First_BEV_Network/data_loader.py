@@ -4,18 +4,18 @@ from torch.utils.data.sampler import SubsetRandomSampler
 from LiDARDataSet import LiDARDataSet
 
 
-def get_loaders(path_training_data, path_validation_data, path_test_data, batch_size, kwargs):
+def get_loaders(path_training_data, path_validation_data, path_test_data, batch_size, use_cuda, kwargs):
     csv_file = path_training_data + '/labels.csv'
     sample_dir = path_training_data + '/samples/'
-    training_data_set = LiDARDataSet(csv_file, sample_dir)
+    training_data_set = LiDARDataSet(csv_file, sample_dir, use_cuda)
 
     csv_file = path_validation_data + '/labels.csv'
     sample_dir = path_validation_data + '/samples/'
-    validation_data_set = LiDARDataSet(csv_file, sample_dir)
+    validation_data_set = LiDARDataSet(csv_file, sample_dir, use_cuda)
 
     csv_file = path_test_data + '/labels.csv'
     sample_dir = path_test_data + '/samples/'
-    test_data_set = LiDARDataSet(csv_file, sample_dir)
+    test_data_set = LiDARDataSet(csv_file, sample_dir, use_cuda)
 
     # Training
     n_training_samples = 100 #len(training_data_set)
