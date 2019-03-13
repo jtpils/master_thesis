@@ -39,6 +39,9 @@ plot_flag = input('Plot results? y / n: ')
 print(' ')
 print('Number of GPUs available: ', torch.cuda.device_count())
 use_cuda = torch.cuda.is_available()
+if use_cuda:
+    id = torch.cuda.current_device()
+    print('Device id: ', id)
 print('CUDA available: ', use_cuda)
 device = torch.device("cuda:0" if use_cuda else "cpu")
 print('Device: ', device)
@@ -48,6 +51,8 @@ print('Device: ', device)
 #device = "cpu"
 ##########
 
+
+'''
 if use_cuda:
     id = torch.cuda.current_device()
     print('device id', id)
@@ -55,7 +60,7 @@ if use_cuda:
     print('memory adress', mem)
     print('device name', torch.cuda.get_device_name(id))
     print('setting device...')
-    torch.cuda.set_device(id)
+    torch.cuda.set_device(id)'''
 
 
 
@@ -72,7 +77,7 @@ print(' ')
 
 
 kwargs = {'pin_memory': True} if use_cuda else {}
-train_loader, val_loader, test_loader = get_loaders(path_training_data, path_validation_data, path_test_data, batch_size, use_cuda, kwargs)
+train_loader, val_loader, test_loader = get_loaders(path_training_data, path_validation_data, path_test_data, batch_size, device, kwargs)
 
 # Load weights
 if load_weights:
