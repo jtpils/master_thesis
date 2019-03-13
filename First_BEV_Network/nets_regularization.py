@@ -91,7 +91,7 @@ class Network_March(torch.nn.Module):
         x = self.pool1(x)  # Size changes to 4,50,50
         x = self.dropout_2d(x)
 
-        x = F.relu(self.conv2_bn(self.conv(x))) # Size changes to 2,50,50
+        x = F.relu(self.conv2_bn(self.conv2(x))) # Size changes to 2,50,50
         x = self.pool1(x)  # Size changes to 2,25,25
         x = self.dropout_2d(x)
 
