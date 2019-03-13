@@ -42,16 +42,17 @@ print('CUDA available: ', use_cuda)
 device = torch.device("cuda" if use_cuda else "cpu")
 print('Device: ', device)
 
-
-torch.cuda.set_device(device)
-
-
 if use_cuda:
     id = torch.cuda.current_device()
     print('device id', id)
     mem = torch.cuda.device(id)
     print('memory adress', mem)
     print('device name', torch.cuda.get_device_name(id))
+    print('setting device...')
+    torch.cuda.set_device(id)
+
+
+
 
 ##########
 #use_cuda = False
