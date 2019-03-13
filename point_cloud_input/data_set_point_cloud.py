@@ -144,6 +144,23 @@ class PointCloudDataSet(Dataset):
 
         del pc_super_array, initial_guess, pc
 
+        #sample points so that all training samples are of the same size always
+        if len(sweep) > 3000:
+            selection_rule = np.random.choice(np.arange(len(sweep)), 3000)
+            sweep = sweep[selection_rule, :]
+        else:
+            #np.pad(sweep, (3000-len(sweep), 0), 'constant', constant_values=(0,0))
+            zeros = np.zeros((3000-len(sweep), 3))
+            sweep = np.concatenate((sweep, zeros), 0)
+
+        if len(map_cutout) > 300000:
+            selection_rule = np.random.choice(np.arange(len(map_cutout)), 300000)
+            map_cutout = map_cutout[selection_rule, :]
+        else:
+            #np.pad(map_cutout, (300000-len(sweep), 0), 'constant', constant_values=(0,0))
+            zeros = np.zeros((300000-len(map_cutout), 3))
+            map_cutout = np.concatenate((map_cutout, zeros), 0)
+
         training_sample = {'sweep': sweep, 'map': map_cutout, 'labels': self.labels[idx]}
 
         return training_sample
