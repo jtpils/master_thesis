@@ -103,14 +103,7 @@ def train_network(net, train_loader, val_loader, n_epochs, learning_rate, patien
 
                 # Wrap them in a Variable object
                 if use_cuda:
-                    t1 = time.time()
                     sample, labels = Variable(sample).cuda(), Variable(labels).cuda()
-                    t2 = time.time()
-                    sample2, labels2 = Variable(sample), Variable(labels)
-                    t3 = time.time()
-                    print('to gpu: ', t2-t1)
-                    print('to cpu: ', t3-t2)
-                    print(' ')
                 else:
                     sample, labels = Variable(sample), Variable(labels)
 

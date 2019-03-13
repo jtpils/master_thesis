@@ -49,7 +49,7 @@ print('device name', torch.cuda.get_device_name(id))
 #use_cuda = False
 ##########
 
-CNN = SuperSimpleCNN()
+CNN = Network_March()
 #CNN = MyBestNetwork()
 #CNN = MyBestNetwork()
 if use_cuda:
