@@ -26,8 +26,8 @@ class LiDARDataSet(Dataset):
 
         sample_file = os.path.join(self.sample_dir, str(idx))
         if self.use_cuda:
-            sample = (torch.from_numpy(np.load(sample_file + '.npy')).float()).cuda()
-            labels = (self.csv_labels.iloc[idx-1, 1:4]).cuda()
+            sample = torch.from_numpy(np.load(sample_file + '.npy')).float().cuda()
+            labels = self.csv_labels.iloc[idx-1, 1:4].cuda()
         else:
             sample = torch.from_numpy(np.load(sample_file + '.npy')).float()
             labels = self.csv_labels.iloc[idx-1, 1:4]
