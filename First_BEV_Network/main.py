@@ -41,7 +41,7 @@ print('Device: ', device)
 
 
 ##########
-use_cuda = False
+#use_cuda = False
 ##########
 
 CNN = SuperSimpleCNN()
@@ -53,7 +53,11 @@ if use_cuda:
 print('Are model parameters on CUDA? ', next(CNN.parameters()).is_cuda)
 print(' ')
 
-
+id = torch.cuda.current_device()
+print('device id', id)
+mem = torch.cuda.device(id)
+print('memory adress', mem)
+print('device name', torch.cuda.get_device_name(id))
 
 #data_flag = input('Real or fake training data? ( real / fake ): ')
 #print(' ')
