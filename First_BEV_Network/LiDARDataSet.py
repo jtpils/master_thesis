@@ -30,6 +30,5 @@ class LiDARDataSet(Dataset):
 
         training_sample = {'sample': sample, 'labels': labels.values}  #  This worked on Sabinas Mac.
         # training_sample = {'sample': sample, 'labels': labels.to_numpy()}
-        type(training_sample)
 
         return training_sample
