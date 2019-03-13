@@ -34,9 +34,7 @@ path_test_data = '/home/annika_lundqvist144/Dataset/fake_test_set' #input('Path 
 batch_size = int(input('Input batch size: '))
 plot_flag = input('Plot results? y / n: ')
 
-##########
-use_cuda = False
-##########
+
 
 print(' ')
 print('Number of GPUs available: ', torch.cuda.device_count())
@@ -44,6 +42,11 @@ use_cuda = torch.cuda.is_available()
 print('CUDA available: ', use_cuda)
 device = torch.device("cuda" if use_cuda else "cpu")
 print('Device: ', device)
+
+##########
+use_cuda = False
+device = "cpu"
+##########
 
 if use_cuda:
     id = torch.cuda.current_device()
