@@ -36,9 +36,18 @@ plot_flag = 'n' #input('Plot results? y / n: ')
 
 
 
+
+
 print(' ')
 print('Number of GPUs available: ', torch.cuda.device_count())
 use_cuda = torch.cuda.is_available()
+
+##########
+use_cuda = False
+device = "cpu"
+##########
+
+
 if use_cuda:
     id = torch.cuda.current_device()
     print('Device id: ', id)
@@ -46,10 +55,6 @@ print('CUDA available: ', use_cuda)
 device = torch.device("cuda:0" if use_cuda else "cpu")
 print('Device: ', device)
 
-##########
-use_cuda = False
-device = "cpu"
-##########
 
 
 '''
