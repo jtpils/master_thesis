@@ -23,9 +23,9 @@ n_epochs = int(input('Number of epochs: '))
 learning_rate = float(input('Learning rate: '))
 patience = int(input('Input patience for EarlyStopping: ')) # Threshold for early stopping. Number of epochs that we will wait until brake
 
-path_training_data = '/home/annika_lundqvist144/Dataset/fake_training_set' #input('Path to training data set folder: ')
-path_validation_data = '/home/annika_lundqvist144/Dataset/fake_validation_set' #input('Path to validation data set folder: ')
-path_test_data = '/home/annika_lundqvist144/Dataset/fake_test_set' #input('Path to test data set folder: ')
+path_training_data = '/home/master04/Desktop/Dataset/fake_training_set' #'/home/annika_lundqvist144/Dataset/fake_training_set' #input('Path to training data set folder: ')
+path_validation_data = '/home/master04/Desktop/Dataset/fake_validation_set' #'/home/annika_lundqvist144/Dataset/fake_validation_set' #input('Path to validation data set folder: ')
+path_test_data = '/home/master04/Desktop/Dataset/fake_test_set' #'/home/annika_lundqvist144/Dataset/fake_test_set' #input('Path to test data set folder: ')
 
 batch_size = int(input('Input batch size: '))
 plot_flag = input('Plot results? y / n: ')
@@ -39,11 +39,12 @@ print('CUDA available: ', use_cuda)
 device = torch.device("cuda" if use_cuda else "cpu")
 print('Device: ', device)
 
-id = torch.cuda.current_device()
-print('device id', id)
-mem = torch.cuda.device(id)
-print('memory adress', mem)
-print('device name', torch.cuda.get_device_name(id))
+if use_cuda:
+    id = torch.cuda.current_device()
+    print('device id', id)
+    mem = torch.cuda.device(id)
+    print('memory adress', mem)
+    print('device name', torch.cuda.get_device_name(id))
 
 ##########
 #use_cuda = False

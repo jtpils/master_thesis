@@ -67,9 +67,9 @@ class Network_March(torch.nn.Module):
 
         self.dropout_2d = torch.nn.Dropout2d(0.1)
         self.dropout_1d = torch.nn.Dropout(0.1)
+        self.pool1 = torch.nn.MaxPool2d(kernel_size=2, stride=2, padding=0)
 
         self.conv1 = torch.nn.Conv2d(8, 4, kernel_size=9, stride=9, padding=0)
-        self.pool1 = torch.nn.MaxPool2d(kernel_size=2, stride=2, padding=0)
         self.conv1_bn = torch.nn.BatchNorm2d(4)
 
         self.conv2 = torch.nn.Conv2d(4, 2, kernel_size=3, stride=1, padding=1)
