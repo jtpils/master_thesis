@@ -67,8 +67,8 @@ if use_cuda:
 
 
 
-#CNN = Network_March2().to(device)
-CNN = MyBestNetwork().to(device)
+CNN = Network_March2().to(device)
+#CNN = MyBestNetwork().to(device)
 
 
 #if use_cuda:
