@@ -67,7 +67,10 @@ if use_cuda:
 
 
 
-CNN = Network_March2().to(device)
+#CNN = Network_March2().to(device)
+CNN = MyBestNetwork().to(device)
+
+
 #if use_cuda:
 #    CNN.cuda()
 
@@ -77,7 +80,7 @@ print(' ')
 
 
 kwargs = {'pin_memory': True} if use_cuda else {}
-train_loader, val_loader, test_loader = get_loaders(path_training_data, path_validation_data, path_test_data, batch_size, device, kwargs)
+train_loader, val_loader, test_loader = get_loaders(path_training_data, path_validation_data, path_test_data, batch_size, use_cuda, kwargs)
 
 # Load weights
 if load_weights:
@@ -94,7 +97,7 @@ os.mkdir(parameter_path)
 
 
 # train!
-train_loss, val_loss = train_network(CNN, train_loader, val_loader, n_epochs, learning_rate, patience, parameter_path, use_cuda)
+train_loss, val_loss = train_network(CNN, train_loader, val_loader, n_epochs, learning_rate, patience, parameter_path, device)
 
 
 
