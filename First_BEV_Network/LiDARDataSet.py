@@ -3,6 +3,7 @@ import numpy as np
 import os
 import torch
 from torch.utils.data import Dataset
+from torch.autograd import Variable
 
 
 class LiDARDataSet(Dataset):
@@ -26,11 +27,13 @@ class LiDARDataSet(Dataset):
 
         sample_file = os.path.join(self.sample_dir, str(idx))
         if self.use_cuda:
-            sample = torch.from_numpy(np.load(sample_file + '.npy')).float().cuda()
-            labels = self.csv_labels.iloc[idx-1, 1:4].cuda()
+            sample = Variable(torch.from_numpy(np.load(sample_file + '.npy')).float()).cuda()
+            labels = Variable(self.csv_labels.iloc[idx-1, 1:4]).cuda()
         else:
-            sample = torch.from_numpy(np.load(sample_file + '.npy')).float()
-            labels = self.csv_labels.iloc[idx-1, 1:4]
+            sample = Variable(torch.from_numpy(np.load(sample_file + '.npy')).float())
+            labels = Variable(self.csv_labels.iloc[idx-1, 1:4])
+
+
 
         training_sample = {'sample': sample, 'labels': labels.values}  #  This worked on Sabinas Mac.
         # training_sample = {'sample': sample, 'labels': labels.to_numpy()}
