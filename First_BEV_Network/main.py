@@ -23,9 +23,13 @@ n_epochs = int(input('Number of epochs: '))
 learning_rate = float(input('Learning rate: '))
 patience = int(input('Input patience for EarlyStopping: ')) # Threshold for early stopping. Number of epochs that we will wait until brake
 
-path_training_data = '/home/master04/Desktop/Dataset/fake_training_set' #'/home/annika_lundqvist144/Dataset/fake_training_set' #input('Path to training data set folder: ')
-path_validation_data = '/home/master04/Desktop/Dataset/fake_validation_set' #'/home/annika_lundqvist144/Dataset/fake_validation_set' #input('Path to validation data set folder: ')
-path_test_data = '/home/master04/Desktop/Dataset/fake_test_set' #'/home/annika_lundqvist144/Dataset/fake_test_set' #input('Path to test data set folder: ')
+#path_training_data = '/home/master04/Desktop/Dataset/fake_training_set' #
+#path_validation_data = '/home/master04/Desktop/Dataset/fake_validation_set' #
+#path_test_data = '/home/master04/Desktop/Dataset/fake_test_set' #
+
+path_training_data = '/home/annika_lundqvist144/Dataset/fake_training_set' #input('Path to training data set folder: ')
+path_validation_data = '/home/annika_lundqvist144/Dataset/fake_validation_set' #input('Path to validation data set folder: ')
+path_test_data = '/home/annika_lundqvist144/Dataset/fake_test_set' #input('Path to test data set folder: ')
 
 batch_size = int(input('Input batch size: '))
 plot_flag = input('Plot results? y / n: ')
