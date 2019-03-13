@@ -1,6 +1,28 @@
 from data_set_point_cloud import *
 from lidar_processing_functions import *
+import numpy as np
+import pandas as pd
+import time
 
+
+path = '/home/master04/Desktop/Dataset/Town02_sorted_grid_ply/global_coordinates.csv'
+
+t1 = time.time()
+fdata = pd.read_csv(path)
+t2 = time.time()
+
+print('Time to read csv file with pandas: ', t2-t1)
+
+np.save('fnumpy.npy', fdata.values)
+path_np = os.getcwd() + '/fnumpy.npy'
+
+t3 = time.time()
+fdata_np = np.load(path_np)
+t4 = time.time()
+
+print('Time to read .npy file with np: ', t4-t3)
+
+'''
 print('Initializing data set: ')
 data_path = '/Users/annikal/Desktop/Ply_files/TEST_sorted_grid_ply'
 dataset = PointCloudDataSet(data_set_path=data_path, number_of_samples=1)
@@ -24,4 +46,6 @@ print(' ')
 print('Creating png: ')
 array_to_png(cutout, 'map_png')
 del cutout
+'''
+
 
