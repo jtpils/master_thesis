@@ -31,7 +31,6 @@ batch_size = int(input('Input batch size: '))
 plot_flag = input('Plot results? y / n: ')
 
 
-
 print(' ')
 print('Number of GPUs available: ', torch.cuda.device_count())
 use_cuda = torch.cuda.is_available()
@@ -50,7 +49,7 @@ if use_cuda:
 #use_cuda = False
 ##########
 
-CNN = Network_March()
+CNN = Network_March2()
 #CNN = MyBestNetwork()
 #CNN = MyBestNetwork()
 if use_cuda:
