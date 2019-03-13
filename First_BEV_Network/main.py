@@ -34,6 +34,9 @@ path_test_data = '/home/annika_lundqvist144/Dataset/fake_test_set' #input('Path 
 batch_size = int(input('Input batch size: '))
 plot_flag = input('Plot results? y / n: ')
 
+##########
+use_cuda = False
+##########
 
 print(' ')
 print('Number of GPUs available: ', torch.cuda.device_count())
@@ -54,9 +57,7 @@ if use_cuda:
 
 
 
-##########
-#use_cuda = False
-##########
+
 
 CNN = Network_March2().to(device)
 #if use_cuda:
