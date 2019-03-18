@@ -1,7 +1,7 @@
 from data_loader import *
 from train_network import *
 import matplotlib.pyplot as plt
-from loaders_only_sweeps import *
+#from loaders_only_sweeps import *
 from new_networks import *
 
 
@@ -18,13 +18,13 @@ load_weights_path = '/home/master04/Desktop/networks_plots_190305/test_multiple_
 model_name = input('Type name of new folder: ')
 n_epochs = int(input('Number of epochs: '))
 learning_rate = 0.001 #float(input('Learning rate: '))
-patience = n_epochs #int(input('Input patience for EarlyStopping: ')) # Threshold for early stopping. Number of epochs that we will wait until brake
+patience = int(input('Input patience for EarlyStopping: ')) # Threshold for early stopping. Number of epochs that we will wait until brake
 
 # /Users/sabinalinderoth/Desktop/fake_test
 
-path_training_data = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/fake_training_set' #
-path_validation_data = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/fake_validation_set' #
-path_test_data = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/fake_test_set' #
+#path_training_data = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/fake_training_set' #
+#path_validation_data = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/fake_validation_set' #
+#path_test_data = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/fake_test_set' #
 
 # path_training_data = '/home/master04/Desktop/Dataset/fake_training_set' #
 # path_validation_data = '/home/master04/Desktop/Dataset/fake_validation_set' #
@@ -49,12 +49,12 @@ use_cuda = torch.cuda.is_available()
 ##########
 
 
-if use_cuda:
-    id = torch.cuda.current_device()
-    print('Device id: ', id)
+#if use_cuda:
+#    id = torch.cuda.current_device()
+#    print('Device id: ', id)
 print('CUDA available: ', use_cuda)
 device = torch.device("cuda:0" if use_cuda else "cpu")
-print('Device: ', device)
+#print('Device: ', device)
 
 
 
@@ -73,13 +73,7 @@ if use_cuda:
 #CNN = Network_March2().to(device)
 #CNN = MyBestNetwork().to(device)
 
-#CNN = LeNet()
-#CNN = LeNetMORE()
-#CNN = LeNetCRAZY()
-#CNN = LeNetWTF()
 CNN = LookAtThisNet()
-
-
 print('=======> NETWORK NAME: =======> ', CNN.name())
 
 if use_cuda:
