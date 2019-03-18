@@ -12,7 +12,7 @@ import time
 
 ## load mnist dataset
 use_cuda = torch.cuda.is_available()
-use_cuda = False
+#use_cuda = False
 
 root = './data'
 if not os.path.exists(root):
@@ -78,8 +78,8 @@ class LeNet(nn.Module):
 
 
 ## training
-#model = LeNet()
-model = MLPNet()
+model = LeNet()
+#model = MLPNet()
 
 if use_cuda:
     model = model.cuda()
