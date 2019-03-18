@@ -14,13 +14,30 @@ def get_file_name_from_frame_number(frame_number):
 
     return file_name
 
+
+def get_grid(x, y):
+    k = 0
+    for edge in x_edges:
+        if x > edge:
+            x_grid_number = k
+        k = k + 1
+
+    k = 0
+    for edge in y_edges:
+        if y > edge:
+            y_grid_number = k
+        k = k + 1
+
+    return x_grid_number, y_grid_number
+
+
 #**********# change the rows marked with this #**********#
 
-# path_to_ply = '/Users/annikal/Documents/master_thesis/ProcessingLiDARdata/_out_Town02_190221_1'#'/home/master04/Desktop/Ply_files/_out_Town03_190306_1'#**********#
-# path_to_csv = os.path.join(path_to_ply, 'Town02_190221_1.csv')#**********#
+path_to_ply = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/_out_Town02_190306_1'#'/home/master04/Desktop/Ply_files/_out_Town03_190306_1'#**********#
+path_to_csv = os.path.join(path_to_ply, 'Town02_190306_1.csv')#**********#
 path_to_pc = os.path.join(path_to_ply, 'pc')
 
-# new_folder = '/Users/annikal/Desktop/Ply_files/TEST_sorted_grid_ply' #'/home/master04/Desktop/Ply_files/Town03_sorted_grid_ply'#**********#
+new_folder = '/Users/sabinalinderoth/Desktop/Ply_files/TEST_sorted_grid_ply' #'/home/master04/Desktop/Ply_files/Town03_sorted_grid_ply'#**********#
 os.mkdir(new_folder)
 
 global_coordinates = pd.read_csv(path_to_csv)
@@ -47,8 +64,6 @@ for x in np.arange(number_x_grids):
         os.mkdir(grid_name)
 
 
-
-
 # create csv, where we store all frame numbers and global coordinates
 new_csv_global_coordinates_path = os.path.join(new_folder, 'global_coordinates.csv')
 with open(new_csv_global_coordinates_path, mode='w') as csv_file:
@@ -56,27 +71,6 @@ with open(new_csv_global_coordinates_path, mode='w') as csv_file:
     csv_writer = csv.writer(csv_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
     csv_writer.writerow(fieldnames)
     print('Successfully created global_coordinates.csv')
-
-
-
-
-def get_grid(x, y):
-    k = 0
-    for edge in x_edges:
-        if x > edge:
-            x_grid_number = k
-        k = k + 1
-
-    k = 0
-    for edge in y_edges:
-        if y > edge:
-            y_grid_number = k
-        k = k + 1
-
-    return x_grid_number, y_grid_number
-
-
-
 
 
 # loop trough each ply file and copy it to the correct directory
