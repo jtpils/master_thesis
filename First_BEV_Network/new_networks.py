@@ -89,8 +89,8 @@ class LookAtThisNet_downsampled(torch.nn.Module):
         self.conv7 = torch.nn.Conv2d(128, 128, kernel_size=5, stride=1, padding=0)
 
         self.conv1_bn = torch.nn.BatchNorm2d(64)
-        self.conv2_bn = torch.nn.BatchNorm2d(64)
-        self.conv3_bn = torch.nn.BatchNorm2d(64)
+        self.conv2_bn = torch.nn.BatchNorm2d(128)
+        self.conv3_bn = torch.nn.BatchNorm2d(128)
         self.conv4_bn = torch.nn.BatchNorm2d(128)
         self.conv5_bn = torch.nn.BatchNorm2d(128)
         self.conv6_bn = torch.nn.BatchNorm2d(128)
