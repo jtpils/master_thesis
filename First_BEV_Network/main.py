@@ -42,8 +42,8 @@ print('Number of GPUs available: ', torch.cuda.device_count())
 use_cuda = torch.cuda.is_available()
 
 ##########
-use_cuda = False
-device = "cpu"
+#use_cuda = False
+#device = "cpu"
 ##########
 
 
@@ -70,8 +70,8 @@ if use_cuda:
 #CNN = Network_March2().to(device)
 #CNN = MyBestNetwork().to(device)
 
-CNN = LeNet()
-#CNN = LeNetMORE()
+#CNN = LeNet()
+CNN = LeNetMORE()
 
 print('=======> NETWORK NAME: =======> ', CNN.name())
 
