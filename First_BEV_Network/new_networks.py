@@ -27,6 +27,7 @@ class LookAtThisNet(torch.nn.Module):
         self.conv7_bn = torch.nn.BatchNorm2d(128)
 
         self.pool1 = torch.nn.MaxPool2d(kernel_size=4, stride=4, padding=0)
+        self.pool2 = torch.nn.MaxPool2d(kernel_size=2, stride=2, padding=0)
         self.dropout_2d = torch.nn.Dropout2d(0.1)
         self.dropout_1d = torch.nn.Dropout(0.1)
 
@@ -41,23 +42,23 @@ class LookAtThisNet(torch.nn.Module):
         x = self.dropout_2d(x)
 
         x = F.relu(self.conv2_bn(self.conv2(x))) # 64, 222, 222
-        x = self.pool1(x) # 64, 111, 111
+        x = self.pool2(x) # 64, 111, 111
         x = self.dropout_2d(x)
 
         x = F.relu(self.conv3_bn(self.conv3(x))) # 64, 109, 109
-        x = self.pool1(x) # 64, 54, 54
+        x = self.pool2(x) # 64, 54, 54
         x = self.dropout_2d(x)
 
         x = F.relu(self.conv4_bn(self.conv4(x))) # 128, 52, 52
-        x = self.pool1(x) # 128, 26, 26
+        x = self.pool2(x) # 128, 26, 26
         x = self.dropout_2d(x)
 
         x = F.relu(self.conv5_bn(self.conv5(x))) # 128, 24, 24
-        x = self.pool1(x) # 128, 12, 12
+        x = self.pool2(x) # 128, 12, 12
         x = self.dropout_2d(x)
 
         x = F.relu(self.conv6_bn(self.conv6(x))) # 128, 10, 10
-        x = self.pool1(x) # 128, 5, 5
+        x = self.pool2(x) # 128, 5, 5
         x = self.dropout_2d(x)
 
         x = F.relu(self.conv7_bn(self.conv7(x))) # 128, 1, 1
