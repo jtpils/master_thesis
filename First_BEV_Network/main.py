@@ -12,8 +12,8 @@ from new_networks import *
 # /Users/annikal/Desktop/fake_training_data_trans2
 
 # load old weights! change here manually
-load_weights = False
-load_weights_path = '/home/annika_lundqvist144/master_thesis/First_BEV_Network/param_190318_2/parameters/epoch_1_checkpoint.pt'
+load_weights = True
+load_weights_path = '/home/annika_lundqvist144/master_thesis/First_BEV_Network/param/parameters/epoch_7_checkpoint.pt'
 
 model_name = input('Type name of new folder: ')
 n_epochs = int(input('Number of epochs: '))
