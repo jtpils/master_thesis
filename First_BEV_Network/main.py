@@ -1,12 +1,9 @@
 from data_loader import *
 from train_network import *
-from super_simple_cnn import SuperSimpleCNN
-from nets_regularization import *
 import matplotlib.pyplot as plt
-import os
-import torch
 from loaders_only_sweeps import *
 from CrazyNets import *
+from new_networks import *
 
 
 # training folder:
@@ -42,8 +39,8 @@ print('Number of GPUs available: ', torch.cuda.device_count())
 use_cuda = torch.cuda.is_available()
 
 ##########
-use_cuda = False
-device = "cpu"
+#use_cuda = False
+#device = "cpu"
 ##########
 
 
@@ -73,7 +70,9 @@ if use_cuda:
 #CNN = LeNet()
 #CNN = LeNetMORE()
 #CNN = LeNetCRAZY()
-CNN = LeNetWTF()
+#CNN = LeNetWTF()
+CNN = LookAtThisNet()
+
 
 print('=======> NETWORK NAME: =======> ', CNN.name())
 
