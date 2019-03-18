@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import os
 import torch
 from loaders_only_sweeps import *
+from CrazyNets import *
 
 
 # training folder:
@@ -36,15 +37,13 @@ plot_flag = 'n' #input('Plot results? y / n: ')
 
 
 
-
-
 print(' ')
 print('Number of GPUs available: ', torch.cuda.device_count())
 use_cuda = torch.cuda.is_available()
 
 ##########
-use_cuda = False
-device = "cpu"
+#use_cuda = False
+#device = "cpu"
 ##########
 
 
@@ -68,13 +67,16 @@ if use_cuda:
     torch.cuda.set_device(id)'''
 
 
-
-
-
-
-CNN = Network_March2().to(device)
+#CNN = Network_March2().to(device)
 #CNN = MyBestNetwork().to(device)
 
+CNN = LeNet()
+#CNN = LeNetMORE()
+
+print('=======> NETWORK NAME: =======> ', CNN.name())
+
+if use_cuda:
+    CNN.cuda()
 
 #if use_cuda:
 #    CNN.cuda()
@@ -102,9 +104,7 @@ os.mkdir(parameter_path)
 
 
 # train!
-train_loss, val_loss = train_network(CNN, train_loader, val_loader, n_epochs, learning_rate, patience, parameter_path, device)
-
-
+train_loss, val_loss = train_network(CNN, train_loader, val_loader, n_epochs, learning_rate, patience, parameter_path, device, use_cuda)
 
 
 
