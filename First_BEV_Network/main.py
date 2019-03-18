@@ -70,8 +70,8 @@ if use_cuda:
 #CNN = LeNet()
 #CNN = LeNetMORE()
 #CNN = LeNetCRAZY()
-CNN = LeNetWTF()
-#CNN = LookAtThisNet()
+#CNN = LeNetWTF()
+CNN = LookAtThisNet()
 
 
 print('=======> NETWORK NAME: =======> ', CNN.name())
