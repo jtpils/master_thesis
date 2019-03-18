@@ -23,20 +23,22 @@ n_epochs = int(input('Number of epochs: '))
 learning_rate = 0.001 #float(input('Learning rate: '))
 patience = n_epochs #int(input('Input patience for EarlyStopping: ')) # Threshold for early stopping. Number of epochs that we will wait until brake
 
-path_training_data = '/home/master04/Desktop/Dataset/fake_training_set' #
-path_validation_data = '/home/master04/Desktop/Dataset/fake_validation_set' #
-path_test_data = '/home/master04/Desktop/Dataset/fake_test_set' #
+# /Users/sabinalinderoth/Desktop/fake_test
+
+path_training_data = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/fake_training_set' #
+path_validation_data = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/fake_validation_set' #
+path_test_data = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/fake_test_set' #
+
+# path_training_data = '/home/master04/Desktop/Dataset/fake_training_set' #
+# path_validation_data = '/home/master04/Desktop/Dataset/fake_validation_set' #
+# path_test_data = '/home/master04/Desktop/Dataset/fake_test_set' #
 
 #path_training_data = '/home/annika_lundqvist144/Dataset/fake_training_set' #input('Path to training data set folder: ')
 #path_validation_data = '/home/annika_lundqvist144/Dataset/fake_validation_set' #input('Path to validation data set folder: ')
 #path_test_data = '/home/annika_lundqvist144/Dataset/fake_test_set' #input('Path to test data set folder: ')
 
 batch_size = int(input('Input batch size: '))
-plot_flag = 'n' #input('Plot results? y / n: ')
-
-
-
-
+plot_flag = input('Plot results? y / n: ')
 
 print(' ')
 print('Number of GPUs available: ', torch.cuda.device_count())
@@ -68,12 +70,9 @@ if use_cuda:
     torch.cuda.set_device(id)'''
 
 
-
-
-
-
-CNN = Network_March2().to(device)
+# CNN = Network_March2().to(device)
 #CNN = MyBestNetwork().to(device)
+CNN = SuperSimpleCNN().to(device)
 
 
 #if use_cuda:
@@ -99,14 +98,8 @@ os.mkdir(model_path)
 parameter_path = os.path.join(model_path, 'parameters')
 os.mkdir(parameter_path)
 
-
-
 # train!
 train_loss, val_loss = train_network(CNN, train_loader, val_loader, n_epochs, learning_rate, patience, parameter_path, device)
-
-
-
-
 
 
 if plot_flag is 'y':
