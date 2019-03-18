@@ -21,7 +21,7 @@ class LookAtThisNet(torch.nn.Module):
         self.conv1_bn = torch.nn.BatchNorm2d(64)
         self.conv2_bn = torch.nn.BatchNorm2d(64)
         self.conv3_bn = torch.nn.BatchNorm2d(64)
-        self.conv4_bn = torch.nn.BatchNorm2d(64)
+        self.conv4_bn = torch.nn.BatchNorm2d(128)
         self.conv5_bn = torch.nn.BatchNorm2d(128)
         self.conv6_bn = torch.nn.BatchNorm2d(128)
         self.conv7_bn = torch.nn.BatchNorm2d(128)
