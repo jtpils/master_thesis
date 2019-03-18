@@ -3,8 +3,6 @@ import torch
 
 
 class LookAtThisNet(torch.nn.Module):
-    # The first network is inspired by Luca's article.
-
     # Our batch shape for input x is (8, 900, 900)
 
     def __init__(self):
@@ -26,7 +24,7 @@ class LookAtThisNet(torch.nn.Module):
         self.conv6_bn = torch.nn.BatchNorm2d(128)
         self.conv7_bn = torch.nn.BatchNorm2d(128)
 
-        self.pool1 = torch.nn.MaxPool2d(kernel_size=4, stride=4, padding=0)
+        self.pool4 = torch.nn.MaxPool2d(kernel_size=4, stride=4, padding=0)
         self.pool2 = torch.nn.MaxPool2d(kernel_size=2, stride=2, padding=0)
         self.dropout_2d = torch.nn.Dropout2d(0.1)
         self.dropout_1d = torch.nn.Dropout(0.1)
@@ -38,7 +36,7 @@ class LookAtThisNet(torch.nn.Module):
     def forward(self, x):
 
         x = F.relu(self.conv1_bn(self.conv1(x))) # 64, 896, 896
-        x = self.pool1(x) # 64, 224, 224
+        x = self.pool4(x) # 64, 224, 224
         x = self.dropout_2d(x)
 
         x = F.relu(self.conv2_bn(self.conv2(x))) # 64, 222, 222

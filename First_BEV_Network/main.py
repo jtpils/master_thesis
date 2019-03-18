@@ -2,7 +2,6 @@ from data_loader import *
 from train_network import *
 import matplotlib.pyplot as plt
 from loaders_only_sweeps import *
-from CrazyNets import *
 from new_networks import *
 
 

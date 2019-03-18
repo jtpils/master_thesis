@@ -1,7 +1,6 @@
 from data_loader import *
 from train_network import *
-from super_simple_cnn import *
-from simple_nets_iteration3 import *
+from networks_classes.simple_nets_iteration3 import *
 import matplotlib.pyplot as plt
 import os
 import torch
