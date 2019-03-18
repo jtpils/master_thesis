@@ -67,7 +67,7 @@ def train_network(net, train_loader, val_loader, n_epochs, learning_rate, patien
             sample = data['sample']
             labels = data['labels']
 
-
+            time_epoch = time.time()
             if use_cuda:
                 sample, labels = sample.cuda(), labels.cuda()
             sample, labels = Variable(sample), Variable(labels)
@@ -88,8 +88,8 @@ def train_network(net, train_loader, val_loader, n_epochs, learning_rate, patien
             total_train_loss += loss_size.item()
     
             if (i+1) % print_every == 0:
-                print('Epoch [{}/{}], Batch [{}/{}], Loss: {:.4f}'
-                       .format(epoch+1, n_epochs, i+1, n_batches, running_loss/print_every))
+                print('Epoch [{}/{}], Batch [{}/{}], Loss: {:.4f}, Time: {:,2f} s'
+                       .format(epoch+1, n_epochs, i+1, n_batches, running_loss/print_every, time.time()-time_epoch))
                 running_loss = 0.0
         
 
