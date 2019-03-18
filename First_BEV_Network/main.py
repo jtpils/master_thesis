@@ -12,12 +12,12 @@ from new_networks import *
 # /Users/annikal/Desktop/fake_training_data_trans2
 
 # load old weights! change here manually
-load_weights = False
-load_weights_path = '/home/master04/Desktop/networks_plots_190305/test_multiple_networks_6/parameters_net2/epoch_9_checkpoint.pt'
+load_weights = True
+load_weights_path = '/home/annika_lundqvist144/master_thesis/First_BEV_Network/param_190318_1/parameters/epoch_1_checkpoint.pt'
 
 model_name = input('Type name of new folder: ')
 n_epochs = int(input('Number of epochs: '))
-learning_rate = 0.001 #float(input('Learning rate: '))
+learning_rate = float(input('Learning rate: '))
 patience = int(input('Input patience for EarlyStopping: ')) # Threshold for early stopping. Number of epochs that we will wait until brake
 
 # /Users/sabinalinderoth/Desktop/fake_test
@@ -89,6 +89,7 @@ train_loader, val_loader, test_loader = get_loaders(path_training_data, path_val
 
 # Load weights
 if load_weights:
+    print('Loading parameters...')
     network_param = torch.load(load_weights_path)
     CNN.load_state_dict(network_param['model_state_dict'])
 
