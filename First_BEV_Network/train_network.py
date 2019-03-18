@@ -22,7 +22,7 @@ def create_loss_and_optimizer(net, learning_rate=0.001):
     return loss, optimizer
 
 
-def train_network(net, train_loader, val_loader, n_epochs, learning_rate, patience, folder_path, use_cuda):
+def train_network(net, train_loader, val_loader, n_epochs, learning_rate, patience, folder_path, device):
 
     # Print all of the hyperparameters of the training iteration:
     print("===== HYPERPARAMETERS =====")
@@ -57,7 +57,7 @@ def train_network(net, train_loader, val_loader, n_epochs, learning_rate, patien
         print('learning rate: ', params[0]['lr'])
 
         running_loss = 0.0
-        print_every = n_batches // 20  # how many mini-batches if we want to print stats x times per epoch
+        print_every = 1  #n_batches // 10  # how many mini-batches if we want to print stats x times per epoch
         start_time = time.time()
         total_train_loss = 0
 
@@ -68,11 +68,7 @@ def train_network(net, train_loader, val_loader, n_epochs, learning_rate, patien
             labels = data['labels']
 
             # Wrap them in a Variable object
-            if use_cuda:
-                sample, labels = Variable(sample).cuda(), Variable(labels).cuda()  # maybe we should use # .to(deveice) here?
-            else:
-                sample, labels = Variable(sample), Variable(labels)
-
+            sample, labels = Variable(sample).to(device), Variable(labels).to(device)
 
             # Set the parameter gradients to zero
             optimizer.zero_grad()
@@ -102,10 +98,7 @@ def train_network(net, train_loader, val_loader, n_epochs, learning_rate, patien
                 labels = data['labels']
 
                 # Wrap them in a Variable object
-                if use_cuda:
-                    sample, labels = Variable(sample).cuda(), Variable(labels).cuda()
-                else:
-                    sample, labels = Variable(sample), Variable(labels)
+                sample, labels = Variable(sample).to(device), Variable(labels).to(device)
 
                 # Forward pass
                 val_outputs = net.forward(sample)

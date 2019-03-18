@@ -4,28 +4,32 @@ import numpy as np
 import pandas as pd
 import time
 
-'''
-path = '/home/master04/Desktop/Dataset/Town02_sorted_grid_ply/global_coordinates.csv'
 
+number_samples = 20
+batch_size = 2
+print('Initializing data set: ')
+data_path = '/home/master04/Desktop/Dataset/Town02_sorted_grid_ply'
+dataset = PointCloudDataSet(data_set_path=data_path, number_of_samples=number_samples)
+print('Done initializing data set. ')
+print(' ')
+'''
+print('Creating samples. ')
+idx = 0
 t1 = time.time()
-fdata = pd.read_csv(path)
+for idx in range(10):
+    sample_dict = dataset.__getitem__(idx)
+    print(np.shape(sample_dict['sweep']))
+    print(np.shape(sample_dict['map']))
+    print(' ')
 t2 = time.time()
 
-print('Time to read csv file with pandas: ', t2-t1)
-
-np.save('fnumpy.npy', fdata.values)
-path_np = os.getcwd() + '/fnumpy.npy'
-
-t3 = time.time()
-fdata_np = np.load(path_np)
-t4 = time.time()
-
-print('Time to read .npy file with np: ', t4-t3)
-
+print('Time: ', t2-t1)
 '''
 
 
+train_loader = get_train_loader(batch_size, data_path, number_samples, kwargs={})
 
+'''
 
 print('Initializing data set: ')
 data_path = '/Users/sabinalinderoth/Desktop/Ply_files/TEST_sorted_grid_ply'

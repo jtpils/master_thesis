@@ -20,62 +20,72 @@ load_weights_path = '/home/master04/Desktop/networks_plots_190305/test_multiple_
 
 model_name = input('Type name of new folder: ')
 n_epochs = int(input('Number of epochs: '))
-learning_rate = float(input('Learning rate: '))
-patience = int(input('Input patience for EarlyStopping: ')) # Threshold for early stopping. Number of epochs that we will wait until brake
+learning_rate = 0.001 #float(input('Learning rate: '))
+patience = n_epochs #int(input('Input patience for EarlyStopping: ')) # Threshold for early stopping. Number of epochs that we will wait until brake
 
-path_training_data = '/home/annika_lundqvist144/Dataset/fake_training_set' #input('Path to training data set folder: ')
-path_validation_data = '/home/annika_lundqvist144/Dataset/fake_validation_set' #input('Path to validation data set folder: ')
-path_test_data = '/home/annika_lundqvist144/Dataset/fake_test_set' #input('Path to test data set folder: ')
+path_training_data = '/home/master04/Desktop/Dataset/fake_training_set' #
+path_validation_data = '/home/master04/Desktop/Dataset/fake_validation_set' #
+path_test_data = '/home/master04/Desktop/Dataset/fake_test_set' #
+
+#path_training_data = '/home/annika_lundqvist144/Dataset/fake_training_set' #input('Path to training data set folder: ')
+#path_validation_data = '/home/annika_lundqvist144/Dataset/fake_validation_set' #input('Path to validation data set folder: ')
+#path_test_data = '/home/annika_lundqvist144/Dataset/fake_test_set' #input('Path to test data set folder: ')
 
 batch_size = int(input('Input batch size: '))
-plot_flag = input('Plot results? y / n: ')
+plot_flag = 'n' #input('Plot results? y / n: ')
+
+
 
 
 
 print(' ')
 print('Number of GPUs available: ', torch.cuda.device_count())
 use_cuda = torch.cuda.is_available()
+
+##########
+use_cuda = False
+device = "cpu"
+##########
+
+
+if use_cuda:
+    id = torch.cuda.current_device()
+    print('Device id: ', id)
 print('CUDA available: ', use_cuda)
-device = torch.device("cuda" if use_cuda else "cpu")
+device = torch.device("cuda:0" if use_cuda else "cpu")
 print('Device: ', device)
 
-id = torch.cuda.current_device()
-print('device id', id)
-mem = torch.cuda.device(id)
-print('memory adress', mem)
-print('device name', torch.cuda.get_device_name(id))
 
-##########
-#use_cuda = False
-##########
 
-CNN = Network_March()
-#CNN = MyBestNetwork()
-#CNN = MyBestNetwork()
+'''
 if use_cuda:
-    CNN.cuda()
+    id = torch.cuda.current_device()
+    print('device id', id)
+    mem = torch.cuda.device(id)
+    print('memory adress', mem)
+    print('device name', torch.cuda.get_device_name(id))
+    print('setting device...')
+    torch.cuda.set_device(id)'''
+
+
+
+
+
+
+CNN = Network_March2().to(device)
+#CNN = MyBestNetwork().to(device)
+
+
+#if use_cuda:
+#    CNN.cuda()
 
 print('Are model parameters on CUDA? ', next(CNN.parameters()).is_cuda)
 print(' ')
 
 
 
-#data_flag = input('Real or fake training data? ( real / fake ): ')
-#print(' ')
-
 kwargs = {'pin_memory': True} if use_cuda else {}
-#if data_flag == 'fake':
 train_loader, val_loader, test_loader = get_loaders(path_training_data, path_validation_data, path_test_data, batch_size, use_cuda, kwargs)
-#elif data_flag == 'real':
-#    map_folder_path = input('Type path to map folder (no slash at the end...): ')
-#
-#    map_path = map_folder_path + '/map.npy' #os.path.join(map_folder_path, '/map.npy')
-#    map_minmax_values_path = map_folder_path + '/max_min.npy' #os.path.join(map_folder_path, '/max_min.npy')
-#    train_loader, val_loader, test_loader = get_sweep_loaders(path_training_data, map_path, map_minmax_values_path,
-#                                                              path_validation_data, path_test_data, batch_size, kwargs)
-#else:
-#    print('You did not type real or fake. Follow the instructions next time, please (:')
-
 
 # Load weights
 if load_weights:
@@ -89,8 +99,15 @@ os.mkdir(model_path)
 parameter_path = os.path.join(model_path, 'parameters')
 os.mkdir(parameter_path)
 
+
+
 # train!
-train_loss, val_loss = train_network(CNN, train_loader, val_loader, n_epochs, learning_rate, patience, parameter_path, use_cuda)
+train_loss, val_loss = train_network(CNN, train_loader, val_loader, n_epochs, learning_rate, patience, parameter_path, device)
+
+
+
+
+
 
 if plot_flag is 'y':
     # plot loss
