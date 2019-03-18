@@ -71,7 +71,8 @@ if use_cuda:
 #CNN = MyBestNetwork().to(device)
 
 #CNN = LeNet()
-CNN = LeNetMORE()
+#CNN = LeNetMORE()
+CNN = LeNetCRAZY()
 
 print('=======> NETWORK NAME: =======> ', CNN.name())
 
