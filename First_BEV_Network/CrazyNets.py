@@ -73,4 +73,4 @@ class LeNetCRAZY(nn.Module):
         return x
 
     def name(self):
-        return "LeNetMORE"
+        return "LeNetCRAZY"
