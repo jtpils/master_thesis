@@ -73,7 +73,8 @@ if use_cuda:
 #CNN = Network_March2().to(device)
 #CNN = MyBestNetwork().to(device)
 
-CNN = LookAtThisNet()
+CNN = LookAtThisNet_downsampled()
+
 print('=======> NETWORK NAME: =======> ', CNN.name())
 
 if use_cuda:
