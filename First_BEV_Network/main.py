@@ -1,11 +1,9 @@
 from data_loader import *
 from train_network import *
-from super_simple_cnn import SuperSimpleCNN
-from nets_regularization import *
 import matplotlib.pyplot as plt
-import os
-import torch
 from loaders_only_sweeps import *
+from CrazyNets import *
+from new_networks import *
 
 
 # training folder:
@@ -33,20 +31,22 @@ path_test_data = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDAR
 # path_validation_data = '/home/master04/Desktop/Dataset/fake_validation_set' #
 # path_test_data = '/home/master04/Desktop/Dataset/fake_test_set' #
 
-#path_training_data = '/home/annika_lundqvist144/Dataset/fake_training_set' #input('Path to training data set folder: ')
-#path_validation_data = '/home/annika_lundqvist144/Dataset/fake_validation_set' #input('Path to validation data set folder: ')
-#path_test_data = '/home/annika_lundqvist144/Dataset/fake_test_set' #input('Path to test data set folder: ')
+path_training_data = '/home/annika_lundqvist144/Dataset/fake_training_set' #input('Path to training data set folder: ')
+path_validation_data = '/home/annika_lundqvist144/Dataset/fake_validation_set' #input('Path to validation data set folder: ')
+path_test_data = '/home/annika_lundqvist144/Dataset/fake_test_set' #input('Path to test data set folder: ')
 
 batch_size = int(input('Input batch size: '))
-plot_flag = input('Plot results? y / n: ')
+
+plot_flag = 'n' #input('Plot results? y / n: ')
+
 
 print(' ')
 print('Number of GPUs available: ', torch.cuda.device_count())
 use_cuda = torch.cuda.is_available()
 
 ##########
-use_cuda = False
-device = "cpu"
+#use_cuda = False
+#device = "cpu"
 ##########
 
 
@@ -70,13 +70,21 @@ if use_cuda:
     torch.cuda.set_device(id)'''
 
 
-# CNN = Network_March2().to(device)
+
+#CNN = Network_March2().to(device)
 #CNN = MyBestNetwork().to(device)
-CNN = SuperSimpleCNN().to(device)
+
+#CNN = LeNet()
+#CNN = LeNetMORE()
+#CNN = LeNetCRAZY()
+#CNN = LeNetWTF()
+CNN = LookAtThisNet()
 
 
-#if use_cuda:
-#    CNN.cuda()
+print('=======> NETWORK NAME: =======> ', CNN.name())
+
+if use_cuda:
+    CNN.cuda()
 
 print('Are model parameters on CUDA? ', next(CNN.parameters()).is_cuda)
 print(' ')
@@ -99,7 +107,8 @@ parameter_path = os.path.join(model_path, 'parameters')
 os.mkdir(parameter_path)
 
 # train!
-train_loss, val_loss = train_network(CNN, train_loader, val_loader, n_epochs, learning_rate, patience, parameter_path, device)
+
+train_loss, val_loss = train_network(CNN, train_loader, val_loader, n_epochs, learning_rate, patience, parameter_path, device, use_cuda)
 
 
 if plot_flag is 'y':
