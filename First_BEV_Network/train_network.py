@@ -71,7 +71,7 @@ def train_network(n_epochs, learning_rate, folder_path, device, use_cuda, batch_
     # print('Number of batches: ', n_batches)
 
     # Create our loss and optimizer functions
-    loss, optimizer = create_loss_and_optimizer(net, learning_rate)
+    loss, optimizer = create_loss_and_optimizer(CNN, learning_rate)
     scheduler = StepLR(optimizer, step_size=20, gamma=0.5)
 
     # Time for printing
