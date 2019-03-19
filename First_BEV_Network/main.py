@@ -16,7 +16,7 @@ load_weights = False
 load_weights_path = '/home/annika_lundqvist144/master_thesis/First_BEV_Network/param/parameters/epoch_7_checkpoint.pt'
 
 model_name = input('Type name of new folder: ')
-n_epochs = 2  #int(input('Number of epochs: '))
+n_epochs = 1  #int(input('Number of epochs: '))
 learning_rate = 0.001 #float(input('Learning rate: '))
 patience = n_epochs  #int(input('Input patience for EarlyStopping: ')) # Threshold for early stopping. Number of epochs that we will wait until brake
 
