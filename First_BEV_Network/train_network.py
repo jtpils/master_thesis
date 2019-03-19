@@ -107,7 +107,7 @@ def train_network(n_epochs, learning_rate, patience, folder_path, device, use_cu
             # Wrap them in a Variable object
             #sample, labels = Variable(sample).to(device), Variable(labels).to(device)
             t2 = time.time()
-            print('get data and wrap it in variable on cuda: ', t2-t1)
+            #print('get data and wrap it in variable on cuda: ', t2-t1)
 
             t1 = time.time()
             # Set the parameter gradients to zero
@@ -118,7 +118,7 @@ def train_network(n_epochs, learning_rate, patience, folder_path, device, use_cu
             loss_size.backward()
             optimizer.step()
             t2 = time.time()
-            print('time for forward, backprop, update: ', t2-t1)
+            #print('time for forward, backprop, update: ', t2-t1)
 
             # Print statistics
             running_loss += loss_size.item()
