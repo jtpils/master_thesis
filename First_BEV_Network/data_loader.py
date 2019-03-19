@@ -13,9 +13,9 @@ def get_loaders(path_training_data, path_validation_data, path_test_data, batch_
     sample_dir = path_validation_data + '/samples/'
     validation_data_set = LiDARDataSet(csv_file, sample_dir, use_cuda)
 
-    csv_file = path_test_data + '/labels.csv'
-    sample_dir = path_test_data + '/samples/'
-    test_data_set = LiDARDataSet(csv_file, sample_dir, use_cuda)
+    #csv_file = path_test_data + '/labels.csv'
+    #sample_dir = path_test_data + '/samples/'
+    #test_data_set = LiDARDataSet(csv_file, sample_dir, use_cuda)
 
     # Training
     n_training_samples = 300  #len(training_data_set)
