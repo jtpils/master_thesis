@@ -4,6 +4,7 @@ import os
 import torch
 from torch.utils.data import Dataset
 from torch.autograd import Variable
+import time
 
 
 class LiDARDataSet(Dataset):
@@ -24,10 +25,15 @@ class LiDARDataSet(Dataset):
         return len(self.csv_labels)
 
     def __getitem__(self, idx):
-
         sample_file = os.path.join(self.sample_dir, str(idx))
 
+        #t1 = time.time()
         sample = torch.from_numpy(np.load(sample_file + '.npy')).float()
+        #t2 = time.time()
+        #sample2 = torch.load(sample_file + '.pt').float()
+        #t3 = time.time()
+        #print('npy: ', t2-t1, 'torch: ', t3-t2)
+        #print('to load one sample: ', t2-t1)
         labels = self.csv_labels.iloc[idx-1, 1:4]
 
         training_sample = {'sample': sample, 'labels': labels.values}  #  This worked on Sabinas Mac.

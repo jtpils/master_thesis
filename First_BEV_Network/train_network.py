@@ -32,9 +32,9 @@ def train_network(n_epochs, learning_rate, patience, folder_path, device, use_cu
     path_validation_data = '/home/annika_lundqvist144/Dataset/fake_validation_set' #input('Path to validation data set folder: ')
     path_test_data = '/home/annika_lundqvist144/Dataset/fake_test_set' #input('Path to test data set folder: ')
 
-    #path_training_data = '/home/master04/Desktop/Dataset/fake_training_set' #
-    #path_validation_data = '/home/master04/Desktop/Dataset/fake_validation_set' #
-    #path_test_data = '/home/master04/Desktop/Dataset/fake_test_set' #
+    path_training_data = '/home/master04/Desktop/Dataset/fake_training_set' #'/home/master04/Desktop/Dataset/fake_training_data_torch'#
+    path_validation_data = '/home/master04/Desktop/Dataset/fake_validation_set' #'/home/master04/Desktop/Dataset/fake_training_data_torch'#
+    path_test_data = '/home/master04/Desktop/Dataset/fake_test_set' #
 
 
     CNN = LookAtThisNet_downsampled()
@@ -44,9 +44,8 @@ def train_network(n_epochs, learning_rate, patience, folder_path, device, use_cu
     print('Are model parameters on CUDA? ', next(CNN.parameters()).is_cuda)
     print(' ')
 
-
     kwargs = {'pin_memory': True} if use_cuda else {}
-    train_loader, val_loader = get_loaders(path_training_data, path_validation_data, path_test_data, batch_size, use_cuda, kwargs)
+    train_loader = get_loaders(path_training_data, path_validation_data, path_test_data, batch_size, use_cuda, kwargs)
 
     '''# Load weights
     if load_weights:
@@ -96,13 +95,14 @@ def train_network(n_epochs, learning_rate, patience, folder_path, device, use_cu
         t1_get_data = time.time()
         for i, data in enumerate(train_loader, 1):
             t2_get_data = time.time()
+            print('time to get data from loader: ', t2_get_data-t1_get_data)
 
             t1 = time.time()
             sample = data['sample']
             labels = data['labels']
 
             if use_cuda:
-                sample, labels = sample.cuda(), labels.cuda()
+                sample, labels = sample.cuda(async=True), labels.cuda(async=True)
             sample, labels = Variable(sample), Variable(labels)
             # Wrap them in a Variable object
             #sample, labels = Variable(sample).to(device), Variable(labels).to(device)
@@ -123,20 +123,20 @@ def train_network(n_epochs, learning_rate, patience, folder_path, device, use_cu
             # Print statistics
             running_loss += loss_size.item()
             total_train_loss += loss_size.item()
-    
+
             if (i+1) % print_every == 0:
                 print('Epoch [{}/{}], Batch [{}/{}], Loss: {:.4f}, Time: '
                        .format(epoch+1, n_epochs, i+1, n_batches, running_loss/print_every), time.time()-time_epoch)
                 running_loss = 0.0
                 time_epoch = time.time()
 
-            print('time to get data from loader: ', t2_get_data-t1_get_data)
+
             t1_get_data = time.time()
 
             del data, sample, labels, outputs, loss_size
 
         # At the end of the epoch, do a pass on the validation set
-        total_val_loss = 0
+        '''total_val_loss = 0
         CNN.eval()
         with torch.no_grad():
             for data in val_loader:
@@ -172,7 +172,7 @@ def train_network(n_epochs, learning_rate, patience, folder_path, device, use_cu
         # If the validation has not improved in patience # of epochs the training loop will break.
         if early_stopping.early_stop:
             print("Early stopping")
-            break
+            break'''
 
 
 

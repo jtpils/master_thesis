@@ -18,16 +18,17 @@ def get_loaders(path_training_data, path_validation_data, path_test_data, batch_
     #test_data_set = LiDARDataSet(csv_file, sample_dir, use_cuda)
 
     # Training
-    n_training_samples = len(training_data_set)
+    n_training_samples = 200  #len(training_data_set)
     print('Number of training samples: ', n_training_samples)
     train_sampler = SubsetRandomSampler(np.arange(1, n_training_samples+1, dtype=np.int64))
-    train_loader = torch.utils.data.DataLoader(training_data_set, batch_size=batch_size, sampler=train_sampler, num_workers=2, **kwargs)
+    train_loader = torch.utils.data.DataLoader(training_data_set, batch_size=batch_size, sampler=train_sampler, num_workers=8, **kwargs)
+    #train_loader = torch.utils.data.DataLoader(training_data_set, batch_size=batch_size, shuffle=True, num_workers=8, **kwargs)
 
     # Validation
-    n_val_samples = len(validation_data_set)
-    print('Number of validation samples: ', n_val_samples)
-    val_sampler = SubsetRandomSampler(np.arange(1, n_val_samples+1, dtype=np.int64))
-    val_loader = torch.utils.data.DataLoader(validation_data_set, batch_size=batch_size, sampler=val_sampler, num_workers=2, **kwargs)
+    #n_val_samples = 8  #len(validation_data_set)
+    #print('Number of validation samples: ', n_val_samples)
+    #val_sampler = SubsetRandomSampler(np.arange(1, n_val_samples+1, dtype=np.int64))
+    #val_loader = torch.utils.data.DataLoader(validation_data_set, batch_size=batch_size, sampler=val_sampler, num_workers=8, **kwargs)
 
     # Test
     #n_test_samples = len(test_data_set)
@@ -37,4 +38,4 @@ def get_loaders(path_training_data, path_validation_data, path_test_data, batch_
 
     print(' ')
 
-    return train_loader, val_loader#, test_loader
+    return train_loader#, val_loader#, test_loader

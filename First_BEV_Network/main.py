@@ -16,9 +16,9 @@ load_weights = False
 load_weights_path = '/home/annika_lundqvist144/master_thesis/First_BEV_Network/param/parameters/epoch_7_checkpoint.pt'
 
 model_name = input('Type name of new folder: ')
-n_epochs = int(input('Number of epochs: '))
-learning_rate = float(input('Learning rate: '))
-patience = int(input('Input patience for EarlyStopping: ')) # Threshold for early stopping. Number of epochs that we will wait until brake
+n_epochs = 2  #int(input('Number of epochs: '))
+learning_rate = 0.001 #float(input('Learning rate: '))
+patience = n_epochs  #int(input('Input patience for EarlyStopping: ')) # Threshold for early stopping. Number of epochs that we will wait until brake
 
 # /Users/sabinalinderoth/Desktop/fake_test
 
@@ -32,11 +32,11 @@ path_training_data = '/home/annika_lundqvist144/Dataset/fake_training_set' #inpu
 path_validation_data = '/home/annika_lundqvist144/Dataset/fake_validation_set' #input('Path to validation data set folder: ')
 path_test_data = '/home/annika_lundqvist144/Dataset/fake_test_set' #input('Path to test data set folder: ')
 
-path_training_data = '/home/master04/Desktop/Dataset/fake_training_set' #
-path_validation_data = '/home/master04/Desktop/Dataset/fake_validation_set' #
+path_training_data = '/home/master04/Desktop/Dataset/fake_training_data_torch'#'/home/master04/Desktop/Dataset/fake_training_set' #
+path_validation_data = '/home/master04/Desktop/Dataset/fake_training_data_torch'#'/home/master04/Desktop/Dataset/fake_validation_set' #
 path_test_data = '/home/master04/Desktop/Dataset/fake_test_set' #
 
-batch_size = int(input('Input batch size: '))
+batch_size = 2  #int(input('Input batch size: '))
 
 plot_flag = 'n' #input('Plot results? y / n: ')
 
