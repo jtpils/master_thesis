@@ -6,6 +6,9 @@ import numpy as np
 import os
 from early_stopping import EarlyStopping
 import torch
+from new_networks import *
+from data_loader import *
+
 
 
 def create_loss_and_optimizer(net, learning_rate=0.001):
@@ -22,7 +25,31 @@ def create_loss_and_optimizer(net, learning_rate=0.001):
     return loss, optimizer
 
 
-def train_network(net, train_loader, val_loader, n_epochs, learning_rate, patience, folder_path, device, use_cuda):
+#def train_network(net, train_loader, val_loader, n_epochs, learning_rate, patience, folder_path, device, use_cuda):
+def train_network(n_epochs, learning_rate, folder_path, device, use_cuda, batch_size):
+
+    path_training_data = '/home/annika_lundqvist144/Dataset/fake_training_set' #input('Path to training data set folder: ')
+    path_validation_data = '/home/annika_lundqvist144/Dataset/fake_validation_set' #input('Path to validation data set folder: ')
+    path_test_data = '/home/annika_lundqvist144/Dataset/fake_test_set' #input('Path to test data set folder: ')
+
+    CNN = LookAtThisNet()
+    print('=======> NETWORK NAME: =======> ', CNN.name())
+    if use_cuda:
+        CNN.cuda()
+    print('Are model parameters on CUDA? ', next(CNN.parameters()).is_cuda)
+    print(' ')
+
+
+    kwargs = {'pin_memory': True} if use_cuda else {}
+    train_loader, val_loader = get_loaders(path_training_data, path_validation_data, path_test_data, batch_size, use_cuda, kwargs)
+
+    '''# Load weights
+    if load_weights:
+        print('Loading parameters...')
+        network_param = torch.load(load_weights_path)
+        CNN.load_state_dict(network_param['model_state_dict'])'''
+
+    patience = 10
 
     # Print all of the hyperparameters of the training iteration:
     print("===== HYPERPARAMETERS =====")

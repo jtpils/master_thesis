@@ -2,7 +2,7 @@ from data_loader import *
 from train_network import *
 import matplotlib.pyplot as plt
 #from loaders_only_sweeps import *
-from new_networks import *
+#from new_networks import *
 
 
 # training folder:
@@ -18,7 +18,7 @@ load_weights_path = '/home/annika_lundqvist144/master_thesis/First_BEV_Network/p
 model_name = input('Type name of new folder: ')
 n_epochs = int(input('Number of epochs: '))
 learning_rate = float(input('Learning rate: '))
-patience = int(input('Input patience for EarlyStopping: ')) # Threshold for early stopping. Number of epochs that we will wait until brake
+#patience = int(input('Input patience for EarlyStopping: ')) # Threshold for early stopping. Number of epochs that we will wait until brake
 
 # /Users/sabinalinderoth/Desktop/fake_test
 
@@ -74,7 +74,7 @@ if use_cuda:
 #CNN = MyBestNetwork().to(device)
 
 #CNN = LookAtThisNet_downsampled()
-CNN = LookAtThisNet()
+'''CNN = LookAtThisNet()
 
 print('=======> NETWORK NAME: =======> ', CNN.name())
 
@@ -87,13 +87,13 @@ print(' ')
 
 
 kwargs = {'pin_memory': True} if use_cuda else {}
-train_loader, val_loader = get_loaders(path_training_data, path_validation_data, path_test_data, batch_size, use_cuda, kwargs)
+train_loader, val_loader = get_loaders(path_training_data, path_validation_data, path_test_data, batch_size, use_cuda, kwargs)'''
 
 # Load weights
-if load_weights:
-    print('Loading parameters...')
-    network_param = torch.load(load_weights_path)
-    CNN.load_state_dict(network_param['model_state_dict'])
+#if load_weights:
+#    print('Loading parameters...')
+#    network_param = torch.load(load_weights_path)
+#    CNN.load_state_dict(network_param['model_state_dict'])
 
 # create directory for model weights
 current_path = os.getcwd()
@@ -104,7 +104,8 @@ os.mkdir(parameter_path)
 
 # train!
 
-train_loss, val_loss = train_network(CNN, train_loader, val_loader, n_epochs, learning_rate, patience, parameter_path, device, use_cuda)
+#train_loss, val_loss = train_network(CNN, train_loader, val_loader, n_epochs, learning_rate, patience, parameter_path, device, use_cuda,batch_size)
+train_loss, val_loss = train_network(n_epochs, learning_rate, parameter_path, device, use_cuda, batch_size)
 
 
 if plot_flag is 'y':
