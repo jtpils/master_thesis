@@ -29,7 +29,7 @@ print('Time: ', t2-t1)
 
 train_loader = get_train_loader(batch_size, data_path, number_samples, kwargs={})
 
-'''
+
 
 print('Initializing data set: ')
 data_path = '/Users/sabinalinderoth/Desktop/Ply_files/TEST_sorted_grid_ply'
