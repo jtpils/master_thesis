@@ -32,7 +32,7 @@ def train_network(n_epochs, learning_rate, folder_path, device, use_cuda, batch_
     path_validation_data = '/home/annika_lundqvist144/Dataset/fake_validation_set' #input('Path to validation data set folder: ')
     path_test_data = '/home/annika_lundqvist144/Dataset/fake_test_set' #input('Path to test data set folder: ')
 
-    CNN = LookAtThisNetAgain()
+    CNN = LookAtThisNet_downsampled()
     print('=======> NETWORK NAME: =======> ', CNN.name())
     if use_cuda:
         CNN.cuda()
