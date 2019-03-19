@@ -31,8 +31,7 @@ class LiDARDataSet(Dataset):
         del labels_csv
         #labels = self.csv_labels.iloc[idx-1, 1:4]  #old version when we loaded the whole csv as a self-variable
 
-        training_sample = {'sample': sample, 'labels': labels.values}  #  This worked on Sabinas Mac.
+        #training_sample = {'sample': sample, 'labels': labels.values}  #  This worked on Sabinas Mac.
 
         del sample
-        return training_sample
-        del training_sample
+        return sample, labels.values #training_sample

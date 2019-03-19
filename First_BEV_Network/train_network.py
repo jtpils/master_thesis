@@ -95,13 +95,14 @@ def train_network(n_epochs, learning_rate, patience, folder_path, device, use_cu
         CNN.train()
         time_epoch = time.time()
         t1_get_data = time.time()
-        for i, data in enumerate(train_loader, 1):
+        #for i, data in enumerate(train_loader, 1):
+        for i, (sample, labels) in enumerate(train_loader, 1):
             t2_get_data = time.time()
             print('time to get data from loader: ', t2_get_data-t1_get_data)
 
             #t1 = time.time()
-            sample = data['sample']
-            labels = data['labels']
+            #sample = data['sample']
+            #labels = data['labels']
 
             if use_cuda:
                 #sample, labels = sample.pin_memory(), labels.pin_memory()
