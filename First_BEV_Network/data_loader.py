@@ -30,11 +30,11 @@ def get_loaders(path_training_data, path_validation_data, path_test_data, batch_
     val_loader = torch.utils.data.DataLoader(validation_data_set, batch_size=batch_size, sampler=val_sampler, num_workers=4, **kwargs)
 
     # Test
-    n_test_samples = len(test_data_set)
-    print('Number of test samples: ', n_test_samples)
-    test_sampler = SubsetRandomSampler(np.arange(1, n_test_samples+1, dtype=np.int64))
-    test_loader = torch.utils.data.DataLoader(test_data_set, batch_size=batch_size, sampler=test_sampler, num_workers=4, **kwargs)
+    #n_test_samples = len(test_data_set)
+    #print('Number of test samples: ', n_test_samples)
+    #test_sampler = SubsetRandomSampler(np.arange(1, n_test_samples+1, dtype=np.int64))
+    #test_loader = torch.utils.data.DataLoader(test_data_set, batch_size=batch_size, sampler=test_sampler, num_workers=4, **kwargs)
 
     print(' ')
 
-    return train_loader, val_loader, test_loader
+    return train_loader, val_loader#, test_loader
