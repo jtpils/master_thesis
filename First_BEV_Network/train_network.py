@@ -94,6 +94,7 @@ def train_network(net, train_loader, val_loader, n_epochs, learning_rate, patien
                 running_loss = 0.0
                 time_epoch = time.time()
         
+            del data, sample, labels, outputs
 
         # At the end of the epoch, do a pass on the validation set
         total_val_loss = 0
@@ -115,6 +116,8 @@ def train_network(net, train_loader, val_loader, n_epochs, learning_rate, patien
 
                 val_loss_size = loss(val_outputs, labels.float())
                 total_val_loss += val_loss_size.item()
+
+                del data, sample, labels, val_outputs
 
         print("Training loss: {:.4f}".format(total_train_loss / len(train_loader)),
               ", Validation loss: {:.4f}".format(total_val_loss / len(val_loader)),
