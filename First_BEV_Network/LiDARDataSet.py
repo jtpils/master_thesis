@@ -35,3 +35,4 @@ class LiDARDataSet(Dataset):
 
         del sample
         return training_sample
+        del training_sample
