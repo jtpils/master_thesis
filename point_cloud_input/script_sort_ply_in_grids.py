@@ -50,9 +50,26 @@ grid_size = 15
 number_x_grids = int(np.ceil((max_x - min_x)/grid_size))
 number_of_x_edges = number_x_grids + 1
 x_edges = [min_x + x for x in np.arange(number_of_x_edges) * grid_size if x < max_x + grid_size] #creates list with all the edge values of the grids
+
+# Sabina's ploebel solution not tested properly but it seems to work for this case.
+# x_edges = []
+# x = min_x
+
+# while x < max_x + grid_size:
+#     x_edges.append(x)
+#     x = x + grid_size
+
 number_y_grids = int(np.ceil((max_y - min_y)/grid_size))
 number_of_y_edges = number_y_grids + 1
 y_edges = [min_y + y for y in np.arange(number_of_y_edges) * grid_size if y < max_y + grid_size] #creates list with all the edge values of the grids
+
+# Sabina's ploebel solution not tested properly but it seems to work for this case.
+# y_edges = []
+# y = min_y
+
+# while y < max_y + grid_size:
+#     y_edges.append(y)
+#     y = y + grid_size
 
 csv_edges_path = os.path.join(new_folder, 'edges.npy')
 np.save(csv_edges_path, [x_edges, y_edges])
