@@ -16,13 +16,13 @@ class LiDARDataSet(Dataset):
             csv_file (string): Path to the csv file with labels.
             sample_dir (string): Directory with all the samples.
         """
-
+        self.num_samples = len(pd.read_csv(csv_file))
         self.csv_labels = csv_file#pd.read_csv(csv_file)
         self.sample_dir = sample_dir
         self.use_cuda = use_cuda
 
     def __len__(self):
-        return len(self.csv_labels)
+        return self.num_samples
 
     def __getitem__(self, idx):
         sample_file = os.path.join(self.sample_dir, str(idx))
