@@ -19,7 +19,7 @@ class LiDARDataSet(Dataset):
         #self.num_samples = len(pd.read_csv(csv_file))
         self.csv_labels = csv_file#pd.read_csv(csv_file)
         self.sample_dir = sample_dir
-        self.use_cuda = use_cuda
+        #self.use_cuda = use_cuda
 
     def __len__(self):
         return 1400 #self.num_samples
