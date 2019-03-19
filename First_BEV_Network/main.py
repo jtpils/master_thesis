@@ -26,13 +26,15 @@ patience = int(input('Input patience for EarlyStopping: ')) # Threshold for earl
 #path_validation_data = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/fake_validation_set' #
 #path_test_data = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/fake_test_set' #
 
-# path_training_data = '/home/master04/Desktop/Dataset/fake_training_set' #
-# path_validation_data = '/home/master04/Desktop/Dataset/fake_validation_set' #
-# path_test_data = '/home/master04/Desktop/Dataset/fake_test_set' #
+
 
 path_training_data = '/home/annika_lundqvist144/Dataset/fake_training_set' #input('Path to training data set folder: ')
 path_validation_data = '/home/annika_lundqvist144/Dataset/fake_validation_set' #input('Path to validation data set folder: ')
 path_test_data = '/home/annika_lundqvist144/Dataset/fake_test_set' #input('Path to test data set folder: ')
+
+path_training_data = '/home/master04/Desktop/Dataset/fake_training_set' #
+path_validation_data = '/home/master04/Desktop/Dataset/fake_validation_set' #
+path_test_data = '/home/master04/Desktop/Dataset/fake_test_set' #
 
 batch_size = int(input('Input batch size: '))
 
@@ -117,9 +119,9 @@ if plot_flag is 'y':
     plt.legend()
     plt.show()
 
-    # save loss
-    loss_path = os.path.join(model_path, 'train_loss.npy')
-    np.save(loss_path, train_loss)
-    loss_path = os.path.join(model_path, 'val_loss.npy')
-    np.save(loss_path, val_loss)
+# save loss
+loss_path = os.path.join(model_path, 'train_loss.npy')
+np.save(loss_path, train_loss)
+loss_path = os.path.join(model_path, 'val_loss.npy')
+np.save(loss_path, val_loss)
 

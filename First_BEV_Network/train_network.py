@@ -14,7 +14,7 @@ from data_loader import *
 def create_loss_and_optimizer(net, learning_rate=0.001):
     # Loss function
     # loss = torch.nn.CrossEntropyLoss()
-    # loss = torch.nn.MSELoss()
+    #loss = torch.nn.MSELoss()
     loss = torch.nn.SmoothL1Loss()
 
     # Optimizer
@@ -31,6 +31,11 @@ def train_network(n_epochs, learning_rate, patience, folder_path, device, use_cu
     path_training_data = '/home/annika_lundqvist144/Dataset/fake_training_set' #input('Path to training data set folder: ')
     path_validation_data = '/home/annika_lundqvist144/Dataset/fake_validation_set' #input('Path to validation data set folder: ')
     path_test_data = '/home/annika_lundqvist144/Dataset/fake_test_set' #input('Path to test data set folder: ')
+
+    #path_training_data = '/home/master04/Desktop/Dataset/fake_training_set' #
+    #path_validation_data = '/home/master04/Desktop/Dataset/fake_validation_set' #
+    #path_test_data = '/home/master04/Desktop/Dataset/fake_test_set' #
+
 
     CNN = LookAtThisNet_downsampled()
     print('=======> NETWORK NAME: =======> ', CNN.name())
@@ -90,24 +95,29 @@ def train_network(n_epochs, learning_rate, patience, folder_path, device, use_cu
         time_epoch = time.time()
         for i, data in enumerate(train_loader, 1):
             # Get inputs
+
+            #t1 = time.time()
             sample = data['sample']
             labels = data['labels']
 
-            
             if use_cuda:
                 sample, labels = sample.cuda(), labels.cuda()
             sample, labels = Variable(sample), Variable(labels)
             # Wrap them in a Variable object
             #sample, labels = Variable(sample).to(device), Variable(labels).to(device)
+            #t2 = time.time()
+            #print('get data and wrap it in variable on cuda: ', t2-t1)
 
+            t1 = time.time()
             # Set the parameter gradients to zero
             optimizer.zero_grad()
-
             # Forward pass, backward pass, optimize
             outputs = CNN.forward(sample)
             loss_size = loss(outputs, labels.float())
             loss_size.backward()
             optimizer.step()
+            t2 = time.time()
+            print('forward, backprop, update: ', t2-t1)
 
             # Print statistics
             running_loss += loss_size.item()
@@ -159,6 +169,8 @@ def train_network(n_epochs, learning_rate, patience, folder_path, device, use_cu
         if early_stopping.early_stop:
             print("Early stopping")
             break
+
+
 
     print("Training finished, took {:.2f}s".format(time.time() - training_start_time))
     return train_loss, val_loss
