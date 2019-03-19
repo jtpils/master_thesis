@@ -32,9 +32,9 @@ def train_network(n_epochs, learning_rate, patience, folder_path, device, use_cu
     path_validation_data = '/home/annika_lundqvist144/Dataset/fake_validation_set' #input('Path to validation data set folder: ')
     path_test_data = '/home/annika_lundqvist144/Dataset/fake_test_set' #input('Path to test data set folder: ')
 
-    path_training_data = '/home/master04/Desktop/Dataset/fake_training_set' #'/home/master04/Desktop/Dataset/fake_training_data_torch'#
-    path_validation_data = '/home/master04/Desktop/Dataset/fake_validation_set' #'/home/master04/Desktop/Dataset/fake_training_data_torch'#
-    path_test_data = '/home/master04/Desktop/Dataset/fake_test_set' #
+    path_training_data = '/home/master04/Desktop/Dataset/fake_test_set' #'/home/master04/Desktop/Dataset/fake_training_data_torch'#
+    path_validation_data = '/home' #'/home/master04/Desktop/Dataset/fake_training_data_torch'#
+    path_test_data = '/home/' #
 
 
     CNN = LookAtThisNet_downsampled()
@@ -83,7 +83,9 @@ def train_network(n_epochs, learning_rate, patience, folder_path, device, use_cu
     for epoch in range(n_epochs):
         scheduler.step()
         params = optimizer.state_dict()['param_groups']
+        print(' ')
         print('learning rate: ', params[0]['lr'])
+
 
         running_loss = 0.0
         print_every = 5  #n_batches // 10  # how many mini-batches if we want to print stats x times per epoch
@@ -102,7 +104,9 @@ def train_network(n_epochs, learning_rate, patience, folder_path, device, use_cu
             labels = data['labels']
 
             if use_cuda:
-                sample, labels = sample.cuda(async=True), labels.cuda(async=True)
+                #sample, labels = sample.pin_memory(), labels.pin_memory()
+                #sample, labels = sample.cuda(async=True), labels.cuda(async=True)
+                sample, labels = sample.cuda(), labels.cuda()
             sample, labels = Variable(sample), Variable(labels)
             # Wrap them in a Variable object
             #sample, labels = Variable(sample).to(device), Variable(labels).to(device)

@@ -9,16 +9,16 @@ def get_loaders(path_training_data, path_validation_data, path_test_data, batch_
     sample_dir = path_training_data + '/samples/'
     training_data_set = LiDARDataSet(csv_file, sample_dir, use_cuda)
 
-    csv_file = path_validation_data + '/labels.csv'
-    sample_dir = path_validation_data + '/samples/'
-    validation_data_set = LiDARDataSet(csv_file, sample_dir, use_cuda)
+    #csv_file = path_validation_data + '/labels.csv'
+    #sample_dir = path_validation_data + '/samples/'
+    #validation_data_set = LiDARDataSet(csv_file, sample_dir, use_cuda)
 
     #csv_file = path_test_data + '/labels.csv'
     #sample_dir = path_test_data + '/samples/'
     #test_data_set = LiDARDataSet(csv_file, sample_dir, use_cuda)
 
     # Training
-    n_training_samples = 200  #len(training_data_set)
+    n_training_samples = 50  #len(training_data_set)
     print('Number of training samples: ', n_training_samples)
     train_sampler = SubsetRandomSampler(np.arange(1, n_training_samples+1, dtype=np.int64))
     train_loader = torch.utils.data.DataLoader(training_data_set, batch_size=batch_size, sampler=train_sampler, num_workers=8, **kwargs)
