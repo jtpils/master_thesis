@@ -69,6 +69,9 @@ class LookAtThisNet(torch.nn.Module):
 
         return x
 
+    def name(self):
+        return "LookAtThisNet"
+
 
 class LookAtThisNetAgain(torch.nn.Module):
     # Our batch shape for input x is (8, 900, 900)
