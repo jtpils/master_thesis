@@ -35,7 +35,7 @@ class LiDARDataSet(Dataset):
         #print('npy: ', t2-t1, 'torch: ', t3-t2)
         #print('to load one sample: ', t2-t1)
 
-        labels_csv = pd.read_csv(self.csv_file)
+        labels_csv = pd.read_csv(self.csv_labels)
         labels = labels_csv.iloc[idx-1, 1:4]
         #labels = self.csv_labels.iloc[idx-1, 1:4]
 
