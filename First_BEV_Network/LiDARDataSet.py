@@ -28,10 +28,10 @@ class LiDARDataSet(Dataset):
 
         labels_csv = pd.read_csv(self.csv_labels)
         labels = labels_csv.iloc[idx-1, 1:4]
-        del labels_csv
+
         #labels = self.csv_labels.iloc[idx-1, 1:4]  #old version when we loaded the whole csv as a self-variable
 
-        #training_sample = {'sample': sample, 'labels': labels.values}  #  This worked on Sabinas Mac.
+        training_sample = {'sample': sample, 'labels': labels.values}  #  This worked on Sabinas Mac.
 
-        #del sample
-        return sample, labels.values #training_sample
+        del sample, labels_csv
+        return training_sample # sample, labels.values #training_sample
