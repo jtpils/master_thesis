@@ -105,7 +105,7 @@ def train_network(n_epochs, learning_rate, patience, folder_path, device, use_cu
 
             if use_cuda:
                 sample, labels = sample.pin_memory(), labels.pin_memory()
-                #sample, labels = sample.cuda(async=True), labels.cuda(async=True)
+                sample, labels = sample.cuda(async=True), labels.cuda(async=True)
                 sample, labels = sample.cuda(), labels.cuda()
             sample, labels = Variable(sample), Variable(labels)
             # Wrap them in a Variable object
