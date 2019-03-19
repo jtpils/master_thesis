@@ -62,12 +62,13 @@ def train_network(net, train_loader, val_loader, n_epochs, learning_rate, patien
         total_train_loss = 0
 
         net.train()
+        time_epoch = time.time()
         for i, data in enumerate(train_loader, 1):
             # Get inputs
             sample = data['sample']
             labels = data['labels']
 
-
+            
             if use_cuda:
                 sample, labels = sample.cuda(), labels.cuda()
             sample, labels = Variable(sample), Variable(labels)
@@ -88,10 +89,12 @@ def train_network(net, train_loader, val_loader, n_epochs, learning_rate, patien
             total_train_loss += loss_size.item()
     
             if (i+1) % print_every == 0:
-                print('Epoch [{}/{}], Batch [{}/{}], Loss: {:.4f}'
-                       .format(epoch+1, n_epochs, i+1, n_batches, running_loss/print_every))
+                print('Epoch [{}/{}], Batch [{}/{}], Loss: {:.4f}, Time: '
+                       .format(epoch+1, n_epochs, i+1, n_batches, running_loss/print_every), time.time()-time_epoch)
                 running_loss = 0.0
+                time_epoch = time.time()
         
+            #del data, sample, labels, outputs, loss_size
 
         # At the end of the epoch, do a pass on the validation set
         total_val_loss = 0
@@ -113,6 +116,8 @@ def train_network(net, train_loader, val_loader, n_epochs, learning_rate, patien
 
                 val_loss_size = loss(val_outputs, labels.float())
                 total_val_loss += val_loss_size.item()
+
+                #del data, sample, labels, val_outputs, val_loss_size
 
         print("Training loss: {:.4f}".format(total_train_loss / len(train_loader)),
               ", Validation loss: {:.4f}".format(total_val_loss / len(val_loader)),
