@@ -17,7 +17,7 @@ class LiDARDataSet(Dataset):
             sample_dir (string): Directory with all the samples.
         """
 
-        self.csv_labels = pd.read_csv(csv_file)
+        self.csv_labels = csv_file#pd.read_csv(csv_file)
         self.sample_dir = sample_dir
         self.use_cuda = use_cuda
 
@@ -34,7 +34,10 @@ class LiDARDataSet(Dataset):
         #t3 = time.time()
         #print('npy: ', t2-t1, 'torch: ', t3-t2)
         #print('to load one sample: ', t2-t1)
-        labels = self.csv_labels.iloc[idx-1, 1:4]
+
+        labels_csv = pd.read_csv(self.csv_file)
+        labels = labels_csv.iloc[idx-1, 1:4]
+        #labels = self.csv_labels.iloc[idx-1, 1:4]
 
         training_sample = {'sample': sample, 'labels': labels.values}  #  This worked on Sabinas Mac.
         # training_sample = {'sample': sample, 'labels': labels.to_numpy()}
