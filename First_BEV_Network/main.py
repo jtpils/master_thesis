@@ -36,7 +36,7 @@ patience = n_epochs  #int(input('Input patience for EarlyStopping: ')) # Thresho
 #path_validation_data = 'test'
 #path_test_data = 'test' #
 
-batch_size = 2  #int(input('Input batch size: '))
+batch_size = 4  #int(input('Input batch size: '))
 
 plot_flag = 'n' #input('Plot results? y / n: ')
 
