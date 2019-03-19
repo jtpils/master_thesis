@@ -93,10 +93,11 @@ def train_network(n_epochs, learning_rate, patience, folder_path, device, use_cu
 
         CNN.train()
         time_epoch = time.time()
+        t1_get_data = time.time()
         for i, data in enumerate(train_loader, 1):
-            # Get inputs
+            t2_get_data = time.time()
 
-            #t1 = time.time()
+            t1 = time.time()
             sample = data['sample']
             labels = data['labels']
 
@@ -105,8 +106,8 @@ def train_network(n_epochs, learning_rate, patience, folder_path, device, use_cu
             sample, labels = Variable(sample), Variable(labels)
             # Wrap them in a Variable object
             #sample, labels = Variable(sample).to(device), Variable(labels).to(device)
-            #t2 = time.time()
-            #print('get data and wrap it in variable on cuda: ', t2-t1)
+            t2 = time.time()
+            print('get data and wrap it in variable on cuda: ', t2-t1)
 
             t1 = time.time()
             # Set the parameter gradients to zero
@@ -117,7 +118,7 @@ def train_network(n_epochs, learning_rate, patience, folder_path, device, use_cu
             loss_size.backward()
             optimizer.step()
             t2 = time.time()
-            print('forward, backprop, update: ', t2-t1)
+            print('time for forward, backprop, update: ', t2-t1)
 
             # Print statistics
             running_loss += loss_size.item()
@@ -128,7 +129,10 @@ def train_network(n_epochs, learning_rate, patience, folder_path, device, use_cu
                        .format(epoch+1, n_epochs, i+1, n_batches, running_loss/print_every), time.time()-time_epoch)
                 running_loss = 0.0
                 time_epoch = time.time()
-        
+
+            print('time to get data from loader: ', t2_get_data-t1_get_data)
+            t1_get_data = time.time()
+
             del data, sample, labels, outputs, loss_size
 
         # At the end of the epoch, do a pass on the validation set
