@@ -18,7 +18,7 @@ load_weights_path = '/home/annika_lundqvist144/master_thesis/First_BEV_Network/p
 model_name = input('Type name of new folder: ')
 n_epochs = int(input('Number of epochs: '))
 learning_rate = float(input('Learning rate: '))
-#patience = int(input('Input patience for EarlyStopping: ')) # Threshold for early stopping. Number of epochs that we will wait until brake
+patience = int(input('Input patience for EarlyStopping: ')) # Threshold for early stopping. Number of epochs that we will wait until brake
 
 # /Users/sabinalinderoth/Desktop/fake_test
 
@@ -105,7 +105,7 @@ os.mkdir(parameter_path)
 # train!
 
 #train_loss, val_loss = train_network(CNN, train_loader, val_loader, n_epochs, learning_rate, patience, parameter_path, device, use_cuda,batch_size)
-train_loss, val_loss = train_network(n_epochs, learning_rate, parameter_path, device, use_cuda, batch_size)
+train_loss, val_loss = train_network(n_epochs, learning_rate, patience, parameter_path, device, use_cuda, batch_size)
 
 
 if plot_flag is 'y':

@@ -26,7 +26,7 @@ def create_loss_and_optimizer(net, learning_rate=0.001):
 
 
 #def train_network(net, train_loader, val_loader, n_epochs, learning_rate, patience, folder_path, device, use_cuda):
-def train_network(n_epochs, learning_rate, folder_path, device, use_cuda, batch_size):
+def train_network(n_epochs, learning_rate, patience, folder_path, device, use_cuda, batch_size):
 
     path_training_data = '/home/annika_lundqvist144/Dataset/fake_training_set' #input('Path to training data set folder: ')
     path_validation_data = '/home/annika_lundqvist144/Dataset/fake_validation_set' #input('Path to validation data set folder: ')
@@ -48,8 +48,6 @@ def train_network(n_epochs, learning_rate, folder_path, device, use_cuda, batch_
         print('Loading parameters...')
         network_param = torch.load(load_weights_path)
         CNN.load_state_dict(network_param['model_state_dict'])'''
-
-    patience = 10
 
     # Print all of the hyperparameters of the training iteration:
     print("===== HYPERPARAMETERS =====")
