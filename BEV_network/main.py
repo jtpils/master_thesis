@@ -17,22 +17,9 @@ num_samples = 1 #int(input('Number of samples to train: (max:1400) '))
 print(' ')
 print('Number of GPUs available: ', torch.cuda.device_count())
 use_cuda = torch.cuda.is_available()
-##########
-#use_cuda = False
-#device = "cpu"
-##########
-#if use_cuda:
-#    id = torch.cuda.current_device()
-#    print('Device id: ', id)
 print('CUDA available: ', use_cuda)
 #device = torch.device("cuda:0" if use_cuda else "cpu")
 #print('Device: ', device)
-
-# Load weights
-#if load_weights:
-#    print('Loading parameters...')
-#    network_param = torch.load(load_weights_path)
-#    CNN.load_state_dict(network_param['model_state_dict'])
 
 # create directory for model weights
 current_path = os.getcwd()
@@ -41,9 +28,14 @@ os.mkdir(model_path)
 parameter_path = os.path.join(model_path, 'parameters')
 os.mkdir(parameter_path)
 
+
+
+
 # train!
 #train_loss, val_loss = train_network(CNN, train_loader, val_loader, n_epochs, learning_rate, patience, parameter_path, device, use_cuda,batch_size)
 train_loss, val_loss = train_network(n_epochs, learning_rate, patience, parameter_path, use_cuda, batch_size, num_samples)
+
+
 
 
 if plot_flag is 'y':
