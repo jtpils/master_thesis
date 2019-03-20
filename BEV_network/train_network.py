@@ -3,7 +3,7 @@ from torch.autograd import Variable
 from torch.optim.lr_scheduler import StepLR
 import numpy as np
 import os
-from early_stopping import EarlyStopping
+#from early_stopping import EarlyStopping
 import torch
 from new_networks import *
 from data_loader import *
@@ -64,7 +64,7 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
     train_loss = []
 
     # initialize the early_stopping object
-    early_stopping = EarlyStopping(folder_path, patience, verbose=True)
+    #early_stopping = EarlyStopping(folder_path, patience, verbose=True)
 
     # Get training data
     n_batches = len(train_loader)
