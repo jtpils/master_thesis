@@ -18,13 +18,13 @@ def get_file_name_from_frame_number(frame_number):
 def get_grid(x, y):
     k = 0
     for edge in x_edges:
-        if x > edge:
+        if x > edge: # should it be >= ?
             x_grid_number = k
         k = k + 1
 
     k = 0
     for edge in y_edges:
-        if y > edge:
+        if y > edge: # should it be >= ?
             y_grid_number = k
         k = k + 1
 
