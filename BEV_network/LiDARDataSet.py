@@ -16,8 +16,8 @@ class LiDARDataSet(Dataset):
             csv_file (string): Path to the csv file with labels.
             sample_dir (string): Directory with all the samples.
         """
-        self.csv_labels = csv_file #
-        #self.csv_labels = pd.read_csv(csv_file)
+        #self.csv_labels = csv_file #
+        self.csv_labels = pd.read_csv(csv_file)
         self.sample_dir = sample_dir
 
     def __len__(self):
@@ -27,10 +27,10 @@ class LiDARDataSet(Dataset):
         sample_file = os.path.join(self.sample_dir, str(idx))
         sample = torch.from_numpy(np.load(sample_file + '.npy')).float()
 
-        labels_csv = pd.read_csv(self.csv_labels)
-        labels = labels_csv.iloc[idx-1, 1:4]
+        #labels_csv = pd.read_csv(self.csv_labels)
+        #labels = labels_csv.iloc[idx-1, 1:4]
 
-        #labels = self.csv_labels.iloc[idx-1, 1:4]  #old version when we loaded the whole csv as a self-variable
+        labels = self.csv_labels.iloc[idx-1, 1:4]  #old version when we loaded the whole csv as a self-variable
 
         training_sample = {'sample': sample, 'labels': labels.values}  #  This worked on Sabinas Mac.
 
