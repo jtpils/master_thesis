@@ -12,6 +12,11 @@ pc_list = point_cloud.tolist()
 print(len(pc_list[0][:]))
 
 a = np.array([1,1,1])
+print(a)
+
+summa = a.sum(axis=0)/3
+print(summa)
+'''
 b = np.array([2,2,2])
 c = np.vstack((a,b))
 d = np.array([9,9,9])
@@ -23,7 +28,7 @@ print(e)
 f = np.array([3,3,3])
 
 f = f.reshape((3,1))
-
+'''
 
 
 
@@ -63,17 +68,5 @@ while x <= x_max + grid_size:
 
 print(np.shape(x_edges_list))
 print('done')
-
-
-
-number_of_points_per_pillar = 100
-number_of_non_empty_pillars = 3
-
-path_to_ply = '/Users/sabinalinderoth/Desktop/Ply_files_1/TEST_sorted_grid_ply_1/grid_13_10/070832.ply'
-point_cloud = pd.read_csv(path_to_ply, delimiter=' ', skiprows=7, header=None, names=('x','y','z'))
-point_cloud = point_cloud.values
-
-
-t = create_pillars(point_cloud)
 
 '''
