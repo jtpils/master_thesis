@@ -86,7 +86,7 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
 
 
         running_loss = 0.0
-        print_every = 5  #n_batches // 10  # how many mini-batches if we want to print stats x times per epoch
+        print_every = 10  #n_batches // 10  # how many mini-batches if we want to print stats x times per epoch
         start_time = time.time()
         total_train_loss = 0
 
@@ -96,7 +96,7 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
         for i, data in enumerate(train_loader, 1):
             #for i, (sample, labels) in enumerate(train_loader, 1):
             t2_get_data = time.time()
-            print('get data from loader: ', t2_get_data-t1_get_data)
+            #print('get data from loader: ', t2_get_data-t1_get_data)
 
             #t1 = time.time()
             sample = data['sample']
