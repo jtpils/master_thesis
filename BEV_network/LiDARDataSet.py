@@ -22,8 +22,8 @@ class LiDARDataSet(Dataset):
         self.length = len(csv)
         del csv
 
-        #self.sample_dir = sample_dir
-        self.pool2 = torch.nn.MaxPool2d(kernel_size=3, stride=3, padding=0)
+        self.sample_dir = sample_dir
+        #self.pool2 = torch.nn.MaxPool2d(kernel_size=3, stride=3, padding=0)
 
 
     def __len__(self):
