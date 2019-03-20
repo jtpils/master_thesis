@@ -103,7 +103,7 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
             labels = data['labels']
 
             if use_cuda:
-                sample, labels = sample.cuda(async=True), labels.cuda(async=True)
+                sample, labels = sample.cuda(async=False), labels.cuda(async=False)
             sample, labels = Variable(sample), Variable(labels)
 
             #t1 = time.time()
@@ -130,7 +130,7 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
 
             t1_get_data = time.time()
 
-            del data, sample, labels, outputs, loss_size
+            #del data, sample, labels, outputs, loss_size
 
         # At the end of the epoch, do a pass on the validation set
         '''total_val_loss = 0
