@@ -30,12 +30,15 @@ class LiDARDataSet(Dataset):
         t1 = time.time()
         sample = torch.from_numpy(np.load(sample_file + '.npy')).float()
         t2 = time.time()
-        print(t2-t1)
+        #print(t2-t1)
         sample = self.pool2(sample)
+
+        t1 = time.time()
 
         labels_csv = pd.read_csv(self.csv_labels)
         labels = labels_csv.iloc[idx-1, 1:4]
-
+        t2 = time.time()
+        print(t2-t1)
         #labels = self.csv_labels.iloc[idx-1, 1:4]  #old version when we loaded the whole csv as a self-variable
 
         training_sample = {'sample': sample, 'labels': labels.values}  #  This worked on Sabinas Mac.
