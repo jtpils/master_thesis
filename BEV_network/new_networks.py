@@ -180,7 +180,7 @@ class LookAtThisNet_downsampled(torch.nn.Module):
 
     def forward(self, x):
         
-        x = self.pool3(x)  # 8, 300, 300
+        #x = self.pool3(x)  # 8, 300, 300
         
         x = F.relu(self.conv1_bn(self.conv1(x))) # 64, 296, 296
         x = self.pool2(x) # 64, 148, 148

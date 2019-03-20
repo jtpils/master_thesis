@@ -19,24 +19,29 @@ class LiDARDataSet(Dataset):
         self.csv_labels = csv_file #
         #self.csv_labels = pd.read_csv(csv_file)
         self.sample_dir = sample_dir
+        self.pool2 = torch.nn.MaxPool2d(kernel_size=3, stride=3, padding=0)
+
 
     def __len__(self):
         return 1400 #self.
 
     def __getitem__(self, idx):
-        t1 = time.time()
         sample_file = os.path.join(self.sample_dir, str(idx))
+        t1 = time.time()
         sample = torch.from_numpy(np.load(sample_file + '.npy')).float()
+        t2 = time.time()
+        #print(t2-t1)
+        sample = self.pool2(sample)
+
+        t1 = time.time()
 
         labels_csv = pd.read_csv(self.csv_labels)
         labels = labels_csv.iloc[idx-1, 1:4]
-
+        t2 = time.time()
+        print(t2-t1)
         #labels = self.csv_labels.iloc[idx-1, 1:4]  #old version when we loaded the whole csv as a self-variable
 
         training_sample = {'sample': sample, 'labels': labels.values}  #  This worked on Sabinas Mac.
 
         del sample, labels_csv
-        t2 = time.time()
-        print('get a sample: ', t2-t1)
-
         return training_sample # sample, labels.values #training_sample
