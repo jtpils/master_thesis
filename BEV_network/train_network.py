@@ -30,7 +30,7 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
     path_validation_data = 'a'#/home/annika_lundqvist144/Dataset/fake_validation_set' #input('Path to validation data set folder: ')
     path_test_data = 'a'#/home/annika_lundqvist144/Dataset/fake_test_set' #input('Path to test data set folder: ')
 
-    #path_training_data = '/home/master04/Desktop/Dataset/fake_test_set' #'/home/master04/Desktop/Dataset/fake_training_data_torch'#
+    path_training_data = '/home/master04/Desktop/Dataset/fake_training_set' #'/home/master04/Desktop/Dataset/fake_training_data_torch'#
     #path_validation_data = '/home' #'/home/master04/Desktop/Dataset/fake_training_data_torch'#
     #path_test_data = '/home/' #
 
@@ -96,7 +96,7 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
         for i, data in enumerate(train_loader, 1):
             #for i, (sample, labels) in enumerate(train_loader, 1):
             t2_get_data = time.time()
-            #print('get data from loader: ', t2_get_data-t1_get_data)
+            print('get data from loader: ', t2_get_data-t1_get_data)
 
             #t1 = time.time()
             sample = data['sample']
