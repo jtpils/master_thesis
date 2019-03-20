@@ -34,5 +34,5 @@ class LiDARDataSet(Dataset):
 
         training_sample = {'sample': sample, 'labels': labels.values}  #  This worked on Sabinas Mac.
 
-        #del sample, labels_csv
+        del sample, labels_csv
         return training_sample # sample, labels.values #training_sample
