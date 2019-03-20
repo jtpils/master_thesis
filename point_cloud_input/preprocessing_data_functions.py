@@ -30,8 +30,6 @@ def create_pillars(point_cloud, pillar_size=0.16):
     min_y = np.min(point_cloud[:,1])
     max_y = np.max(point_cloud[:, 1])
 
-    number_x_grids = int(np.ceil((max_x - min_x) / pillar_size))
-
     x_edges = []
     x = min_x
 
@@ -46,7 +44,6 @@ def create_pillars(point_cloud, pillar_size=0.16):
         y_edges.append(y)
         y = y + pillar_size
 
-    # create a dict with number_of_cells*number_of_cells cells
     pillar_dict = {}
 
     for row in range(len(point_cloud[:,0])):
