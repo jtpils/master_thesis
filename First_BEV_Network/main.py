@@ -2,7 +2,7 @@ from data_loader import *
 from train_network import *
 import matplotlib.pyplot as plt
 #from loaders_only_sweeps import *
-from new_networks import *
+#from new_networks import *
 
 
 # training folder:
@@ -16,9 +16,9 @@ load_weights = False
 load_weights_path = '/home/annika_lundqvist144/master_thesis/First_BEV_Network/param/parameters/epoch_7_checkpoint.pt'
 
 model_name = input('Type name of new folder: ')
-n_epochs = int(input('Number of epochs: '))
-learning_rate = float(input('Learning rate: '))
-patience = int(input('Input patience for EarlyStopping: ')) # Threshold for early stopping. Number of epochs that we will wait until brake
+n_epochs = 5  #int(input('Number of epochs: '))
+learning_rate = 0.001 #float(input('Learning rate: '))
+patience = n_epochs  #int(input('Input patience for EarlyStopping: ')) # Threshold for early stopping. Number of epochs that we will wait until brake
 
 # /Users/sabinalinderoth/Desktop/fake_test
 
@@ -26,15 +26,17 @@ patience = int(input('Input patience for EarlyStopping: ')) # Threshold for earl
 #path_validation_data = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/fake_validation_set' #
 #path_test_data = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/fake_test_set' #
 
-# path_training_data = '/home/master04/Desktop/Dataset/fake_training_set' #
-# path_validation_data = '/home/master04/Desktop/Dataset/fake_validation_set' #
-# path_test_data = '/home/master04/Desktop/Dataset/fake_test_set' #
 
-path_training_data = '/home/annika_lundqvist144/Dataset/fake_training_set' #input('Path to training data set folder: ')
-path_validation_data = '/home/annika_lundqvist144/Dataset/fake_validation_set' #input('Path to validation data set folder: ')
-path_test_data = '/home/annika_lundqvist144/Dataset/fake_test_set' #input('Path to test data set folder: ')
 
-batch_size = int(input('Input batch size: '))
+#path_training_data = '/home/annika_lundqvist144/Dataset/fake_training_set' #input('Path to training data set folder: ')
+#path_validation_data = '/home/annika_lundqvist144/Dataset/fake_validation_set' #input('Path to validation data set folder: ')
+#path_test_data = '/home/annika_lundqvist144/Dataset/fake_test_set' #input('Path to test data set folder: ')
+
+#path_training_data = ''
+#path_validation_data = 'test'
+#path_test_data = 'test' #
+
+batch_size = 4  #int(input('Input batch size: '))
 
 plot_flag = 'n' #input('Plot results? y / n: ')
 
@@ -74,7 +76,7 @@ if use_cuda:
 #CNN = MyBestNetwork().to(device)
 
 #CNN = LookAtThisNet_downsampled()
-CNN = LookAtThisNet()
+'''CNN = LookAtThisNet()
 
 print('=======> NETWORK NAME: =======> ', CNN.name())
 
@@ -87,13 +89,13 @@ print(' ')
 
 
 kwargs = {'pin_memory': True} if use_cuda else {}
-train_loader, val_loader = get_loaders(path_training_data, path_validation_data, path_test_data, batch_size, use_cuda, kwargs)
+train_loader, val_loader = get_loaders(path_training_data, path_validation_data, path_test_data, batch_size, use_cuda, kwargs)'''
 
 # Load weights
-if load_weights:
-    print('Loading parameters...')
-    network_param = torch.load(load_weights_path)
-    CNN.load_state_dict(network_param['model_state_dict'])
+#if load_weights:
+#    print('Loading parameters...')
+#    network_param = torch.load(load_weights_path)
+#    CNN.load_state_dict(network_param['model_state_dict'])
 
 # create directory for model weights
 current_path = os.getcwd()
@@ -104,7 +106,8 @@ os.mkdir(parameter_path)
 
 # train!
 
-train_loss, val_loss = train_network(CNN, train_loader, val_loader, n_epochs, learning_rate, patience, parameter_path, device, use_cuda)
+#train_loss, val_loss = train_network(CNN, train_loader, val_loader, n_epochs, learning_rate, patience, parameter_path, device, use_cuda,batch_size)
+train_loss, val_loss = train_network(n_epochs, learning_rate, patience, parameter_path, device, use_cuda, batch_size)
 
 
 if plot_flag is 'y':
@@ -116,9 +119,9 @@ if plot_flag is 'y':
     plt.legend()
     plt.show()
 
-    # save loss
-    loss_path = os.path.join(model_path, 'train_loss.npy')
-    np.save(loss_path, train_loss)
-    loss_path = os.path.join(model_path, 'val_loss.npy')
-    np.save(loss_path, val_loss)
+# save loss
+loss_path = os.path.join(model_path, 'train_loss.npy')
+np.save(loss_path, train_loss)
+loss_path = os.path.join(model_path, 'val_loss.npy')
+np.save(loss_path, val_loss)
 

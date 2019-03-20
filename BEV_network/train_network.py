@@ -1,14 +1,12 @@
-from functions import *
 import time
 from torch.autograd import Variable
 from torch.optim.lr_scheduler import StepLR
 import numpy as np
 import os
-from early_stopping import EarlyStopping
+#from early_stopping import EarlyStopping
 import torch
 from new_networks import *
 from data_loader import *
-
 
 
 def create_loss_and_optimizer(net, learning_rate=0.001):
@@ -18,7 +16,7 @@ def create_loss_and_optimizer(net, learning_rate=0.001):
     loss = torch.nn.SmoothL1Loss()
 
     # Optimizer
-    optimizer = optim.Adam(net.parameters(), lr=learning_rate, weight_decay=1e-5)
+    optimizer = torch.optim.Adam(net.parameters(), lr=learning_rate, weight_decay=1e-5)
     # optimizer = optim.Adagrad(net.parameters(), lr=learning_rate, lr_decay=1e-3)
     # optimizer = optim.SGD(net.parameters(), lr=learning_rate)
 
@@ -26,7 +24,7 @@ def create_loss_and_optimizer(net, learning_rate=0.001):
 
 
 #def train_network(net, train_loader, val_loader, n_epochs, learning_rate, patience, folder_path, device, use_cuda):
-def train_network(n_epochs, learning_rate, patience, folder_path, device, use_cuda, batch_size):
+def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batch_size, num_samples):
 
     path_training_data = '/home/annika_lundqvist144/Dataset/fake_training_set' #input('Path to training data set folder: ')
     path_validation_data = 'a'#/home/annika_lundqvist144/Dataset/fake_validation_set' #input('Path to validation data set folder: ')
@@ -45,7 +43,7 @@ def train_network(n_epochs, learning_rate, patience, folder_path, device, use_cu
     print(' ')
 
     kwargs = {'pin_memory': True} if use_cuda else {}
-    train_loader = get_loaders(path_training_data, path_validation_data, path_test_data, batch_size, use_cuda, kwargs)
+    train_loader = get_loaders(path_training_data, path_validation_data, batch_size, use_cuda, num_samples, kwargs)
 
     '''# Load weights
     if load_weights:
@@ -55,7 +53,7 @@ def train_network(n_epochs, learning_rate, patience, folder_path, device, use_cu
 
     # Print all of the hyperparameters of the training iteration:
     print("===== HYPERPARAMETERS =====")
-    # print("batch_size =", batch_size)
+    print("batch_size =", batch_size)
     print("epochs =", n_epochs)
     print("initial learning_rate =", learning_rate)
     print('patience:', patience)
@@ -66,7 +64,7 @@ def train_network(n_epochs, learning_rate, patience, folder_path, device, use_cu
     train_loss = []
 
     # initialize the early_stopping object
-    early_stopping = EarlyStopping(folder_path, patience, verbose=True)
+    #early_stopping = EarlyStopping(folder_path, patience, verbose=True)
 
     # Get training data
     n_batches = len(train_loader)
@@ -98,20 +96,15 @@ def train_network(n_epochs, learning_rate, patience, folder_path, device, use_cu
         for i, data in enumerate(train_loader, 1):
             #for i, (sample, labels) in enumerate(train_loader, 1):
             t2_get_data = time.time()
-            print('time to get data from loader: ', t2_get_data-t1_get_data)
+            #print('get data from loader: ', t2_get_data-t1_get_data)
 
             #t1 = time.time()
             sample = data['sample']
             labels = data['labels']
 
             if use_cuda:
-                #sample, labels = sample.cuda(async=True), labels.cuda(async=True)
-                sample, labels = sample.cuda(), labels.cuda()
+                sample, labels = sample.cuda(async=True), labels.cuda(async=True)
             sample, labels = Variable(sample), Variable(labels)
-            # Wrap them in a Variable object
-            #sample, labels = Variable(sample).to(device), Variable(labels).to(device)
-            #t2 = time.time()
-            #print('get data and wrap it in variable on cuda: ', t2-t1)
 
             #t1 = time.time()
             # Set the parameter gradients to zero
