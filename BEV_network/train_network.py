@@ -43,7 +43,7 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
     print(' ')
 
     kwargs = {'pin_memory': True} if use_cuda else {}
-    train_loader = get_loaders(path_training_data, path_validation_data, path_test_data, batch_size, use_cuda, kwargs)
+    train_loader = get_loaders(path_training_data, path_validation_data, batch_size, use_cuda, kwargs)
 
     '''# Load weights
     if load_weights:
