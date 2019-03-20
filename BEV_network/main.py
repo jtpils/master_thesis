@@ -12,6 +12,7 @@ learning_rate = 0.001 #float(input('Learning rate: '))
 patience = n_epochs  #int(input('Input patience for EarlyStopping: ')) # Threshold for early stopping. Number of epochs that we will wait until brake
 batch_size = 4  #int(input('Input batch size: '))
 plot_flag = 'n' #input('Plot results? y / n: ')
+num_samples = int(input('Number of samples to train: (max:1400) '))
 
 print(' ')
 print('Number of GPUs available: ', torch.cuda.device_count())
@@ -42,7 +43,7 @@ os.mkdir(parameter_path)
 
 # train!
 #train_loss, val_loss = train_network(CNN, train_loader, val_loader, n_epochs, learning_rate, patience, parameter_path, device, use_cuda,batch_size)
-train_loss, val_loss = train_network(n_epochs, learning_rate, patience, parameter_path, use_cuda, batch_size)
+train_loss, val_loss = train_network(n_epochs, learning_rate, patience, parameter_path, use_cuda, batch_size, num_samples)
 
 
 if plot_flag is 'y':

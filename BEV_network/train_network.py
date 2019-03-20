@@ -24,7 +24,7 @@ def create_loss_and_optimizer(net, learning_rate=0.001):
 
 
 #def train_network(net, train_loader, val_loader, n_epochs, learning_rate, patience, folder_path, device, use_cuda):
-def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batch_size):
+def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batch_size, num_samples):
 
     path_training_data = '/home/annika_lundqvist144/Dataset/fake_training_set' #input('Path to training data set folder: ')
     path_validation_data = 'a'#/home/annika_lundqvist144/Dataset/fake_validation_set' #input('Path to validation data set folder: ')
@@ -43,7 +43,7 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
     print(' ')
 
     kwargs = {'pin_memory': True} if use_cuda else {}
-    train_loader = get_loaders(path_training_data, path_validation_data, batch_size, use_cuda, kwargs)
+    train_loader = get_loaders(path_training_data, path_validation_data, batch_size, use_cuda, num_samples, kwargs)
 
     '''# Load weights
     if load_weights:
