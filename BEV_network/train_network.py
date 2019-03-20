@@ -96,7 +96,7 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
         for i, data in enumerate(train_loader, 1):
             #for i, (sample, labels) in enumerate(train_loader, 1):
             t2_get_data = time.time()
-            print('time to get data from loader: ', t2_get_data-t1_get_data)
+            print('get data from loader: ', t2_get_data-t1_get_data)
 
             #t1 = time.time()
             sample = data['sample']
