@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-
+import random
 grid_size = 0.16
 
 
@@ -11,11 +11,16 @@ point_cloud = point_cloud.values
 pc_list = point_cloud.tolist()
 print(len(pc_list[0][:]))
 
-a = np.array([1,1,1])
-print(a)
+a = np.array([0,1,2,3,4,5])
+print(type(a))
 
-summa = a.sum(axis=0)/3
-print(summa)
+b = random.sample(list(a), 3)
+
+print(b)
+
+
+
+
 '''
 b = np.array([2,2,2])
 c = np.vstack((a,b))

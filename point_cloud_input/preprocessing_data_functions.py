@@ -1,6 +1,10 @@
 import numpy as np
+from random import *
 import random
 import pandas as pd
+import time
+
+
 def get_grid(x, y, x_edges, y_edges):
     k = 0
     for edge in x_edges:
@@ -73,13 +77,12 @@ def create_pillars(point_cloud, pillar_size=0.16):
         # And then calculate the features xc, yc, zc which is the distance from the arithmetic mean. Reshape to be able
         # to stack them later.
 
-        # 2. calculate the offset from the pillar x,y center i.e xp and yp. I AM UNCERTAIN ABOUT THIS! //S
+        # 2. calculate the offset from the pillar x,y center i.e xp and yp. TODO: I AM UNCERTAIN ABOUT THIS! //S
         # Reshape to be able to stack them later.
-        
+
         if np.shape(key_value) == (3,):
 
             key_value = key_value.reshape((1,np.shape(key_value)[0]))
-            print(np.shape(key_value))
 
             x_mean = key_value[0, 0] / num_points
             y_mean = key_value[0, 1] / num_points
@@ -104,10 +107,7 @@ def create_pillars(point_cloud, pillar_size=0.16):
             yp = np.array([[yp]])
 
             # 3. Append the new features column wise to the array with the point coordinates.
-
-            print(np.shape(key_value), np.shape(key_value), np.shape(xc), np.shape(yc), np.shape(zc), np.shape(xp), np.shape(yp))
             features = np.hstack((key_value, xc, yc, zc, xp, yp))
-            print(features)
             # 4. Update the dict key with the complete feature array
             pillar_dict.update({key: features})
 
@@ -125,7 +125,6 @@ def create_pillars(point_cloud, pillar_size=0.16):
             zc = key_value[:, 2] - z_mean
             zc = zc.reshape((np.shape(zc)[0], 1))
 
-
             x_offset = pillar_size/2 + np.min(key_value[:, 0])
             y_offset = pillar_size/2 + np.min(key_value[:, 1])
 
@@ -140,52 +139,58 @@ def create_pillars(point_cloud, pillar_size=0.16):
             # 4. Update the dict key with the complete feature array
             pillar_dict.update({key: features})
 
-
-
-    print('pillar dict done')
     return pillar_dict
 
 
-def get_feature_tensor(pillar_dict, max_number_of_pillars=12000, max_number_of_points_per_pillar=100):
+def get_feature_tensor(pillar_dict, max_number_of_pillars=12000, max_number_of_points_per_pillar=100, dimension=8):
     '''
     Function that creates the feature tensor with dimension (D,P,N)
     D = Dimension (8)
     P = max antal pillars (12000)
     N = maximum points per pillar (100)
-    :param pillar_dict: <dict> Dict containing features for each pillar.
-    :param max_number_of_pillars: <int> Max number of pillars in a sample
-    :param max_number_of_points_per_pillar: <int> Max number of points in a sample.
-    :return:
+    :param pillar_dicts: <dict> Dict containing features for each pillar.
+    :param max_number_of_pillars: <int> Max number of pillars in a sample. (default=12000)
+    :param max_number_of_points_per_pillar: <int> Max number of points in a sample. (default=100)
+    :param dimension: <int> Dimension of features. (default=8)
+    :return: feature_tensor
     '''
+
+    # Initialize feature tensor
+
+    feature_tensor = np.zeros((dimension, max_number_of_pillars, max_number_of_points_per_pillar))
 
     # 1. Check how many keys in the dict. If more than max number of pillars pick random max_numer_of_pillars
     number_of_pillars = len(pillar_dict.keys())
 
+    # in number of pillars is mor than the maximum allowed. set number of pillars = max_number and sample the key list
     if number_of_pillars > max_number_of_pillars:
-        random_key = random.sample(pillar_dict, 10)[0]
-        print(random_key)
 
-        print('Do something')
-
+        # number_of_pillars = max_number_of_pillars
+        key_list = random.sample(list(pillar_dict), max_number_of_pillars)
     else:
-        print('Do something')
+        key_list = list(pillar_dict)
 
+    pillar = 0
+    for key in key_list:
+        # Get value from dict
+        key_value = pillar_dict[key]
+        number_of_points = np.shape(key_value)[0]
 
-# 2. For each pillar. Check number of points. if more than max_number_of_points_per_pillar pick random
-# max_number_of_points_per_pillar.
+        if number_of_points > max_number_of_points_per_pillar:
 
-# The tensor dimension is (D,P,N)
-# D = Dimension (8)
-# P = max antal pillars (12000)
-# N = maximum points per pillar (100)
+            number_of_points_index = list(range(0,number_of_points-1))
+            random_index = sample(number_of_points_index, max_number_of_points_per_pillar)
 
-#    return feature_tensor
+            points = [number_of_points_index[i] for i in random_index]
 
+        else:
+            points = np.array(range(0,number_of_points))
 
-path_to_ply = '/Users/sabinalinderoth/Desktop/Ply_files_1/TEST_sorted_grid_ply_1/grid_13_10/070832.ply'
-point_cloud = pd.read_csv(path_to_ply, delimiter=' ', skiprows=7, header=None, names=('x','y','z'))
-point_cloud = point_cloud.values
+        feature_point = 0
+        for point in points:
+            for feature in range(0 , dimension):
+                feature_tensor[feature, pillar, feature_point] = key_value[point,feature]
+            feature_point += 1
+        pillar += 1
 
-
-pillar_dict = create_pillars(point_cloud)
-feature_tensor = get_feature_tensor(pillar_dict, max_number_of_pillars=12000, max_number_of_points_per_pillar=100)
+    return feature_tensor
