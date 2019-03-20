@@ -22,7 +22,7 @@ class LiDARDataSet(Dataset):
         self.length = len(csv)
         del csv
 
-        self.sample_dir = sample_dir
+        #self.sample_dir = sample_dir
         self.pool2 = torch.nn.MaxPool2d(kernel_size=3, stride=3, padding=0)
 
 
@@ -31,12 +31,12 @@ class LiDARDataSet(Dataset):
 
     def __getitem__(self, idx):
         sample_file = os.path.join(self.sample_dir, str(idx))
-        t1 = time.time()
+        #t1 = time.time()
         sample = torch.from_numpy(np.load(sample_file + '.npy')).float()
         #sample = torch.load(sample_file + '.pt').float()
-        t2 = time.time()
+        #t2 = time.time()
         #print(t2-t1)
-        sample = self.pool2(sample)
+        #sample = self.pool2(sample)
 
         labels_csv = pd.read_csv(self.csv_labels)
         labels = labels_csv.iloc[idx-1, 1:4]
