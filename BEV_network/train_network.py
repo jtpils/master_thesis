@@ -30,7 +30,7 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
     path_validation_data = 'a'#/home/annika_lundqvist144/Dataset/fake_validation_set' #input('Path to validation data set folder: ')
     path_test_data = 'a'#/home/annika_lundqvist144/Dataset/fake_test_set' #input('Path to test data set folder: ')
 
-    #path_training_data = '/home/master04/Desktop/Dataset/fake_test_set' #'/home/master04/Desktop/Dataset/fake_training_data_torch'#
+    #path_training_data = '/home/master04/Desktop/Dataset/fake_training_set' #'/home/master04/Desktop/Dataset/fake_training_data_torch'#
     #path_validation_data = '/home' #'/home/master04/Desktop/Dataset/fake_training_data_torch'#
     #path_test_data = '/home/' #
 
@@ -42,8 +42,8 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
     print('Are model parameters on CUDA? ', next(CNN.parameters()).is_cuda)
     print(' ')
 
-    kwargs = {'pin_memory': True} if use_cuda else {}
-    train_loader = get_loaders(path_training_data, path_validation_data, batch_size, use_cuda, num_samples, kwargs)
+
+    train_loader = get_loaders(path_training_data, path_validation_data, batch_size, use_cuda)
 
     '''# Load weights
     if load_weights:
@@ -86,7 +86,7 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
 
 
         running_loss = 0.0
-        print_every = 5  #n_batches // 10  # how many mini-batches if we want to print stats x times per epoch
+        print_every = 10  #n_batches // 10  # how many mini-batches if we want to print stats x times per epoch
         start_time = time.time()
         total_train_loss = 0
 
