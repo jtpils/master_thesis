@@ -3,6 +3,7 @@ from random import *
 import random
 import pandas as pd
 import time
+import matplotlib.pyplot as plt
 
 
 def get_grid(x, y, x_edges, y_edges):
@@ -201,3 +202,27 @@ def get_feature_tensor(pillar_dict, max_number_of_pillars=12000, max_number_of_p
         pillar += 1
 
     return feature_tensor
+
+
+
+# create pillars
+
+path_to_ply = '/Users/sabinalinderoth/Desktop/Ply_files/TEST_sorted_grid_ply/grid_13_10/070832.ply'
+point_cloud = pd.read_csv(path_to_ply, delimiter=' ', skiprows=7, header=None, names=('x','y','z'))
+point_cloud = point_cloud.values
+
+pillars = create_pillars(point_cloud, pillar_size=0.16)
+
+# get the feature tensor
+tensor = get_feature_tensor(pillars, max_number_of_pillars=12000, max_number_of_points_per_pillar=100,
+                                dimension=8)
+
+
+
+
+x = tensor[0,2,:]
+y = tensor[1,2,:]
+
+
+plt.plot(x,y,'.')
+plt.show()
