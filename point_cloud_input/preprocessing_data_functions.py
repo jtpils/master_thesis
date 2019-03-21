@@ -73,7 +73,13 @@ def create_pillars(point_cloud, pillar_size=0.16):
 
         key_value = pillar_dict[key]
         num_points = len(key_value)
-        print('#points in pillar: ',num_points)
+
+        # translate all points to "new" origo in pillar
+        x_grid, y_grid = get_grid(key_value[0,0], key_value[0,1], x_edges, y_edges)
+        key_value[:,0] = key_value[:,0] - x_edges[x_grid]
+        key_value[:,1] = key_value[:,1] - y_edges[y_grid]
+        # key_value[:,2] = key_value[:,2]
+
         # 1. calculate distance to the arithmetic mean for x,y,z
         # And then calculate the features xc, yc, zc which is the distance from the arithmetic mean. Reshape to be able
         # to stack them later.
@@ -132,7 +138,7 @@ def create_pillars(point_cloud, pillar_size=0.16):
         #x_offset = pillar_size/2 + np.min(key_value[:, 0]) # TODO, we should be checking the edges here, not min/max values
         #y_offset = pillar_size/2 + np.min(key_value[:, 1]) # TODO, we should be checking the edges here, not min/max values
 
-        x_grid, y_grid = get_grid(key_value[0,0], key_value[0,1], x_edges, y_edges)
+        #x_grid, y_grid = get_grid(key_value[0,0], key_value[0,1], x_edges, y_edges)
         x_offset = x_edges[x_grid] + pillar_size/2
         y_offset = y_edges[y_grid] + pillar_size/2
 
