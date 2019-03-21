@@ -26,7 +26,7 @@ def create_pillars(point_cloud, pillar_size=0.16):
     Function that creates a dict containing the 8 features for each pillar in a point cloud. Each pillar is grid_size large.
     :param point_cloud: <nd.array> [nx3] nd array containing the x, y, z coordinates of a point cloud
     :param pillar_size: <float> The size of the pillar.
-    :return: pillar_dict: <dict> A dict containing the features for each piller
+    :return: pillar_dict: <dict> A dict containing the features for each pillar
     '''
 
     min_x = np.min(point_cloud[:, 0])
@@ -50,8 +50,8 @@ def create_pillars(point_cloud, pillar_size=0.16):
 
     pillar_dict = {}
 
-    for row in range(len(point_cloud[:,0])):
-        # Get which grid yhe current point belongs to. The key in the dict has the name of the grid. ex 0,0
+    for row in range(len(point_cloud[:,0])): # TODO: maybe we should sort for x and y as we did before? /A
+        # Get which grid the current point belongs to. The key in the dict has the name of the grid. ex 0,0
         x_grid, y_grid = get_grid(point_cloud[row,0], point_cloud[row,1], x_edges, y_edges)
         cell_name = str(x_grid) + ',' + str(y_grid)
 
@@ -73,7 +73,7 @@ def create_pillars(point_cloud, pillar_size=0.16):
         key_value = pillar_dict[key]
         num_points = len(key_value)
 
-        # 1. calculate distance t othe arithmetic mean for x,y,z
+        # 1. calculate distance to the arithmetic mean for x,y,z
         # And then calculate the features xc, yc, zc which is the distance from the arithmetic mean. Reshape to be able
         # to stack them later.
 
@@ -116,13 +116,13 @@ def create_pillars(point_cloud, pillar_size=0.16):
             y_mean = key_value[:, 1].sum(axis=0)/num_points
             z_mean = key_value[:, 2].sum(axis=0)/num_points
 
-            xc = key_value[:, 0] - x_mean
+            xc = key_value[:, 0] - x_mean# TODO this dows not seem to do waht we want to do
             xc = xc.reshape((np.shape(xc)[0],1))
 
-            yc = key_value[:, 1] - y_mean
+            yc = key_value[:, 1] - y_mean# TODO this dows not seem to do waht we want to do
             yc = yc.reshape((np.shape(yc)[0], 1))
 
-            zc = key_value[:, 2] - z_mean
+            zc = key_value[:, 2] - z_mean# TODO this dows not seem to do waht we want to do
             zc = zc.reshape((np.shape(zc)[0], 1))
 
             x_offset = pillar_size/2 + np.min(key_value[:, 0])

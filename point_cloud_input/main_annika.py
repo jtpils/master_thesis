@@ -1,54 +1,50 @@
 from data_set_point_cloud import *
 from lidar_processing_functions import *
+from preprocessing_data_functions import *
 import numpy as np
 import pandas as pd
 import time
+import matplotlib.pyplot as plt
+
+use_cuda = False
+batch_size = 1
+data_set_path = '/home/master04/Desktop/Dataset/Town02_sorted_grid_ply'
+number_of_samples = 1
+workers = 0
+kwargs = {'num_workers': workers, 'pin_memory': True} if use_cuda else {'num_workers': workers}
+data_loader = get_train_loader(batch_size, data_set_path, number_of_samples, kwargs)
 
 
-number_samples = 20
-batch_size = 2
+for i, data in enumerate(data_loader):
+    print(i)
+    sweep, map, labels = data['sweep'].numpy(), data['map'].numpy(), data['labels']
+    sweep, map = np.squeeze(sweep, axis=0), np.squeeze(map, axis=0)
+    create_pillars(sweep, pillar_size=1)
+
+
+
+'''
+number_samples = 2
+batch_size = 1
 print('Initializing data set: ')
 data_path = '/home/master04/Desktop/Dataset/Town02_sorted_grid_ply'
 dataset = PointCloudDataSet(data_set_path=data_path, number_of_samples=number_samples)
 print('Done initializing data set. ')
 print(' ')
-'''
+
 print('Creating samples. ')
 idx = 0
-t1 = time.time()
-for idx in range(10):
+for idx in range(1):
     sample_dict = dataset.__getitem__(idx)
     print(np.shape(sample_dict['sweep']))
     print(np.shape(sample_dict['map']))
     print(' ')
-t2 = time.time()
 
-print('Time: ', t2-t1)
 '''
 
 
-train_loader = get_train_loader(batch_size, data_path, number_samples, kwargs={})
 
 
-
-print('Initializing data set: ')
-data_path = '/Users/sabinalinderoth/Desktop/Ply_files/TEST_sorted_grid_ply'
-
-
-
-dataset = PointCloudDataSet(data_set_path=data_path, number_of_samples=100)
-print('Done initializing data set. ')
-print(' ')
-
-print('Creating samples. ')
-#idx = 0
-t1 = time.time()
-for idx in tqdm(range(0,100)):
-
-    sample_dict = dataset.__getitem__(idx)
-
-t2 = time.time()
-print('Time:', t2-t1)
 
 '''
 print('discretizing sweep: ')
