@@ -72,7 +72,7 @@ def create_pillars(point_cloud, pillar_size=0.16):
 
         key_value = pillar_dict[key]
         num_points = len(key_value)
-
+        print('#points in pillar: ',num_points)
         # 1. calculate distance to the arithmetic mean for x,y,z
         # And then calculate the features xc, yc, zc which is the distance from the arithmetic mean. Reshape to be able
         # to stack them later.
@@ -84,6 +84,8 @@ def create_pillars(point_cloud, pillar_size=0.16):
 
             key_value = key_value.reshape((1,np.shape(key_value)[0]))
 
+            # TODO, we could skip this and always execute the else below instead?
+            '''
             x_mean = key_value[0, 0] / num_points
             y_mean = key_value[0, 1] / num_points
             z_mean = key_value[0, 2] / num_points
@@ -110,34 +112,39 @@ def create_pillars(point_cloud, pillar_size=0.16):
             features = np.hstack((key_value, xc, yc, zc, xp, yp))
             # 4. Update the dict key with the complete feature array
             pillar_dict.update({key: features})
+            '''
 
-        else:
-            x_mean = key_value[:, 0].sum(axis=0)/num_points
-            y_mean = key_value[:, 1].sum(axis=0)/num_points
-            z_mean = key_value[:, 2].sum(axis=0)/num_points
+       # else:
+        x_mean = key_value[:, 0].sum(axis=0)/num_points #Todo: are these ALL points or just number of coordinate tripletes?
+        y_mean = key_value[:, 1].sum(axis=0)/num_points
+        z_mean = key_value[:, 2].sum(axis=0)/num_points
 
-            xc = key_value[:, 0] - x_mean# TODO this dows not seem to do waht we want to do
-            xc = xc.reshape((np.shape(xc)[0],1))
+        xc = key_value[:, 0] - x_mean
+        xc = xc.reshape((np.shape(xc)[0],1))
 
-            yc = key_value[:, 1] - y_mean# TODO this dows not seem to do waht we want to do
-            yc = yc.reshape((np.shape(yc)[0], 1))
+        yc = key_value[:, 1] - y_mean
+        yc = yc.reshape((np.shape(yc)[0], 1))
 
-            zc = key_value[:, 2] - z_mean# TODO this dows not seem to do waht we want to do
-            zc = zc.reshape((np.shape(zc)[0], 1))
+        zc = key_value[:, 2] - z_mean
+        zc = zc.reshape((np.shape(zc)[0], 1))
 
-            x_offset = pillar_size/2 + np.min(key_value[:, 0])
-            y_offset = pillar_size/2 + np.min(key_value[:, 1])
+        #x_offset = pillar_size/2 + np.min(key_value[:, 0]) # TODO, we should be checking the edges here, not min/max values
+        #y_offset = pillar_size/2 + np.min(key_value[:, 1]) # TODO, we should be checking the edges here, not min/max values
 
-            xp = key_value[:, 0] - x_offset
-            xp = xp.reshape((np.shape(xp)[0],1))
+        x_grid, y_grid = get_grid(key_value[0,0], key_value[0,1], x_edges, y_edges)
+        x_offset = x_edges[x_grid] + pillar_size/2
+        y_offset = y_edges[y_grid] + pillar_size/2
 
-            yp = key_value[:, 1] - y_offset
-            yp = yp.reshape((np.shape(yp)[0],1))
+        xp = key_value[:, 0] - x_offset
+        xp = xp.reshape((np.shape(xp)[0],1))
 
-            # 3. Append the new features column wise to the array with the point coordinates.
-            features = np.hstack((key_value, xc, yc, zc, xp, yp))
-            # 4. Update the dict key with the complete feature array
-            pillar_dict.update({key: features})
+        yp = key_value[:, 1] - y_offset
+        yp = yp.reshape((np.shape(yp)[0],1))
+
+        # 3. Append the new features column wise to the array with the point coordinates.
+        features = np.hstack((key_value, xc, yc, zc, xp, yp))
+        # 4. Update the dict key with the complete feature array
+        pillar_dict.update({key: features})
 
     return pillar_dict
 
