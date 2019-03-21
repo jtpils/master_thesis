@@ -1,9 +1,9 @@
 import numpy as np
 import pandas as pd
 import random
-grid_size = 0.16
-
-
+import time
+import pickle
+'''
 path_to_ply = '/Users/sabinalinderoth/Desktop/Ply_files_1/TEST_sorted_grid_ply_1/grid_13_10/070832.ply'
 point_cloud = pd.read_csv(path_to_ply, delimiter=' ', skiprows=7, header=None, names=('x','y','z'))
 point_cloud = point_cloud.values
@@ -13,65 +13,31 @@ print(len(pc_list[0][:]))
 
 a = np.array([0,1,2,3,4,5])
 print(type(a))
-
-b = random.sample(list(a), 3)
-
-print(b)
-
-
-
-
-'''
-b = np.array([2,2,2])
-c = np.vstack((a,b))
-d = np.array([9,9,9])
-
-e = np.vstack((c,d))
-print(e)
-
-
-f = np.array([3,3,3])
-
-f = f.reshape((3,1))
 '''
 
 
+#dict_sample = np.load('/Users/sabinalinderoth/Documents/master_thesis/point_cloud_input/test_3/training_sample_1.npy')
+for k in list(range(0,10)):
+    print('round ' + str(k))
+    for i in list(range(1,11)):
+
+        t1 = time.time()
+
+        file_name = '/Users/sabinalinderoth/Documents/master_thesis/point_cloud_input/data_set_190321/training_sample_' + \
+                    str(i)
+        pickle_in = open(file_name, "rb")
+        dict_sample = pickle.load(pickle_in)
+        t2 = time.time()
+
+        string = 'time to load sample ' + str(i) + ':'
+        print(string ,t2-t1)
 
 
-#h = np.array([[5,5,5]]).T
 
 
-#i = np.hstack((e,f,g,h))
-#print(i)
-#e_sum_0 = e.sum(axis=0)#np.sum(e, axis=0)
-#print(e_sum_0)
-
-#e_sum_1 = np.sum(e, axis=1)
-#print(e_sum_1)
-'''
-x_min = -1.7245
-x_max =  1.7245
+#sweep = dict_sample['sweep']
+#map = dict_sample['map']
+#label = dict_sample['labels']
 
 
-number_x_grids = int(np.ceil((x_max - x_min) / grid_size))
-number_of_x_edges = number_x_grids + 1
-print('number_of_x_edges:', number_of_x_edges)
-x_edges = [x_min + x for x in np.arange(number_of_x_edges) * grid_size if x < x_max + grid_size]  # creates list with all the edge values of the grids
-print('length x edges', np.shape(x_edges))
-print('x edges:', x_edges)
-
-x_edges_list = []
-x = x_min
-
-while x <= x_max + grid_size:
-
-    x_edges_list.append(x)
-
-    x = x + grid_size
-    print(x_edges_list)
-
-
-print(np.shape(x_edges_list))
-print('done')
-
-'''
+#print(dict)
