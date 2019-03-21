@@ -73,7 +73,7 @@ def create_pillars(point_cloud, pillar_size=0.16):
 
         key_value = pillar_dict[key]
         num_points = len(key_value)
-        print('#points in pillar: ',num_points)
+
         # 1. calculate distance to the arithmetic mean for x,y,z
         # And then calculate the features xc, yc, zc which is the distance from the arithmetic mean. Reshape to be able
         # to stack them later.
