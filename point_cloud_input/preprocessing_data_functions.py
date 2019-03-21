@@ -220,8 +220,8 @@ tensor = get_feature_tensor(pillars, max_number_of_pillars=12000, max_number_of_
 
 
 
-x = tensor[0,2,:]
-y = tensor[1,2,:]
+x = tensor[0,:,:]
+y = tensor[1,:,:]
 
 
 plt.plot(x,y,'.')
