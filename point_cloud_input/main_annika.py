@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 import time
 import matplotlib.pyplot as plt
+from tqdm import tqdm
 
 use_cuda = False
 batch_size = 1
@@ -19,7 +20,21 @@ for i, data in enumerate(data_loader):
     print(i)
     sweep, map, labels = data['sweep'].numpy(), data['map'].numpy(), data['labels']
     sweep, map = np.squeeze(sweep, axis=0), np.squeeze(map, axis=0)
-    create_pillars(sweep, pillar_size=1)
+    pillar_dict = create_pillars(sweep, pillar_size=1)
+
+list_keys = pillar_dict.keys()
+for key in tqdm(list_keys):
+    x = pillar_dict[key][:,0]
+    y = pillar_dict[key][:,1]
+    plt.plot(x,y,'.')
+plt.show()
+
+tensor = get_feature_tensor(pillar_dict, max_number_of_pillars=12000, max_number_of_points_per_pillar=100, dimension=8)
+
+x = tensor[0,:,:]
+y = tensor[1,:,:]
+plt.plot(x,y,'.')
+plt.show()
 
 
 

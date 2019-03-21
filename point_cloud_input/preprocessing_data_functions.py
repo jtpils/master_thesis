@@ -77,51 +77,12 @@ def create_pillars(point_cloud, pillar_size=0.16):
         if np.shape(key_value) == (3,):
             key_value = key_value.reshape((1,np.shape(key_value)[0]))
 
-        # translate all points to "new" origo in pillar
         x_grid, y_grid = get_grid(key_value[0,0], key_value[0,1], x_edges, y_edges)
-        key_value[:,0] = key_value[:,0] - x_edges[x_grid]
-        key_value[:,1] = key_value[:,1] - y_edges[y_grid]
-        # key_value[:,2] = key_value[:,2]
 
         # 1. calculate distance to the arithmetic mean for x,y,z
         # And then calculate the features xc, yc, zc which is the distance from the arithmetic mean. Reshape to be able
         # to stack them later.
-
-        # 2. calculate the offset from the pillar x,y center i.e xp and yp. TODO: I AM UNCERTAIN ABOUT THIS! //S
-        # Reshape to be able to stack them later.
-
-        # TODO, we could skip this and always execute the else below instead?
-        '''
-        x_mean = key_value[0, 0] / num_points
-        y_mean = key_value[0, 1] / num_points
-        z_mean = key_value[0, 2] / num_points
-
-        xc = key_value[0, 0] - x_mean
-        xc = np.array([[xc]])
-
-        yc = key_value[0, 1] - y_mean
-        yc = np.array([[yc]])
-
-        zc = key_value[0, 2] - z_mean
-        zc = np.array([[zc]])
-
-        x_offset = pillar_size / 2 + key_value[0, 0]
-        y_offset = pillar_size / 2 + key_value[0, 1]
-
-        xp = key_value[0, 0] - x_offset
-        xp = np.array([[xp]])
-
-        yp = key_value[0, 1] - y_offset
-        yp = np.array([[yp]])
-
-        # 3. Append the new features column wise to the array with the point coordinates.
-        features = np.hstack((key_value, xc, yc, zc, xp, yp))
-        # 4. Update the dict key with the complete feature array
-        pillar_dict.update({key: features})
-        '''
-
-       # else:
-        x_mean = key_value[:, 0].sum(axis=0)/num_points #Todo: are these ALL points or just number of coordinate tripletes?
+        x_mean = key_value[:, 0].sum(axis=0)/num_points
         y_mean = key_value[:, 1].sum(axis=0)/num_points
         z_mean = key_value[:, 2].sum(axis=0)/num_points
 
@@ -134,10 +95,8 @@ def create_pillars(point_cloud, pillar_size=0.16):
         zc = key_value[:, 2] - z_mean
         zc = zc.reshape((np.shape(zc)[0], 1))
 
-        #x_offset = pillar_size/2 + np.min(key_value[:, 0]) # TODO, we should be checking the edges here, not min/max values
-        #y_offset = pillar_size/2 + np.min(key_value[:, 1]) # TODO, we should be checking the edges here, not min/max values
-
-        #x_grid, y_grid = get_grid(key_value[0,0], key_value[0,1], x_edges, y_edges)
+        # 2. calculate the offset from the pillar x,y center i.e xp and yp.
+        # Reshape to be able to stack them later.
         x_offset = x_edges[x_grid] + pillar_size/2
         y_offset = y_edges[y_grid] + pillar_size/2
 
@@ -149,6 +108,7 @@ def create_pillars(point_cloud, pillar_size=0.16):
 
         # 3. Append the new features column wise to the array with the point coordinates.
         features = np.hstack((key_value, xc, yc, zc, xp, yp))
+
         # 4. Update the dict key with the complete feature array
         pillar_dict.update({key: features})
 
@@ -169,13 +129,12 @@ def get_feature_tensor(pillar_dict, max_number_of_pillars=12000, max_number_of_p
     '''
 
     # Initialize feature tensor
-
     feature_tensor = np.zeros((dimension, max_number_of_pillars, max_number_of_points_per_pillar))
 
     # 1. Check how many keys in the dict. If more than max number of pillars pick random max_numer_of_pillars
     number_of_pillars = len(pillar_dict.keys())
 
-    # in number of pillars is mor than the maximum allowed. set number of pillars = max_number and sample the key list
+    # if number of pillars is more than the maximum allowed. set number of pillars = max_number and sample the key list
     if number_of_pillars > max_number_of_pillars:
 
         # number_of_pillars = max_number_of_pillars
@@ -199,11 +158,11 @@ def get_feature_tensor(pillar_dict, max_number_of_pillars=12000, max_number_of_p
         else:
             points = np.array(range(0,number_of_points))
 
-        feature_point = 0
+        lidar_point = 0
         for point in points:
             for feature in range(0 , dimension):
-                feature_tensor[feature, pillar, feature_point] = key_value[point,feature]
-            feature_point += 1
+                feature_tensor[feature, pillar, lidar_point] = key_value[point,feature]
+            lidar_point += 1
         pillar += 1
 
     return feature_tensor
