@@ -74,6 +74,9 @@ def create_pillars(point_cloud, pillar_size=0.16):
         key_value = pillar_dict[key]
         num_points = len(key_value)
 
+        if np.shape(key_value) == (3,):
+            key_value = key_value.reshape((1,np.shape(key_value)[0]))
+
         # translate all points to "new" origo in pillar
         x_grid, y_grid = get_grid(key_value[0,0], key_value[0,1], x_edges, y_edges)
         key_value[:,0] = key_value[:,0] - x_edges[x_grid]
@@ -87,39 +90,35 @@ def create_pillars(point_cloud, pillar_size=0.16):
         # 2. calculate the offset from the pillar x,y center i.e xp and yp. TODO: I AM UNCERTAIN ABOUT THIS! //S
         # Reshape to be able to stack them later.
 
-        if np.shape(key_value) == (3,):
+        # TODO, we could skip this and always execute the else below instead?
+        '''
+        x_mean = key_value[0, 0] / num_points
+        y_mean = key_value[0, 1] / num_points
+        z_mean = key_value[0, 2] / num_points
 
-            key_value = key_value.reshape((1,np.shape(key_value)[0]))
+        xc = key_value[0, 0] - x_mean
+        xc = np.array([[xc]])
 
-            # TODO, we could skip this and always execute the else below instead?
-            '''
-            x_mean = key_value[0, 0] / num_points
-            y_mean = key_value[0, 1] / num_points
-            z_mean = key_value[0, 2] / num_points
+        yc = key_value[0, 1] - y_mean
+        yc = np.array([[yc]])
 
-            xc = key_value[0, 0] - x_mean
-            xc = np.array([[xc]])
+        zc = key_value[0, 2] - z_mean
+        zc = np.array([[zc]])
 
-            yc = key_value[0, 1] - y_mean
-            yc = np.array([[yc]])
+        x_offset = pillar_size / 2 + key_value[0, 0]
+        y_offset = pillar_size / 2 + key_value[0, 1]
 
-            zc = key_value[0, 2] - z_mean
-            zc = np.array([[zc]])
+        xp = key_value[0, 0] - x_offset
+        xp = np.array([[xp]])
 
-            x_offset = pillar_size / 2 + key_value[0, 0]
-            y_offset = pillar_size / 2 + key_value[0, 1]
+        yp = key_value[0, 1] - y_offset
+        yp = np.array([[yp]])
 
-            xp = key_value[0, 0] - x_offset
-            xp = np.array([[xp]])
-
-            yp = key_value[0, 1] - y_offset
-            yp = np.array([[yp]])
-
-            # 3. Append the new features column wise to the array with the point coordinates.
-            features = np.hstack((key_value, xc, yc, zc, xp, yp))
-            # 4. Update the dict key with the complete feature array
-            pillar_dict.update({key: features})
-            '''
+        # 3. Append the new features column wise to the array with the point coordinates.
+        features = np.hstack((key_value, xc, yc, zc, xp, yp))
+        # 4. Update the dict key with the complete feature array
+        pillar_dict.update({key: features})
+        '''
 
        # else:
         x_mean = key_value[:, 0].sum(axis=0)/num_points #Todo: are these ALL points or just number of coordinate tripletes?
@@ -209,26 +208,3 @@ def get_feature_tensor(pillar_dict, max_number_of_pillars=12000, max_number_of_p
 
     return feature_tensor
 
-
-
-# create pillars
-
-path_to_ply = '/Users/sabinalinderoth/Desktop/Ply_files/TEST_sorted_grid_ply/grid_13_10/070832.ply'
-point_cloud = pd.read_csv(path_to_ply, delimiter=' ', skiprows=7, header=None, names=('x','y','z'))
-point_cloud = point_cloud.values
-
-pillars = create_pillars(point_cloud, pillar_size=0.16)
-
-# get the feature tensor
-tensor = get_feature_tensor(pillars, max_number_of_pillars=12000, max_number_of_points_per_pillar=100,
-                                dimension=8)
-
-
-
-
-x = tensor[0,2,:]
-y = tensor[1,2,:]
-
-
-plt.plot(x,y,'.')
-plt.show()
