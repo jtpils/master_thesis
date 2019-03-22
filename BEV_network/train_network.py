@@ -123,7 +123,7 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
 
             if (i+1) % print_every == 0:
                 print('Epoch [{}/{}], Batch [{}/{}], Loss: {:.4f}, Time: '
-                       .format(epoch+1, n_epochs, i+1, n_batches, running_loss/print_every), time.time()-time_epoch)
+                       .format(epoch+1, n_epochs, i, n_batches, running_loss/print_every), time.time()-time_epoch)
                 running_loss = 0.0
                 time_epoch = time.time()
             
