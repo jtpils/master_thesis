@@ -41,6 +41,6 @@ class LiDARDataSet(Dataset):
 
         training_sample = {'sample': sample, 'labels': labels.values}
 
-        print('get sample: ', t2-t1)
+        #print('get sample: ', t2-t1)
         del sample, labels_csv
         return training_sample

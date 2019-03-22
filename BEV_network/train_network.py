@@ -97,7 +97,7 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
         t1_get_data = time.time()
         for i, data in enumerate(train_loader, 1):
             t2_get_data = time.time()
-            print('get data from loader: ', t2_get_data-t1_get_data)
+            #print('get data from loader: ', t2_get_data-t1_get_data)
 
             sample = data['sample']
             labels = data['labels']
@@ -115,7 +115,7 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
             loss_size.backward()
             optimizer.step()
             t2 = time.time()
-            print('time for forward, backprop, update: ', t2-t1)
+            #print('time for forward, backprop, update: ', t2-t1)
 
             # Print statistics
             running_loss += loss_size.item()
