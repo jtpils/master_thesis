@@ -5,10 +5,8 @@ import numpy as np
 import os
 #from early_stopping import EarlyStopping
 import torch
-from new_networks import *
+from cat_networks import *
 from data_loader import *
-import pandas as pd
-#import h5py
 
 
 def create_loss_and_optimizer(net, learning_rate=0.001):
@@ -24,20 +22,16 @@ def create_loss_and_optimizer(net, learning_rate=0.001):
 
     return loss, optimizer
 
-
 # def train_network(net, train_loader, val_loader, n_epochs, learning_rate, patience, folder_path, device, use_cuda):
 def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batch_size):
 
     #path_training_data = '/home/annika_lundqvist144/Dataset/fake_training_set' #input('Path to training data set folder: ')
-    #path_training_data = '/home/master04/Desktop/Dataset/fake_training_data_high_Res'
     path_validation_data = '/home'  # /home/annika_lundqvist144/Dataset/fake_validation_set' #input('Path to validation data set folder: ')
 
-    #path_training_data = '/home/master04/Desktop/Dataset/fake_training_data_high_Res' #'/home/master04/Desktop/Dataset/fake_training_data_torch'#
     #path_training_data = '/home/master04/Desktop/Dataset/fake_training_data_low_Res'  # '/home/master04/Desktop/Dataset/fake_training_data_torch'#
     path_training_data = '/home/annika_lundqvist144/Dataset/fake_training_data_low_Res'
 
-
-    CNN = LookAtThisNetLowRes()
+    CNN = Duchess()
     print('=======> NETWORK NAME: =======> ', CNN.name())
     if use_cuda:
         CNN.cuda()

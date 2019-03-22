@@ -33,7 +33,7 @@ train_loss, val_loss = train_network(n_epochs, learning_rate, patience, paramete
 
 if plot_flag is 'y':
     # plot loss
-    np.shape(train_loss)
+    #np.shape(train_loss)
     epochs_vec = np.arange(1, np.shape(train_loss)[0] + 1) # uses the shape of the train loss to plot to be the same of epochs before early stopping did its work.
     plt.plot(epochs_vec, train_loss, label='train loss')
     plt.plot(epochs_vec, val_loss, label='val loss')
