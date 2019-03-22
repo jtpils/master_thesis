@@ -33,8 +33,8 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
     path_validation_data = '/home'  # /home/annika_lundqvist144/Dataset/fake_validation_set' #input('Path to validation data set folder: ')
 
     #path_training_data = '/home/master04/Desktop/Dataset/fake_training_data_high_Res' #'/home/master04/Desktop/Dataset/fake_training_data_torch'#
-    path_training_data = '/home/master04/Desktop/Dataset/fake_training_data_low_Res'  # '/home/master04/Desktop/Dataset/fake_training_data_torch'#
-    #path_training_data = '/home/annika_lundqvist144/Dataset/fake_training_data_low_Res'
+    #path_training_data = '/home/master04/Desktop/Dataset/fake_training_data_low_Res'  # '/home/master04/Desktop/Dataset/fake_training_data_torch'#
+    path_training_data = '/home/annika_lundqvist144/Dataset/fake_training_data_low_Res'
 
 
     CNN = LookAtThisNetLowRes()
