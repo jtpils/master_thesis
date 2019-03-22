@@ -5,7 +5,7 @@ import numpy as np
 import os
 #from early_stopping import EarlyStopping
 import torch
-from new_networks import *
+from cat_networks import *
 from data_loader import *
 
 
@@ -22,26 +22,21 @@ def create_loss_and_optimizer(net, learning_rate=0.001):
 
     return loss, optimizer
 
+# def train_network(net, train_loader, val_loader, n_epochs, learning_rate, patience, folder_path, device, use_cuda):
+def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batch_size):
 
-#def train_network(net, train_loader, val_loader, n_epochs, learning_rate, patience, folder_path, device, use_cuda):
-def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batch_size, num_samples):
+    #path_training_data = '/home/annika_lundqvist144/Dataset/fake_training_set' #input('Path to training data set folder: ')
+    path_validation_data = '/home'  # /home/annika_lundqvist144/Dataset/fake_validation_set' #input('Path to validation data set folder: ')
 
-    path_training_data = '/home/annika_lundqvist144/Dataset/fake_training_set' #input('Path to training data set folder: ')
-    path_validation_data = 'a'#/home/annika_lundqvist144/Dataset/fake_validation_set' #input('Path to validation data set folder: ')
-    path_test_data = 'a'#/home/annika_lundqvist144/Dataset/fake_test_set' #input('Path to test data set folder: ')
+    #path_training_data = '/home/master04/Desktop/Dataset/fake_training_data_low_Res'  # '/home/master04/Desktop/Dataset/fake_training_data_torch'#
+    path_training_data = '/home/annika_lundqvist144/Dataset/fake_training_data_low_Res'
 
-    #path_training_data = '/home/master04/Desktop/Dataset/fake_training_set' #'/home/master04/Desktop/Dataset/fake_training_data_torch'#
-    #path_validation_data = '/home' #'/home/master04/Desktop/Dataset/fake_training_data_torch'#
-    #path_test_data = '/home/' #
-
-
-    CNN = LookAtThisNet_downsampled()
+    CNN = Duchess()
     print('=======> NETWORK NAME: =======> ', CNN.name())
     if use_cuda:
         CNN.cuda()
     print('Are model parameters on CUDA? ', next(CNN.parameters()).is_cuda)
     print(' ')
-
 
     train_loader = get_loaders(path_training_data, path_validation_data, batch_size, use_cuda)
 
@@ -72,10 +67,11 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
 
     # Create our loss and optimizer functions
     loss, optimizer = create_loss_and_optimizer(CNN, learning_rate)
-    scheduler = StepLR(optimizer, step_size=10, gamma=0.5)
+    scheduler = StepLR(optimizer, step_size=100, gamma=0.5)
 
     # Time for printing
     training_start_time = time.time()
+    start_time = time.time()
 
     # Loop for n_epochs
     for epoch in range(n_epochs):
@@ -86,7 +82,7 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
 
 
         running_loss = 0.0
-        print_every = 10  #n_batches // 10  # how many mini-batches if we want to print stats x times per epoch
+        print_every = 13  #n_batches // 10  # how many mini-batches if we want to print stats x times per epoch
         start_time = time.time()
         total_train_loss = 0
 
@@ -94,11 +90,9 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
         time_epoch = time.time()
         t1_get_data = time.time()
         for i, data in enumerate(train_loader, 1):
-            #for i, (sample, labels) in enumerate(train_loader, 1):
             t2_get_data = time.time()
             #print('get data from loader: ', t2_get_data-t1_get_data)
 
-            #t1 = time.time()
             sample = data['sample']
             labels = data['labels']
 
@@ -106,7 +100,7 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
                 sample, labels = sample.cuda(async=True), labels.cuda(async=True)
             sample, labels = Variable(sample), Variable(labels)
 
-            #t1 = time.time()
+            t1 = time.time()
             # Set the parameter gradients to zero
             optimizer.zero_grad()
             # Forward pass, backward pass, optimize
@@ -114,7 +108,7 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
             loss_size = loss(outputs, labels.float())
             loss_size.backward()
             optimizer.step()
-            #t2 = time.time()
+            t2 = time.time()
             #print('time for forward, backprop, update: ', t2-t1)
 
             # Print statistics
@@ -123,17 +117,16 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
 
             if (i+1) % print_every == 0:
                 print('Epoch [{}/{}], Batch [{}/{}], Loss: {:.4f}, Time: '
-                       .format(epoch+1, n_epochs, i+1, n_batches, running_loss/print_every), time.time()-time_epoch)
+                       .format(epoch+1, n_epochs, i, n_batches, running_loss/print_every), time.time()-time_epoch)
                 running_loss = 0.0
                 time_epoch = time.time()
-
-
+            
             t1_get_data = time.time()
-
             del data, sample, labels, outputs, loss_size
 
         # At the end of the epoch, do a pass on the validation set
-        '''total_val_loss = 0
+        '''
+        total_val_loss = 0
         CNN.eval()
         with torch.no_grad():
             for data in val_loader:
@@ -162,7 +155,7 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
         # save the loss for each epoch
         train_loss.append(total_train_loss / len(train_loader))
         val_loss.append(total_val_loss / len(val_loader))
-
+        
         # see if validation loss has decreased, if it has a checkpoint will be saved of the current model.
         early_stopping(epoch, total_train_loss, total_val_loss, CNN, optimizer)
 
