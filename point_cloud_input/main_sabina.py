@@ -3,6 +3,7 @@ import pandas as pd
 import random
 import time
 import pickle
+from preprocessing_data_functions import *
 '''
 path_to_ply = '/Users/sabinalinderoth/Desktop/Ply_files_1/TEST_sorted_grid_ply_1/grid_13_10/070832.ply'
 point_cloud = pd.read_csv(path_to_ply, delimiter=' ', skiprows=7, header=None, names=('x','y','z'))
@@ -10,11 +11,10 @@ point_cloud = point_cloud.values
 
 pc_list = point_cloud.tolist()
 print(len(pc_list[0][:]))
-
-a = np.array([0,1,2,3,4,5])
-print(type(a))
 '''
 
+
+'''
 
 #dict_sample = np.load('/Users/sabinalinderoth/Documents/master_thesis/point_cloud_input/test_3/training_sample_1.npy')
 for k in list(range(0,10)):
@@ -33,11 +33,29 @@ for k in list(range(0,10)):
         print(string ,t2-t1)
 
 
+'''
 
 
-#sweep = dict_sample['sweep']
-#map = dict_sample['map']
-#label = dict_sample['labels']
+
+# create pillars
+
+path_to_ply = '/Users/sabinalinderoth/Desktop/Ply_files/TEST_sorted_grid_ply/grid_13_10/070832.ply'
+point_cloud = pd.read_csv(path_to_ply, delimiter=' ', skiprows=7, header=None, names=('x','y','z'))
+point_cloud = point_cloud.values
+
+pillars = create_pillars(point_cloud, pillar_size=0.16)
+
+# get the feature tensor
+tensor = get_feature_tensor(pillars, max_number_of_pillars=12000, max_number_of_points_per_pillar=100,
+                                dimension=8)
 
 
-#print(dict)
+
+
+'''
+x = tensor[0,1,:]
+y = tensor[1,1,:]
+
+plt.plot(x,y,'.')
+plt.show()
+'''
