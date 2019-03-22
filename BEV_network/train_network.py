@@ -88,7 +88,7 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
 
 
         running_loss = 0.0
-        print_every = 1  #n_batches // 10  # how many mini-batches if we want to print stats x times per epoch
+        print_every = 13  #n_batches // 10  # how many mini-batches if we want to print stats x times per epoch
         start_time = time.time()
         total_train_loss = 0
 
@@ -121,8 +121,7 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
             running_loss += loss_size.item()
             total_train_loss += loss_size.item()
 
-            #if (i+1) % print_every == 0:
-            if i % n_batches == 0:
+            if (i+1) % print_every == 0:
                 print('Epoch [{}/{}], Batch [{}/{}], Loss: {:.4f}, Time: '
                        .format(epoch+1, n_epochs, i, n_batches, running_loss/print_every), time.time()-time_epoch)
                 running_loss = 0.0
