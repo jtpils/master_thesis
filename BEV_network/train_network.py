@@ -73,7 +73,7 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
 
     # Create our loss and optimizer functions
     loss, optimizer = create_loss_and_optimizer(CNN, learning_rate)
-    scheduler = StepLR(optimizer, step_size=10, gamma=0.5)
+    scheduler = StepLR(optimizer, step_size=100, gamma=0.5)
 
     # Time for printing
     training_start_time = time.time()
