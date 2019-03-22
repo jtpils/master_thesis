@@ -26,7 +26,7 @@ def create_loss_and_optimizer(net, learning_rate=0.001):
 
 
 # def train_network(net, train_loader, val_loader, n_epochs, learning_rate, patience, folder_path, device, use_cuda):
-def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batch_size, num_samples):
+def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batch_size):
 
     #path_training_data = '/home/annika_lundqvist144/Dataset/fake_training_set' #input('Path to training data set folder: ')
     #path_training_data = '/home/master04/Desktop/Dataset/fake_training_data_high_Res'
@@ -37,7 +37,7 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
     path_training_data = '/home/annika_lundqvist144/Dataset/fake_training_data_low_Res'
 
 
-    CNN = LookAtThisNet_downsampled()
+    CNN = LookAtThisNetLowRes()
     print('=======> NETWORK NAME: =======> ', CNN.name())
     if use_cuda:
         CNN.cuda()
