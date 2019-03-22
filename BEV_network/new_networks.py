@@ -85,7 +85,7 @@ class LookAtThisNetLowRes(torch.nn.Module):
         self.conv4 = torch.nn.Conv2d(64, 128, kernel_size=3, stride=1, padding=0)
         self.conv5 = torch.nn.Conv2d(128, 128, kernel_size=3, stride=1, padding=0)
         self.conv6 = torch.nn.Conv2d(128, 128, kernel_size=3, stride=1, padding=0)
-        self.conv7 = torch.nn.Conv2d(128, 128, kernel_size=5, stride=1, padding=0)
+        self.conv7 = torch.nn.Conv2d(128, 128, kernel_size=3, stride=1, padding=0)
 
         self.conv1_bn = torch.nn.BatchNorm2d(64)
         self.conv2_bn = torch.nn.BatchNorm2d(64)
@@ -127,10 +127,11 @@ class LookAtThisNetLowRes(torch.nn.Module):
         x = self.dropout_2d(x)
 
         x = F.relu(self.conv6_bn(self.conv6(x))) # 128,11,11
-        x = self.pool2(x) # 128,5,5
+        x = self.pool2(x) # 128,5,5 ----> 128,4,4?
         x = self.dropout_2d(x)
 
-        x = F.relu(self.conv7_bn(self.conv7(x))) # 128,1,1
+        x = F.relu(self.conv7_bn(self.conv7(x))) # 128,2,2
+        x = self.pool2(x) # 128,1,1
         x = self.dropout_2d(x)
 
         x = x.view(-1, 128 * 1 * 1)
