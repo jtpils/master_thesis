@@ -2,7 +2,7 @@ import numpy as np
 import torch
 from torch.utils.data.sampler import SubsetRandomSampler
 from LiDARDataSet import LiDARDataSet
-from h5py_dataset import h5py_dataset
+#from h5py_dataset import h5py_dataset
 
 
 def get_loaders(path_training_data, path_validation_data, batch_size, use_cuda):

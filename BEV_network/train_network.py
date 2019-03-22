@@ -8,7 +8,7 @@ import torch
 from new_networks import *
 from data_loader import *
 import pandas as pd
-import h5py
+#import h5py
 
 
 def create_loss_and_optimizer(net, learning_rate=0.001):
