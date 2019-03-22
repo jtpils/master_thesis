@@ -2,25 +2,27 @@ import numpy as np
 import torch
 from torch.utils.data.sampler import SubsetRandomSampler
 from LiDARDataSet import LiDARDataSet
+from h5py_dataset import h5py_dataset
 
 
 def get_loaders(path_training_data, path_validation_data, batch_size, use_cuda):
     csv_file = path_training_data + '/labels.csv'
     sample_dir = path_training_data + '/samples/'
     training_data_set = LiDARDataSet(csv_file, sample_dir, use_cuda)
+    #training_data_set = h5py_dataset(csv_file, 'train_files/')
 
     #csv_file = path_validation_data + '/labels.csv'
     #sample_dir = path_validation_data + '/samples/'
     #validation_data_set = LiDARDataSet(csv_file, sample_dir, use_cuda)
 
-    #kwargs = {'pin_memory': True} if use_cuda else {}
+    kwargs = {'pin_memory': True} if use_cuda else {}
 
     # Training
     n_training_samples = len(training_data_set)
     print('Number of training samples: ', n_training_samples)
-    #train_sampler = SubsetRandomSampler(np.arange(1, n_training_samples+1, dtype=np.int64))
-    #train_loader = torch.utils.data.DataLoader(training_data_set, batch_size=batch_size, sampler=train_sampler, num_workers=4, pin_memory=True)#**kwargs)
-    train_loader = torch.utils.data.DataLoader(training_data_set, batch_size=batch_size, shuffle=True, num_workers=4, pin_memory=True)#**kwargs)
+    train_sampler = SubsetRandomSampler(np.arange(1, n_training_samples+1, dtype=np.int64))
+    train_loader = torch.utils.data.DataLoader(training_data_set, batch_size=batch_size, sampler=train_sampler, num_workers=0, **kwargs)
+    #train_loader = torch.utils.data.DataLoader(training_data_set, batch_size=batch_size, shuffle=True, num_workers=4, pin_memory=use_cuda)#**kwargs)
 
     # Validation
     #n_val_samples = 8  #len(validation_data_set)
@@ -30,4 +32,4 @@ def get_loaders(path_training_data, path_validation_data, batch_size, use_cuda):
 
     print(' ')
 
-    return train_loader#, val_loader#, test_loader
+    return train_loader#, val_loader
