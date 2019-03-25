@@ -57,7 +57,7 @@ for i, data in tqdm(enumerate(train_loader, 1)):
     # Save the map cutout and the sweep in a folder together with the labels
     training_sample = {'sweep': sweep_tensor, 'map': map_tensor, 'labels': labels}
 
-    file_name = 'training_sample_' + str(i)
+    file_name = 'training_sample_' + str(i-1)
 
     sample_path = os.path.join(folder_path,file_name)
 
