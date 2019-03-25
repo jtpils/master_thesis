@@ -134,7 +134,7 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
                 total_val_loss += val_loss_size.item()
 
                 if (i+1) % 5 == 0:
-                    print('Batch [{}/{}], Time: '.format(i, val_batches, time.time()-val_time))
+                    print('Batch [{}/{}], Time: '.format(i, val_batches), time.time()-val_time)
                     val_time = time.time()
 
                 del data, sample, labels, val_outputs, val_loss_size
