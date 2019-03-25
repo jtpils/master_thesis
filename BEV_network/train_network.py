@@ -61,6 +61,7 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
 
     # Get training data
     n_batches = len(train_loader)
+    val_batches = len(val_loader)
 
     # Create our loss and optimizer functions
     loss, optimizer = create_loss_and_optimizer(CNN, learning_rate)
@@ -133,7 +134,8 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
                 total_val_loss += val_loss_size.item()
 
                 if (i+1) % 5 == 0:
-                    print('Batch [{}/{}], Time: '.format(i, n_batches, time.time()-val_time))
+                    print('Batch [{}/{}], Time: '.format(i, val_batches, time.time()-val_time))
+                    val_time = time.time()
 
                 del data, sample, labels, val_outputs, val_loss_size
 
