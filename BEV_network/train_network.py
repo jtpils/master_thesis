@@ -117,7 +117,7 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
         CNN = CNN.eval()
         val_time = time.time()
         with torch.no_grad():
-            for i, data in val_loader:
+            for i, data in enumerate(val_loader, 1):
                 sample = data['sample']
                 labels = data['labels']
 
