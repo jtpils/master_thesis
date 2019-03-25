@@ -4,8 +4,8 @@ import os
 
 
 # load old weights! change here manually
-load_weights = False
-load_weights_path = '/home/annika_lundqvist144/master_thesis/First_BEV_Network/param/parameters/epoch_7_checkpoint.pt'
+load_weights = True
+load_weights_path = '/home/annika_lundqvist144/master_thesis/BEV_network/Duchess_190325_1/parameters/epoch_8_checkpoint.pt'
 
 save_parameters_folder = input('Type name of new folder: ')
 n_epochs = int(input('Number of epochs: '))
