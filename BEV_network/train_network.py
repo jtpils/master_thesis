@@ -29,7 +29,7 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
     #path_training_data = '/home/annika_lundqvist144/Dataset/fake_training_data_low_Res'
     #path_training_data = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/fake_training_set'
 
-    CNN = Duchess()
+    CNN = Knutte()
     print('=======> NETWORK NAME: =======> ', CNN.name())
     if use_cuda:
         CNN.cuda()
@@ -61,6 +61,7 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
 
     # Get training data
     n_batches = len(train_loader)
+    val_batches = len(val_loader)
 
     # Create our loss and optimizer functions
     loss, optimizer = create_loss_and_optimizer(CNN, learning_rate)
@@ -81,7 +82,7 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
         start_time = time.time()
         total_train_loss = 0
 
-        CNN.train()
+        CNN = CNN.train()
         time_epoch = time.time()
         #t1_get_data = time.time()
         for i, data in enumerate(train_loader, 1):
@@ -114,10 +115,10 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
 
         # At the end of the epoch, do a pass on the validation set
         total_val_loss = 0
-        CNN.eval()
+        CNN = CNN.eval()
         val_time = time.time()
         with torch.no_grad():
-            for i, data in val_loader:
+            for i, data in enumerate(val_loader, 1):
                 sample = data['sample']
                 labels = data['labels']
 
@@ -133,7 +134,8 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
                 total_val_loss += val_loss_size.item()
 
                 if (i+1) % 5 == 0:
-                    print('Batch [{}/{}], Time: '.format(i, n_batches, time.time()-val_time))
+                    print('Validation: Batch [{}/{}], Time: '.format(i, val_batches), time.time()-val_time)
+                    val_time = time.time()
 
                 del data, sample, labels, val_outputs, val_loss_size
 

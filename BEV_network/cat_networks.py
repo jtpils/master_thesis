@@ -153,3 +153,46 @@ class Gustav(torch.nn.Module):
 
     def name(self):
         return "Gustav"
+
+
+
+class Knutte(torch.nn.Module):
+    # Simple net
+    def __init__(self):
+        super(Knutte, self).__init__()
+
+        self.conv1 = torch.nn.Conv2d(8, 32, kernel_size=3, stride=1, padding=0)
+        self.conv2 = torch.nn.Conv2d(32, 32, kernel_size=3, stride=1, padding=0)
+        self.conv3 = torch.nn.Conv2d(32, 8, kernel_size=3, stride=1, padding=0)
+        self.conv4 = torch.nn.Conv2d(8, 4, kernel_size=3, stride=1, padding=0)
+
+        self.pool1 = torch.nn.MaxPool2d(kernel_size=2, stride=2, padding=0)
+
+        self.fc1 = torch.nn.Linear(4*26*26, 128)
+        self.fc2 = torch.nn.Linear(128, 32)
+        self.fc_out = torch.nn.Linear(32, 3)
+
+    def forward(self, x):
+        x = F.relu(self.conv1(x))  # 32,448,448
+        x = self.pool1(x)  # 32,224,224
+
+        x = F.relu(self.conv2(x))  # 32,222,222
+        x = self.pool1(x)  # 32,111,111
+
+        x = F.relu(self.conv3(x))  # 8,109,109
+        x = self.pool1(x)  # 8,54,54
+
+        x = F.relu(self.conv4(x))  # 4,52,52
+        x = self.pool1(x)  # 4,26,26
+
+        # FC-CONNECTED
+        x = x.view(-1, 4*26*26)
+        x = torch.tanh(self.fc1(x))
+        x = torch.tanh(self.fc2(x))
+        x = self.fc_out(x)
+
+        return x
+
+    def name(self):
+        return "Knutte"
+
