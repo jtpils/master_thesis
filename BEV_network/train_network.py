@@ -70,6 +70,7 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
     # Time for printing
     training_start_time = time.time()
 
+
     # Loop for n_epochs
     for epoch in range(n_epochs):
         scheduler.step()
@@ -84,7 +85,7 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
 
         CNN = CNN.train()
         time_epoch = time.time()
-        #t1_get_data = time.time()
+        t1_get_data = time.time()
         for i, data in enumerate(train_loader, 1):
             sample = data['sample']
             labels = data['labels']
@@ -92,6 +93,8 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
             if use_cuda:
                 sample, labels = sample.cuda(async=True), labels.cuda(async=True)
             sample, labels = Variable(sample), Variable(labels)
+            t2_get_data = time.time()
+            #print('get data: ', t2_get_data-t1_get_data)
 
             # Set the parameter gradients to zero
             optimizer.zero_grad()
@@ -110,8 +113,9 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
                        .format(epoch+1, n_epochs, i, n_batches, running_loss/print_every), time.time()-time_epoch)
                 running_loss = 0.0
                 time_epoch = time.time()
-            
+
             del data, sample, labels, outputs, loss_size
+            t1_get_data = time.time()
 
         # At the end of the epoch, do a pass on the validation set
         total_val_loss = 0
