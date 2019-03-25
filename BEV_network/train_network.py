@@ -29,7 +29,7 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
     #path_training_data = '/home/annika_lundqvist144/Dataset/fake_training_data_low_Res'
     #path_training_data = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/fake_training_set'
 
-    CNN = Duchess()
+    CNN = Knutte()
     print('=======> NETWORK NAME: =======> ', CNN.name())
     if use_cuda:
         CNN.cuda()
