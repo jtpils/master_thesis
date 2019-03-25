@@ -30,6 +30,8 @@ def create_pillars(point_cloud, pillar_size=0.16):
     :return: pillar_dict: <dict> A dict containing the features for each pillar
     '''
 
+    '''
+    # OLD CODE 
     min_x = np.min(point_cloud[:, 0])
     max_x = np.max(point_cloud[:,0])
     min_y = np.min(point_cloud[:,1])
@@ -48,6 +50,10 @@ def create_pillars(point_cloud, pillar_size=0.16):
     while y <= max_y + pillar_size:  # creates list with the y-edge values of the grids
         y_edges.append(y)
         y = y + pillar_size
+    '''
+
+    x_edges = np.arange(-15, 15, pillar_size)
+    y_edges = np.arange(-15, 15, pillar_size)
 
     pillar_dict = {}
 

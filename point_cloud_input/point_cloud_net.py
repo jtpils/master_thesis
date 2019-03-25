@@ -79,12 +79,8 @@ class PFNLayer(torch.nn.Module):
     """
     Pillar Feature Net Layer (PFN) (The PFN could be composed of a series of these layers)
     Ïn the PointPillar paper a single layer of PFN is used.
-    For each point, a linear layer is applied followed by BatchNorm and ReLU. This generates a (C,P,N) sized tensor.
-    Then a max operator is applied over the channels to create an output tensor of size (C,P).
-    :param in_channels: <int>. Number of input channels.
-    :param out_channels: <int>. Number of output channels. (default 64)
-    :param use_norm: <bool>. Whether to include BatchNorm.
-    :param last_layer: <bool>. If last_layer, there is no concatenation of features.
+    For each point, a linear layer is applied followed by BatchNorm and ReLU. This generates a (C=8,P,N) sized tensor.
+    Then a max operator is applied over the channels to create an output tensor of size (C=8,P).
     """
 
     def __init__(self):
@@ -108,15 +104,12 @@ class PFNLayer(torch.nn.Module):
 
 class PointPillarsScatter(nn.Module):
     def __init__(self,
-                 output_shape,
-                 num_input_features=64):
+                 output_shape = [188,188]):
         """
         Point Pillar's Scatter.
-        Converts learned features from dense tensor to sparse pseudo image. This replaces SECOND's
-        second.pytorch.voxelnet.SparseMiddleExtractor.
-        :param output_shape: ([int]: 4). Required output shape of features. (Output shape [1,C,H,W]
+        Converts learned features from dense tensor to sparse pseudo image.
+        :param output_shape: <nd.array(int*4)> Required output shape of features. (Output shape [1,C,H,W]
         C = channels (64), H = height (y-values), W = width (x-values)
-        :param num_input_features: <int>. Number of input features. (default=64)
         """
 
         super(PointPillarsScatter).__init__()
@@ -124,16 +117,21 @@ class PointPillarsScatter(nn.Module):
         self.output_shape = output_shape
         self.height = output_shape[2]
         self.width = output_shape[3]
-        self.nchannels = num_input_features
+        self.num_channels = output_shape[1]
 
-    def forward(self, voxel_features, coords, batch_size):
+    def forward(self, PFN_output, pillar_tensor, batch_size):
 
         # batch_canvas will be the final output.
         batch_canvas = []
         for batch_itt in range(batch_size):
             # Create the canvas for this sample
-            canvas = torch.zeros(self.nchannels, self.nx * self.ny, dtype=voxel_features.dtype,
-                                 device=voxel_features.device)
+            canvas = torch.zeros(self.num_channels, self.height, self.width)#, dtype=voxel_features.dtype, device=voxel_features.device)
+
+            # Check pillar one in pillar tensor and save the 64 channels in pillar one in PFN output.
+            # i [:,0,0] ska alla värden för pillar one vara
+
+
+
 
             # Only include non-empty pillars
             batch_mask = coords[:, 0] == batch_itt
