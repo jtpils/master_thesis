@@ -81,7 +81,7 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
         start_time = time.time()
         total_train_loss = 0
 
-        CNN.train()
+        CNN = CNN.train()
         time_epoch = time.time()
         #t1_get_data = time.time()
         for i, data in enumerate(train_loader, 1):
@@ -114,7 +114,7 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
 
         # At the end of the epoch, do a pass on the validation set
         total_val_loss = 0
-        CNN.eval()
+        CNN = CNN.eval()
         val_time = time.time()
         with torch.no_grad():
             for i, data in val_loader:
