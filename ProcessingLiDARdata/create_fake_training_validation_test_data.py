@@ -16,9 +16,13 @@ path_to_lidar_data_training = '/home/master04/Desktop/Ply_files/_out_Town01_1903
 path_to_lidar_data_validation = '/home/master04/Desktop/Ply_files/validation_and_test/validation_set'
 path_to_lidar_data_test = '/home/master04/Desktop/Ply_files/validation_and_test/test_set'
 
+#path_to_lidar_data_training = '/Users/sabinalinderoth/Desktop/fake_test/training_set'
+#path_to_lidar_data_validation = '/Users/sabinalinderoth/Desktop/fake_test/validation_set'
+#path_to_lidar_data_test = '/Users/sabinalinderoth/Desktop/fake_test/test_set'
+
+
 path_to_lidar_data_list = [path_to_lidar_data_training, path_to_lidar_data_validation, path_to_lidar_data_test]
 
-number_of_files_to_load_list = [1400, 400, 200]
 
 k = 0
 for foldername in input_folder_name:

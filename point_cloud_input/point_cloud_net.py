@@ -90,6 +90,7 @@ class PFNLayer(torch.nn.Module):
     def __init__(self):
 
         super(PFNLayer, self).__init__()
+        self.name = "PFNLayer"
 
         # Linear Layer:  The linear layer can be formulated as a 1*1 convolution layer across the tensor
         self.conv1 = torch.nn.Conv2d(8, 64, kernel_size=1, stride=1, padding=0)
@@ -98,10 +99,61 @@ class PFNLayer(torch.nn.Module):
 
     def forward(self, inputs):
 
-        x = F.relu(self.conv1_bn(self.conv1(inputs)))
-        x_max = torch.max(x, dim=3, keepdim=True)[0]
+        x = F.relu(self.conv1_bn(self.conv1(inputs))) # shape (1,64,1200,100)
+        x_max = torch.max(x, dim=3, keepdim=True)[0]  # shape (1,64,1200,1)
+        x_max = torch.squeeze(x_max)  # shape (64,12000)
 
         return x_max
 
-    def name(self):
-        return "PFNLayer"
+
+class PointPillarsScatter(nn.Module):
+    def __init__(self,
+                 output_shape,
+                 num_input_features=64):
+        """
+        Point Pillar's Scatter.
+        Converts learned features from dense tensor to sparse pseudo image. This replaces SECOND's
+        second.pytorch.voxelnet.SparseMiddleExtractor.
+        :param output_shape: ([int]: 4). Required output shape of features. (Output shape [1,C,H,W]
+        C = channels (64), H = height (y-values), W = width (x-values)
+        :param num_input_features: <int>. Number of input features. (default=64)
+        """
+
+        super(PointPillarsScatter).__init__()
+        self.name = 'PointPillarsScatter'
+        self.output_shape = output_shape
+        self.height = output_shape[2]
+        self.width = output_shape[3]
+        self.nchannels = num_input_features
+
+    def forward(self, voxel_features, coords, batch_size):
+
+        # batch_canvas will be the final output.
+        batch_canvas = []
+        for batch_itt in range(batch_size):
+            # Create the canvas for this sample
+            canvas = torch.zeros(self.nchannels, self.nx * self.ny, dtype=voxel_features.dtype,
+                                 device=voxel_features.device)
+
+            # Only include non-empty pillars
+            batch_mask = coords[:, 0] == batch_itt
+            this_coords = coords[batch_mask, :]
+            indices = this_coords[:, 2] * self.nx + this_coords[:, 3]
+            indices = indices.type(torch.long)
+            voxels = voxel_features[batch_mask, :]
+            voxels = voxels.t()
+
+            # Now scatter the blob back to the canvas.
+            canvas[:, indices] = voxels
+
+            # Append to a list for later stacking.
+            batch_canvas.append(canvas)
+
+        # Stack to 3-dim tensor (batch-size, nchannels, nrows*ncols)
+        batch_canvas = torch.stack(batch_canvas, 0)
+
+        # Undo the column stacking to final 4-dim tensor
+        batch_canvas = batch_canvas.view(batch_size, self.nchannels, self.ny, self.nx)
+
+        return batch_canvas
+
