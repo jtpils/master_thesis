@@ -21,14 +21,13 @@ def create_loss_and_optimizer(net, learning_rate=0.001):
 
 
 # def train_network(net, train_loader, val_loader, n_epochs, learning_rate, patience, folder_path, device, use_cuda):
-def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batch_size):
+def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batch_size, load_weights, load_weights_path):
 
-    #path_training_data = '/home/annika_lundqvist144/Dataset/fake_training_set' #input('Path to training data set folder: ')
-    path_validation_data = '/home'  # /home/annika_lundqvist144/Dataset/fake_validation_set' #input('Path to validation data set folder: ')
-    path_validation_data = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/fake_validation_set'
+    path_training_data = '/home/annika_lundqvist144/Dataset/Low_resolution_001/fake_training_set' #input('Path to training data set folder: ')
+    path_validation_data = '/home/annika_lundqvist144/Dataset/Low_resolution_001/fake_validation_set'
     #path_training_data = '/home/master04/Desktop/Dataset/fake_training_data_low_Res'  # '/home/master04/Desktop/Dataset/fake_training_data_torch'#
-    path_training_data = '/home/annika_lundqvist144/Dataset/fake_training_data_low_Res'
-    path_training_data = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/fake_training_set'
+    #path_training_data = '/home/annika_lundqvist144/Dataset/fake_training_data_low_Res'
+    #path_training_data = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/fake_training_set'
 
     CNN = Duchess()
     print('=======> NETWORK NAME: =======> ', CNN.name())

@@ -17,15 +17,13 @@ except OSError:
 else:
     print('Successfully created new directory with subdirectory, at ', folder_path)
 
-
 batch_size = 1
-path_to_lidar_data = input('Type complete path to the folder that contains "pc"-folder with LiDAR data and a csv file, '
+path_to_lidar_data = input('Type complete path to the folder that contains grid-folders with LiDAR data and a csv file, '
                            'e.g. in the Ply_files/sorted_grid :')
 
 number_of_samples = int(input('Type number of samples to create:'))
 
 train_loader = get_train_loader(batch_size, path_to_lidar_data, number_of_samples, {})
-
 
 for i, data in tqdm(enumerate(train_loader, 1)):
     
