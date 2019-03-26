@@ -16,7 +16,7 @@ def get_loaders(path_training_data, path_validation_data, batch_size, use_cuda):
     kwargs = {'pin_memory': True} if use_cuda else {}
     workers_train = 16
     workers_val = 4
-    print('Number of workers: ', workers)
+    print('Number of workers: ', workers_train)
 
     # Training
     n_training_samples = len(training_data_set)
