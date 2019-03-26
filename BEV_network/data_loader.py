@@ -14,7 +14,7 @@ def get_loaders(path_training_data, path_validation_data, batch_size, use_cuda):
     validation_data_set = LiDARDataSet(csv_file, sample_dir, use_cuda)
 
     kwargs = {'pin_memory': True} if use_cuda else {}
-    workers = 16
+    workers = 8
     print('Number of workers: ', workers)
 
     # Training
