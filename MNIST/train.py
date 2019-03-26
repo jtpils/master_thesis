@@ -12,7 +12,7 @@ import time
 
 ## load mnist dataset
 use_cuda = torch.cuda.is_available()
-use_cuda = False
+#use_cuda = False
 
 root = './data'
 if not os.path.exists(root):
