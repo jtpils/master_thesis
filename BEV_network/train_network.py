@@ -25,11 +25,10 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
 
     path_training_data = '/home/annika_lundqvist144/Dataset/Low_resolution_001/fake_training_set' #input('Path to training data set folder: ')
     path_validation_data = '/home/annika_lundqvist144/Dataset/Low_resolution_001/fake_validation_set'
-    #path_training_data = '/home/master04/Desktop/Dataset/fake_training_data_low_Res'  # '/home/master04/Desktop/Dataset/fake_training_data_torch'#
-    #path_training_data = '/home/annika_lundqvist144/Dataset/fake_training_data_low_Res'
-    #path_training_data = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/fake_training_set'
+    path_training_data = '/home/master04/Desktop/Dataset/Low_resolution_001/fake_training_set'  # '/home/master04/Desktop/Dataset/fake_training_data_torch'#
+    path_validation_data = '/home/master04/Desktop/Dataset/Low_resolution_001/fake_validation_set'
 
-    CNN = Knutte()
+    CNN = Duchess()
     print('=======> NETWORK NAME: =======> ', CNN.name())
     if use_cuda:
         CNN.cuda()
@@ -94,8 +93,9 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
                 sample, labels = sample.cuda(async=True), labels.cuda(async=True)
             sample, labels = Variable(sample), Variable(labels)
             t2_get_data = time.time()
-            #print('get data: ', t2_get_data-t1_get_data)
+            print('get data: ', t2_get_data-t1_get_data)
 
+            t1 = time.time()
             # Set the parameter gradients to zero
             optimizer.zero_grad()
             # Forward pass, backward pass, optimize
@@ -103,6 +103,9 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
             loss_size = loss(outputs, labels.float())
             loss_size.backward()
             optimizer.step()
+            t2 = time.time()
+            print('update weights: ', t2-t1)
+
 
             # Print statistics
             running_loss += loss_size.item()
