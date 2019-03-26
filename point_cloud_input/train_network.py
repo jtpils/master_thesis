@@ -103,9 +103,9 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
             # Set the parameter gradients to zero
             optimizer.zero_grad()
             # Forward pass, backward pass, optimize
-
+            print('here we go')
             outputs = net.forward(sweep.float(), map.float(), scatter)
-
+            print('done')
             loss_size = loss(outputs, labels.float())
             loss_size.backward()
             optimizer.step()
