@@ -69,7 +69,6 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
     # Time for printing
     training_start_time = time.time()
 
-
     # Loop for n_epochs
     for epoch in range(n_epochs):
         scheduler.step()
@@ -104,8 +103,7 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
             loss_size.backward()
             optimizer.step()
             t2 = time.time()
-            print('update weights: ', t2-t1)
-
+            #print('update weights: ', t2-t1)
 
             # Print statistics
             running_loss += loss_size.item()
@@ -120,6 +118,7 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
             del data, sample, labels, outputs, loss_size
             t1_get_data = time.time()
 
+        print('===== Validation =====')
         # At the end of the epoch, do a pass on the validation set
         total_val_loss = 0
         CNN = CNN.eval()
