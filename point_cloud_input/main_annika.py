@@ -6,9 +6,18 @@ import pandas as pd
 import time
 import matplotlib.pyplot as plt
 from tqdm import tqdm
+import pickle
+from train_network import *
 
 path_data_set = '/home/master04/Desktop/Dataset/point_cloud/pc_small_set'
+#file = open(path_data_set + '/training_sample_1', 'rb')
+#training_sample = pickle.load(file)
 
+#sweep = training_sample['sweep']
+
+train_loader = get_train_loader_pc(1, path_data_set, 2, {})
+
+train_loss, val_loss = train_network(1, 0.001, 1, folder_path, False, batch_size)
 
 '''
 print('discretizing sweep: ')

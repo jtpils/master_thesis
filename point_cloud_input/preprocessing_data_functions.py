@@ -52,6 +52,7 @@ def create_pillars(point_cloud, pillar_size=0.16):
         y = y + pillar_size
     '''
 
+    # TODO: should the range be -22,22 instead so that the map fits as well?
     x_edges = np.arange(-15, 15, pillar_size)
     y_edges = np.arange(-15, 15, pillar_size)
 

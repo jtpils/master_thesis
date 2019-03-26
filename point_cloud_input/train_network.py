@@ -24,15 +24,17 @@ def create_loss_and_optimizer(net, learning_rate=0.001):
 
 # def train_network(net, train_loader, val_loader, n_epochs, learning_rate, patience, folder_path, device, use_cuda):
 def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batch_size):
+    data_set_path = '/home/master04/Desktop/Dataset/point_cloud/pc_small_set'
+    #data_set_path = '/Users/sabinalinderoth/Documents/master_thesis/point_cloud_input/data_set_190321'
+    number_of_samples = 2 #int(input('Type number of samples: '))
 
-    data_set_path = '/Users/sabinalinderoth/Documents/master_thesis/point_cloud_input/data_set_190321'
-    number_of_samples = int(input('Type number of samples: '))
 
-    CNN = PFNLayer()
-    print('=======> NETWORK NAME: =======> ', CNN.name())
+    scatter = PointPillarsScatter(batch_size)
+    net = PointPillars(batch_size)
+    #print('=======> NETWORK NAME: =======> ', net.name())
     if use_cuda:
-        CNN.cuda()
-    print('Are model parameters on CUDA? ', next(CNN.parameters()).is_cuda)
+        net.cuda()
+    #print('Are model parameters on CUDA? ', next(net.parameters()).is_cuda)
     print(' ')
 
     train_loader = get_train_loader_pc(batch_size, data_set_path, number_of_samples, {})
@@ -41,7 +43,7 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
     if load_weights:
         print('Loading parameters...')
         network_param = torch.load(load_weights_path)
-        CNN.load_state_dict(network_param['model_state_dict'])'''
+        net.load_state_dict(network_param['model_state_dict'])'''
 
     # Print all of the hyperparameters of the training iteration:
     print("===== HYPERPARAMETERS =====")
@@ -63,7 +65,7 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
     # print('Number of batches: ', n_batches)
 
     # Create our loss and optimizer functions
-    loss, optimizer = create_loss_and_optimizer(CNN, learning_rate)
+    loss, optimizer = create_loss_and_optimizer(net, learning_rate)
     scheduler = StepLR(optimizer, step_size=100, gamma=0.5)
 
     # Time for printing
@@ -82,7 +84,7 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
         start_time = time.time()
         total_train_loss = 0
 
-        CNN.train()
+        net = net.train()
         time_epoch = time.time()
         t1_get_data = time.time()
         for i, data in enumerate(train_loader, 1):
@@ -101,7 +103,9 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
             # Set the parameter gradients to zero
             optimizer.zero_grad()
             # Forward pass, backward pass, optimize
-            outputs = CNN.forward(sweep.float())
+
+            outputs = net.forward(sweep.float(), map.float(), scatter)
+
             loss_size = loss(outputs, labels.float())
             loss_size.backward()
             optimizer.step()
@@ -124,7 +128,7 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
         # At the end of the epoch, do a pass on the validation set
         '''
         total_val_loss = 0
-        CNN.eval()
+        net = net.eval()
         with torch.no_grad():
             for data in val_loader:
                 sample = data['sample']
@@ -138,7 +142,7 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
                 sample, labels = Variable(sample), Variable(labels)
 
                 # Forward pass
-                val_outputs = CNN.forward(sample)
+                val_outputs = net.forward(sample)
 
                 val_loss_size = loss(val_outputs, labels.float())
                 total_val_loss += val_loss_size.item()
@@ -154,7 +158,7 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
         val_loss.append(total_val_loss / len(val_loader))
 
         # see if validation loss has decreased, if it has a checkpoint will be saved of the current model.
-        early_stopping(epoch, total_train_loss, total_val_loss, CNN, optimizer)
+        early_stopping(epoch, total_train_loss, total_val_loss, net, optimizer)
 
         # If the validation has not improved in patience # of epochs the training loop will break.
         if early_stopping.early_stop:
