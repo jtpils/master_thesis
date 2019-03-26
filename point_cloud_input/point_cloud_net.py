@@ -8,6 +8,38 @@ import numpy as np
 import torch.nn.functional as F
 from preprocessing_data_functions import get_grid
 
+def PointPillarsScatter(PFN_input, PFN_output, batch_size):
+    '''
+    :param PFN_input: <tensor> size: [number_of_batches, 8, max_number_of_pillars, max_number_of_points]. The feature
+            tensor that used as an input to the PFN layer. This is used to find the original location of the pillars
+    :param PFN_output: <tensor> size: [number_of_batches, 64, max_number_of_pillars]. The output from the PFN layer.
+            Containing the pillars that should be scattered back.
+    :param batch_size: <int> size of the batch
+    :return: batch_canvas: <list> lsit of canvas from each batch.
+    '''
+
+    num_channels = 64
+    height = 282
+    width = 282
+    pillar_size = 0.16
+    x_edges = np.arange(-22, 22, pillar_size)
+    y_edges = np.arange(-22, 22, pillar_size)
+
+    batch_canvas = []
+    for batch in np.arange(batch_size):
+
+        pillar_list = np.nonzero(PFN_input[batch, 0, :, 0])
+        for pillar in pillar_list:
+            canvas = torch.zeros((num_channels, height, width))
+            x, y = PFN_input[batch, 0, pillar, 0], PFN_input[batch, 1, pillar, 0]
+            xgrid, ygrid = get_grid(x, y, x_edges, y_edges)
+            pillar_vector = PFN_output[batch, :, pillar]
+            pillar_vector = torch.squeeze(pillar_vector)
+            canvas[:, ygrid, xgrid] = pillar_vector
+        batch_canvas.append(canvas)
+
+    return batch_canvas
+
 
 class PFNLayer(torch.nn.Module):
     """
@@ -34,7 +66,7 @@ class PFNLayer(torch.nn.Module):
         x = x.view(np.shape(x)[:3])
         return x
 
-
+'''
 class PointPillarsScatter(nn.Module):
     def __init__(self, batch_size, output_shape = [64,188,188]):
         """
@@ -72,7 +104,7 @@ class PointPillarsScatter(nn.Module):
         # TODO: should we use torch.stack() to get some useful dimensions
 
         return batch_canvas
-
+'''
 
 class Backbone(nn.Module):
     def __init__(self):
@@ -104,16 +136,32 @@ class PointPillars(torch.nn.Module):
         #self.PointPillarsScatter = PointPillarsScatter(self.batch_size)
         self.Backbone = Backbone()
 
-    def forward(self, sweep, map, PointPillarsScatter):
+    #def forward(self, sweep, map, PointPillarsScatter):
+    def forward(self, sweep, map):
 
         sweep_outputs = self.PFNlayer_sweep.forward(sweep)
         map_outputs = self.PFNlayer_map.forward(map)
 
-        sweep_canvas = PointPillarsScatter.forward(sweep, sweep_outputs)
-        map_canvas = PointPillarsScatter.forward(map, map_outputs)
+        # sweep_canvas = PointPillarsScatter.forward(sweep, sweep_outputs)
+        # map_canvas = PointPillarsScatter.forward(map, map_outputs)
+
+        sweep_canvas = PointPillarsScatter(sweep, sweep_outputs, self.batch_size)
+        map_canvas = PointPillarsScatter(map, map_outputs, self.batch_size)
+
+        zipped_canvas = list(zip(sweep_canvas,map_canvas))
+
+        concatenated_canvas = torch.zeros(self.batch_size, 128, 282, 282)
+
+        for i in np.arange(self.batch_size):
+            print(i)
+            sweep_layers = zipped_canvas[i][0]
+            map_layers = zipped_canvas[i][1]
+            concatenated_layers = torch.cat((sweep_layers , map_layers ), 0)
+
+            concatenated_canvas[i, :, :, :] = concatenated_layers
 
         # concatenate the canvases, one sample should be a sweep+map
-        samples = 1  #concatenate...
+        samples = concatenated_canvas  #concatenate... [batchsize, 64*2, 288, 288] type toch.Tensor
 
         output = self.Backbone.forward(samples)
 
