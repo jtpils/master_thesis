@@ -140,7 +140,7 @@ class PointCloudDataSet(Dataset):
         initial_guess = np.array((ply_coordinates[1]+self.labels[idx][0], -(ply_coordinates[2]+self.labels[idx][1]), 0))
         # translate all the points in the super_array such that the initial guess becomes the origin
         pc_super_array = pc_super_array - initial_guess
-        map_cutout = trim_pointcloud(pc_super_array, range=22)
+        map_cutout = trim_pointcloud(pc_super_array)
 
         del pc_super_array, initial_guess, pc
 
@@ -153,12 +153,12 @@ class PointCloudDataSet(Dataset):
             zeros = np.zeros((3000-len(sweep), 3))
             sweep = np.concatenate((sweep, zeros), 0)
 
-        if len(map_cutout) > 300000:
-            selection_rule = np.random.choice(np.arange(len(map_cutout)), 300000)
+        if len(map_cutout) > 30000:
+            selection_rule = np.random.choice(np.arange(len(map_cutout)), 30000)
             map_cutout = map_cutout[selection_rule, :]
         else:
             #np.pad(map_cutout, (300000-len(sweep), 0), 'constant', constant_values=(0,0))
-            zeros = np.zeros((300000-len(map_cutout), 3))
+            zeros = np.zeros((30000-len(map_cutout), 3))
             map_cutout = np.concatenate((map_cutout, zeros), 0)
 
         training_sample = {'sweep': sweep, 'map': map_cutout, 'labels': self.labels[idx]}

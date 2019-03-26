@@ -47,13 +47,14 @@ class PointPillarsScatter(nn.Module):
         #self.name = 'PointPillarsScatter'
         self.batch_size = batch_size
         self.num_channels = output_shape[0]
-        self.height = output_shape[1]
-        self.width = output_shape[2]
+        self.height = 282  #output_shape[1]
+        self.width = 282  #output_shape[2]
 
     def forward(self, PFN_input, PFN_output):
+        pillar_size = 0.16
 
-        x_edges = np.arange(-15, 15, 0.16)
-        y_edges = np.arange(-15, 15, 0.16)
+        x_edges = np.arange(-22, 22, pillar_size)
+        y_edges = np.arange(-22, 22, pillar_size)
 
         batch_canvas = []
         for batch in np.arange(self.batch_size):
