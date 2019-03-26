@@ -212,7 +212,7 @@ class SmallDuchess(torch.nn.Module):
         self.dropout_2d = torch.nn.Dropout2d(p=0.2)
         self.conv3 = torch.nn.Conv2d(32, 64, kernel_size=3, stride=1, padding=1)
         self.conv4 = torch.nn.Conv2d(64, 64, kernel_size=3, stride=1, padding=1)
-        self.conv5 = torch.nn.Conv2d(64, 64, kernel_size=3, stride=1, padding=1))
+        self.conv5 = torch.nn.Conv2d(64, 64, kernel_size=3, stride=1, padding=1)
         self.conv6 = torch.nn.Conv2d(64, 64, kernel_size=3, stride=1, padding=1)
         self.conv7 = torch.nn.Conv2d(64, 64, kernel_size=3, stride=1, padding=1)
         self.conv8 = torch.nn.Conv2d(64, 32, kernel_size=3, stride=1, padding=1)
