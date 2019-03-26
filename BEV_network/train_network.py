@@ -103,7 +103,7 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
             loss_size.backward()
             optimizer.step()
             t2 = time.time()
-            #print('update weights: ', t2-t1)
+            print('update weights: ', t2-t1)
 
             # Print statistics
             running_loss += loss_size.item()
