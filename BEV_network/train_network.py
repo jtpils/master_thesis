@@ -92,7 +92,7 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
                 sample, labels = sample.cuda(async=True), labels.cuda(async=True)
             sample, labels = Variable(sample), Variable(labels)
             t2_get_data = time.time()
-            #print('get data: ', t2_get_data-t1_get_data)
+            print('get data: ', t2_get_data-t1_get_data)
 
             t1 = time.time()
             # Set the parameter gradients to zero

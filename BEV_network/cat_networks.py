@@ -265,3 +265,21 @@ class SmallDuchess(torch.nn.Module):
     def name(self):
         return "SmallDuchess"
 
+
+class SuperSilly(torch.nn.Module):
+    def __init__(self):
+        super(SuperSilly, self).__init__()
+
+        self.fc = torch.nn.Linear(4*4*4, 3)
+        self.pool = torch.nn.MaxPool2d(kernel_size=50, stride=50, padding=0)
+
+    def forward(self, x):
+
+        x = self.pool(x)  # 4,4,4
+        x = x.view(-1, 4*4*4)
+        x = self.fc(x)
+
+        return x
+
+    def name(self):
+        return "SuperSilly"
