@@ -23,13 +23,12 @@ def create_loss_and_optimizer(net, learning_rate=0.001):
 # def train_network(net, train_loader, val_loader, n_epochs, learning_rate, patience, folder_path, device, use_cuda):
 def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batch_size, load_weights, load_weights_path):
 
-    path_training_data = '/home/annika_lundqvist144/Dataset/Low_resolution_001/fake_training_set' #input('Path to training data set folder: ')
-    path_validation_data = '/home/annika_lundqvist144/Dataset/Low_resolution_001/fake_validation_set'
-    #path_training_data = '/home/master04/Desktop/Dataset/fake_training_data_low_Res'  # '/home/master04/Desktop/Dataset/fake_training_data_torch'#
-    #path_training_data = '/home/annika_lundqvist144/Dataset/fake_training_data_low_Res'
-    #path_training_data = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/fake_training_set'
+    path_training_data = '/home/annika_lundqvist144/Low_resolution_001/fake_training_set' #input('Path to training data set folder: ')
+    path_validation_data = '/home/annika_lundqvist144/Low_resolution_001/fake_validation_set'
+    #path_training_data = '/home/master04/Desktop/Dataset/Low_resolution_001/fake_training_set'  # '/home/master04/Desktop/Dataset/fake_training_data_torch'#
+    #path_validation_data = '/home/master04/Desktop/Dataset/Low_resolution_001/fake_validation_set'
 
-    CNN = Knutte()
+    CNN = Duchess()
     print('=======> NETWORK NAME: =======> ', CNN.name())
     if use_cuda:
         CNN.cuda()
@@ -70,7 +69,6 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
     # Time for printing
     training_start_time = time.time()
 
-
     # Loop for n_epochs
     for epoch in range(n_epochs):
         scheduler.step()
@@ -96,6 +94,7 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
             t2_get_data = time.time()
             #print('get data: ', t2_get_data-t1_get_data)
 
+            t1 = time.time()
             # Set the parameter gradients to zero
             optimizer.zero_grad()
             # Forward pass, backward pass, optimize
@@ -103,6 +102,8 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
             loss_size = loss(outputs, labels.float())
             loss_size.backward()
             optimizer.step()
+            t2 = time.time()
+            #print('update weights: ', t2-t1)
 
             # Print statistics
             running_loss += loss_size.item()
@@ -117,6 +118,7 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
             del data, sample, labels, outputs, loss_size
             t1_get_data = time.time()
 
+        print('===== Validation =====')
         # At the end of the epoch, do a pass on the validation set
         total_val_loss = 0
         CNN = CNN.eval()

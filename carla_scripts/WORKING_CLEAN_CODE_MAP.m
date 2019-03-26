@@ -2,8 +2,13 @@
 
 clear all;clc
 % CHANGE PATH HERE
+
 pc_path = '/Users/sabinalinderoth/Desktop/Town01_190308/pc/';
 csv_path = '/Users/sabinalinderoth/Desktop/Town01_190308/Town01_190308.csv';
+
+# pc_path = '/home/master04/Desktop/Ply_files/validation_and_test/test_set/pc/';
+# csv_path = '/home/master04/Desktop/Ply_files/validation_and_test/test_set/test_set.csv';
+
 global_coordinates = importdata(csv_path);
 
 files = dir(strcat(pc_path,'/*.ply'));
