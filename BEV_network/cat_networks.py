@@ -195,4 +195,73 @@ class Knutte(torch.nn.Module):
 
     def name(self):
         return "Knutte"
+        
+        
+class SmallDuchess(torch.nn.Module):
+    def __init__(self):
+        super(SmallDuchess, self).__init__()
+        # Our batch shape for input x is (batch_size, 4, 200, 200)
+
+        # ENCODER
+        self.conv1 = torch.nn.Conv2d(4, 32, kernel_size=3, stride=1, padding=1)
+        self.conv2 = torch.nn.Conv2d(32, 32, kernel_size=3, stride=1, padding=1)
+
+        self.pool = torch.nn.MaxPool2d(kernel_size=2, stride=2, padding=0)
+
+        # CONTEXT
+        self.dropout_2d = torch.nn.Dropout2d(p=0.2)
+        self.conv3 = torch.nn.Conv2d(32, 64, kernel_size=3, stride=1, padding=1)
+        self.conv4 = torch.nn.Conv2d(64, 64, kernel_size=3, stride=1, padding=1)
+        self.conv5 = torch.nn.Conv2d(64, 64, kernel_size=3, stride=1, padding=1))
+        self.conv6 = torch.nn.Conv2d(64, 64, kernel_size=3, stride=1, padding=1)
+        self.conv7 = torch.nn.Conv2d(64, 64, kernel_size=3, stride=1, padding=1)
+        self.conv8 = torch.nn.Conv2d(64, 32, kernel_size=3, stride=1, padding=1)
+        self.conv9 = torch.nn.Conv2d(32, 16, kernel_size=3, stride=1, padding=1)
+        self.conv10 = torch.nn.Conv2d(16, 8, kernel_size=3, stride=1, padding=1)
+
+        # FC
+        self.dropout_1d = torch.nn.Dropout2d(p=0.2)
+        self.fc1 = torch.nn.Linear(8*50*50, 64)
+        self.fc2 = torch.nn.Linear(64,16)
+        self.fc_out = torch.nn.Linear(16, 3)
+
+    def forward(self, x):
+        # ENCODER
+        x = F.relu(self.conv1(x))  # 32,200,200
+        x = F.relu(self.conv2(x))  # 32,200,200
+        x = self.pool(x)  # 32,100,100
+
+        # CONTEXT
+        x = F.relu(self.conv3(x))  # 64,100,100
+        x = self.dropout_2d(x)
+        x = F.relu(self.conv4(x))
+        x = self.dropout_2d(x)
+        x = F.relu(self.conv5(x))
+        x = self.dropout_2d(x)
+        x = F.relu(self.conv6(x))
+        x = self.dropout_2d(x)
+        x = F.relu(self.conv7(x))
+        x = self.dropout_2d(x)
+
+        x = self.pool(x)  # 64,50,50
+
+        x = F.relu(self.conv8(x))  # 32,50,50
+        x = self.dropout_2d(x)
+        x = F.relu(self.conv9(x))  # 16,50,50
+        x = self.dropout_2d(x)
+        x = F.relu(self.conv10(x))  # 8,50,50
+
+
+        # FC
+        x = x.view(-1, 8*50*50)
+        x = torch.tanh(self.fc1(x))
+        x = self.dropout_1d(x)
+
+        x = torch.tanh(self.fc2(x))
+        x = self.fc_out(x)
+
+        return x
+
+    def name(self):
+        return "SmallDuchess"
 
