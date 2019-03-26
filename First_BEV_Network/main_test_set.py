@@ -1,8 +1,7 @@
 from data_loader import *
 from train_network import *
-from super_simple_cnn import SuperSimpleCNN
+from networks_classes.super_simple_cnn import SuperSimpleCNN
 import matplotlib.pyplot as plt
-import os
 import torch
 
 

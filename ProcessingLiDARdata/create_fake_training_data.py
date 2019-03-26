@@ -3,6 +3,7 @@ import csv
 import random
 import os
 
+
 ###############################################################################
 # CREATE FAKE TRAINING SAMPLES (of one single sweep) WITHOUT A NEED FOR A MAP #
 ###############################################################################
@@ -31,7 +32,8 @@ for file in dir_list:
     if '.csv' in file:  # find csv-file
         path_to_csv = os.path.join(path_to_lidar_data, file)
 
-
+grid_size = float(input('Spatial resolution (eg 0.05): '))
+image_size = int(30/grid_size)
 translation = float(input('Translation in meters:'))
 rotation = float(input('Rotation in degrees:'))
 number_of_files_to_load = int(input('How many training samples do you want to create:'))
@@ -76,37 +78,35 @@ for file_name in ply_files[:number_of_files_to_load]:
     sweep = training_sample_rotation_translation(pc, rand_trans)
     sweep = trim_pointcloud(sweep)
     # discretize and pad sweep
-    sweep_image = discretize_pointcloud(sweep, array_size=600, trim_range=15, spatial_resolution=0.05, padding=True, pad_size=150)
+    map_size = int(image_size*1.5)
+    padding = int((map_size - image_size)/2)
+    sweep_image = discretize_pointcloud(sweep, array_size=image_size, trim_range=15, spatial_resolution=grid_size, padding=True, pad_size=padding)
 
     # fake a map cutout
-
-    '''print('creating sweep...')
-    rand_trans = random_rigid_transformation(1, 10)
-    sweep = training_sample_rotation_translation(pc, rand_trans)
-    sweep = trim_pointcloud(sweep)
-    sweep_image = discretize_pointcloud(sweep)
-
-    # padd the sweep with zeros to get a 900x900 grid.
-
-    np.pad(sweep_image, ((150, 150), (150, 150)), 'constant')
-
-
-    path = path_sweeps + '/' + str(i)
-    np.save(path, sweep_image)
-
-    # fake a map cutout
-    print('creating cutout...')'''
     cutout = trim_pointcloud(pc, range=1.5*15)
-    cutout_image = discretize_pointcloud(cutout, array_size=600*1.5, trim_range=1.5*15, padding=False)
+    cutout_image = discretize_pointcloud(cutout, array_size=int(image_size*1.5), trim_range=1.5*15, padding=False)
 
     # concatenate the sweep and the cutout image into one image and save.
     sweep_and_cutout_image = np.concatenate((sweep_image, cutout_image))
+
+    #visualize_detections(sweep_and_cutout_image, layer=0, fig_num=1)
+    #visualize_detections(sweep_and_cutout_image, layer=4, fig_num=2)
+    #plt.show()
+
     sweep_and_cutout_image = normalize_sample(sweep_and_cutout_image)
     path = path_samples + '/' + str(i)
     np.save(path, sweep_and_cutout_image)
+
+    #import torch
+    #sweep_and_cutout_image = torch.from_numpy(sweep_and_cutout_image)
+    #path = path + '.pt'
+    #torch.save(sweep_and_cutout_image, path)
+
 
     # write frame_number in column 1, and the transformation in the next columns
     with open(csv_labels_path , mode ='a') as csv_file:
         csv_writer = csv.writer(csv_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
         csv_writer.writerow([i, rand_trans[0], rand_trans[1], rand_trans[2]])
 
+
+print('Done.')

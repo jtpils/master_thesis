@@ -117,7 +117,7 @@ for file_name in ply_files[:number_of_files_to_load]:
 
 
 
-    visualize_detections()
+    #visualize_detections()
     '''# Uncomment for visualisation of the sweep and cut_out
     layer = 2
     max_value = np.max(sweep[layer, :, :])

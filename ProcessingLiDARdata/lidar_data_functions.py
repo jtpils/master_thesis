@@ -5,28 +5,29 @@ import sys
 import pandas as pd
 import math
 from matplotlib import pyplot as plt
+from tqdm import tqdm
 
 
 def load_data(path_to_ply, path_to_csv):
     '''
-    Load the data from a .ply-file, toghether with the global coordinates for this fram from a csv-file.
+    Load the data from a .ply-file, toghether with the global coordinates for this from from a csv-file.
     :param
         path_to_ply: string with path to .ply-file
-        path_to_csv: string with path to csv-file
+        path_to_csv: string with path to .csv-file
     :return:
-        pointcloud: nd-array with xyz-coordinates for all detections in the .ply-file. Shape (N,3).
+        pointcloud: ndarray with xyz-coordinates for all detections in the .ply-file. Detections are relative to LiDAR position.
         global_lidar_coordinates: global xyz-coordinates and yaw in degrees for LiDAR position, [x y z yaw]
     '''
 
     # load pointcloud
     point_cloud = pd.read_csv(path_to_ply, delimiter=' ', skiprows=7, header=None, names=('x','y','z'))
     point_cloud = point_cloud.values
-    point_cloud[:, -1] = - point_cloud[:, -1]  # z = -z
+    point_cloud[:, -1] = - point_cloud[:, -1]  # z = -z, get the correct coordinate system
 
     # check if ply file is empty. Stop execution if it is.
     if np.shape(point_cloud)[0] == 0:
         print("ply file with point cloud is empty")
-        sys.exit()
+        #sys.exit()
 
     # extract frame_number from filename
     file_name = path_to_ply.split('/')[-1]  # keep the last part of the path, i.e. the file name
@@ -38,14 +39,14 @@ def load_data(path_to_ply, path_to_csv):
 
     # extract information from csv at given frame_number
     row = np.where(global_coordinates == frame_number)[0]  # returns which row the frame number is located on
-    global_lidar_coordinates = global_coordinates[row, 1:5]
+    global_lidar_coordinates = global_coordinates[row, 1:5]  # save that row, columns [x y z yaw]
 
     # Fix yaw angle:
     if global_lidar_coordinates[0][3] < 0:
-        global_lidar_coordinates[0][3] = global_lidar_coordinates[0][3] + 360  # change to interval [0,360]
-    global_lidar_coordinates[0][3] = global_lidar_coordinates[0][3] + 90  # add 90
+        global_lidar_coordinates[0][3] = global_lidar_coordinates[0][3] + 360  # change angles to interval [0,360]
+    global_lidar_coordinates[0][3] = global_lidar_coordinates[0][3] + 90  # add 90 to get the correct coordinate system
 
-    global_lidar_coordinates[0][1] = -global_lidar_coordinates[0][1]  # y = -y
+    global_lidar_coordinates[0][1] = -global_lidar_coordinates[0][1]  # y = -y, get the correct coordinate system
 
     return point_cloud, global_lidar_coordinates
 
@@ -64,7 +65,7 @@ def rotate_pointcloud_to_global(pointcloud, global_coordinates):
     rotated_pointcloud = Rz @ np.transpose(pointcloud)  # rotate each vector with coordinates, transpose to get dimensions correctly
     rotated_pointcloud = np.transpose(rotated_pointcloud)
 
-    rotated_pointcloud[:, 1] = -rotated_pointcloud[:,1]  # y = -y
+    rotated_pointcloud[:, 1] = -rotated_pointcloud[:,1]  # y = -y, get the correct coordinate system
 
     return rotated_pointcloud
 
@@ -150,7 +151,7 @@ def discretize_pointcloud(trimmed_point_cloud, array_size=600, trim_range=15, sp
         # sort the point cloud by x in increasing order
         x_sorted_point_cloud = np.asarray(sorted(trimmed_point_cloud, key=lambda row: row[0]))
 
-        for x_cell in range(array_size):
+        for x_cell in tqdm(range(array_size)):
 
             # get the x-values in the spatial resolution interval
             lower_bound = spatial_resolution * x_cell - trim_range
@@ -522,16 +523,17 @@ def get_cut_out(discretized_point_cloud_map, global_coordinate, max_min_values_m
     return cut_out
 
 
-def visualize_detections(discretized_point_cloud, fig_num=1):
+def visualize_detections(discretized_point_cloud, layer=0, fig_num=1):
     '''
     takes as input a discretized point cloud (all channels) and visualizes the detections in channel 0. Every cell with
     at least one detection is assigned the value 255. When showing the image, all detections will appear as white pixels.
     Call plt.show() after this function! Can plot multiple figures.
     :param discretized_point_cloud: pointcloud with 4 channels
+           layer = the layer we want to see. Often 0 or 4
            fig_num: figure number
     :return:
     '''
-    detection_layer = discretized_point_cloud[0, :, :]
+    detection_layer = discretized_point_cloud[layer, :, :]
     detection_layer[detection_layer > 0] = 255
 
     plt.figure(fig_num)

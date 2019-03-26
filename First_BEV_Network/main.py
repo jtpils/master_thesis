@@ -1,11 +1,8 @@
 from data_loader import *
 from train_network import *
-from super_simple_cnn import SuperSimpleCNN
-from simple_nets_iteration3 import *
 import matplotlib.pyplot as plt
-import os
-import torch
-from loaders_only_sweeps import *
+#from loaders_only_sweeps import *
+#from new_networks import *
 
 
 # training folder:
@@ -16,50 +13,89 @@ from loaders_only_sweeps import *
 
 # load old weights! change here manually
 load_weights = False
-load_weights_path = '/home/master04/Desktop/networks_plots_190305/test_multiple_networks_6/parameters_net2/epoch_9_checkpoint.pt'
+load_weights_path = '/home/annika_lundqvist144/master_thesis/First_BEV_Network/param/parameters/epoch_7_checkpoint.pt'
 
 model_name = input('Type name of new folder: ')
-n_epochs = int(input('Number of epochs: '))
-learning_rate = float(input('Learning rate: '))
-patience = int(input('Input patience for EarlyStopping: ')) # Threshold for early stopping. Number of epochs that we will wait until brake
+n_epochs = 5  #int(input('Number of epochs: '))
+learning_rate = 0.001 #float(input('Learning rate: '))
+patience = n_epochs  #int(input('Input patience for EarlyStopping: ')) # Threshold for early stopping. Number of epochs that we will wait until brake
 
-path_training_data = input('Path to training data set folder: ')
-path_validation_data = input('Path to validation data set folder: ')
+# /Users/sabinalinderoth/Desktop/fake_test
 
-batch_size = 4  # int(input('Input batch size: '))
-plot_flag = input('Plot results? y / n: ')
+#path_training_data = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/fake_training_set' #
+#path_validation_data = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/fake_validation_set' #
+#path_test_data = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/fake_test_set' #
+
+
+
+#path_training_data = '/home/annika_lundqvist144/Dataset/fake_training_set' #input('Path to training data set folder: ')
+#path_validation_data = '/home/annika_lundqvist144/Dataset/fake_validation_set' #input('Path to validation data set folder: ')
+#path_test_data = '/home/annika_lundqvist144/Dataset/fake_test_set' #input('Path to test data set folder: ')
+
+#path_training_data = ''
+#path_validation_data = 'test'
+#path_test_data = 'test' #
+
+batch_size = 4  #int(input('Input batch size: '))
+
+plot_flag = 'n' #input('Plot results? y / n: ')
+
 
 print(' ')
 print('Number of GPUs available: ', torch.cuda.device_count())
 use_cuda = torch.cuda.is_available()
+
+##########
+#use_cuda = False
+#device = "cpu"
+##########
+
+
+#if use_cuda:
+#    id = torch.cuda.current_device()
+#    print('Device id: ', id)
 print('CUDA available: ', use_cuda)
-device = torch.device("cuda" if use_cuda else "cpu")
-print('Device: ', device)
+device = torch.device("cuda:0" if use_cuda else "cpu")
+#print('Device: ', device)
 
 
-CNN = SimpleNet3_single_channel().to(device)
+
+'''
+if use_cuda:
+    id = torch.cuda.current_device()
+    print('device id', id)
+    mem = torch.cuda.device(id)
+    print('memory adress', mem)
+    print('device name', torch.cuda.get_device_name(id))
+    print('setting device...')
+    torch.cuda.set_device(id)'''
+
+
+
+#CNN = Network_March2().to(device)
+#CNN = MyBestNetwork().to(device)
+
+#CNN = LookAtThisNet_downsampled()
+'''CNN = LookAtThisNet()
+
+print('=======> NETWORK NAME: =======> ', CNN.name())
+
+if use_cuda:
+    CNN.cuda()
+
 print('Are model parameters on CUDA? ', next(CNN.parameters()).is_cuda)
 print(' ')
 
-# pytorch_total_params = sum(p.numel() for p in CNN.parameters() if p.requires_grad)
-# print(pytorch_total_params)
 
+
+kwargs = {'pin_memory': True} if use_cuda else {}
+train_loader, val_loader = get_loaders(path_training_data, path_validation_data, path_test_data, batch_size, use_cuda, kwargs)'''
 
 # Load weights
-if load_weights:
-    network_param = torch.load(load_weights_path)
-    CNN.load_state_dict(network_param['model_state_dict'])
-#CNN.train()
-
-# get data loaders
-kwargs = {'pin_memory': True} if use_cuda else {}
-map_path = '/Users/annikal/Documents/master_thesis/ProcessingLiDARdata/_out_map_190302_1/map.npy'
-map_minmax_values_path = '/Users/annikal/Documents/master_thesis/ProcessingLiDARdata/_out_map_190302_1/max_min.npy'
-#train_loader, val_loader, test_loader = get_loaders(path_training_data, path_validation_data, batch_size, kwargs) #########################
-train_loader, val_loader, test_loader = get_sweep_loaders(path_training_data, map_path, map_minmax_values_path,
-                                                          path_validation_data, batch_size, kwargs)
-
-
+#if load_weights:
+#    print('Loading parameters...')
+#    network_param = torch.load(load_weights_path)
+#    CNN.load_state_dict(network_param['model_state_dict'])
 
 # create directory for model weights
 current_path = os.getcwd()
@@ -69,7 +105,10 @@ parameter_path = os.path.join(model_path, 'parameters')
 os.mkdir(parameter_path)
 
 # train!
-train_loss, val_loss = train_network(CNN, train_loader, val_loader, n_epochs, learning_rate, patience, parameter_path, use_cuda)
+
+#train_loss, val_loss = train_network(CNN, train_loader, val_loader, n_epochs, learning_rate, patience, parameter_path, device, use_cuda,batch_size)
+train_loss, val_loss = train_network(n_epochs, learning_rate, patience, parameter_path, device, use_cuda, batch_size)
+
 
 if plot_flag is 'y':
     # plot loss
@@ -80,9 +119,9 @@ if plot_flag is 'y':
     plt.legend()
     plt.show()
 
-    # save loss
-    loss_path = os.path.join(model_path, 'train_loss.npy')
-    np.save(loss_path, train_loss)
-    loss_path = os.path.join(model_path, 'val_loss.npy')
-    np.save(loss_path, val_loss)
+# save loss
+loss_path = os.path.join(model_path, 'train_loss.npy')
+np.save(loss_path, train_loss)
+loss_path = os.path.join(model_path, 'val_loss.npy')
+np.save(loss_path, val_loss)
 

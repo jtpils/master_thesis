@@ -2,8 +2,8 @@
 
 clear all;clc
 % CHANGE PATH HERE
-pc_path = '/home/master04/Desktop/_out_town2/pc/';
-csv_path = '/home/master04/Desktop/_out_town2/town2.csv';
+pc_path = '/home/master04/Desktop/Ply_files/validation_and_test/test_set/pc/';
+csv_path = '/home/master04/Desktop/Ply_files/validation_and_test/test_set/test_set.csv';
 global_coordinates = importdata(csv_path);
 
 files = dir(strcat(pc_path,'/*.ply'));
@@ -15,7 +15,7 @@ figure('units','normalized','outerposition',[0 0 1 1]);
 %row = 1;
 step = 1; % set to 1 if you want to visualize all frames
 for file_number=1:step:length(files)-3
-    file_name = files(file_number).name
+    file_name = files(file_number).name;
     try
         path_to_file = strcat(pc_path, file_name);
         temp = importdata(path_to_file, delimiterIn, headerlinesIn);
