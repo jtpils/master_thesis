@@ -1,4 +1,4 @@
-from lidar_data_functions import *
+from functions_for_smaller_data import *
 import csv
 import random
 import os
@@ -22,7 +22,7 @@ path_to_lidar_data_test = '/home/master04/Desktop/Ply_files/validation_and_test/
 
 
 path_to_lidar_data_list = [path_to_lidar_data_training, path_to_lidar_data_validation, path_to_lidar_data_test]
-
+number_of_files_to_load_list = [1400, 400, 1]
 
 k = 0
 for foldername in input_folder_name:
@@ -80,7 +80,7 @@ for foldername in input_folder_name:
             path_to_ply = os.path.join(path_to_pc, file_name)
             pc, global_lidar_coordinates = load_data(path_to_ply, path_to_csv)
             i = i + 1
-            print('Creating training sample ', i, ' of ', number_of_files_to_load)
+            print('Creating sample ', i, ' of ', number_of_files_to_load)
         except:
             print('Failed to load file ', file_name, '. Moving on to next file.')
             continue
@@ -91,12 +91,13 @@ for foldername in input_folder_name:
         sweep = training_sample_rotation_translation(pc, rand_trans)
         sweep = trim_pointcloud(sweep)
         # discretize and pad sweep
-        sweep_image = discretize_pointcloud(sweep, array_size=300, trim_range=15, spatial_resolution=0.05, padding=True,
-                                            pad_size=75)
+        #sweep_image = discretize_pointcloud(sweep, array_size=300, trim_range=15, spatial_resolution=0.05, padding=True, pad_size=75)
+        sweep_image = discretize_pointcloud(sweep)
 
         # fake a map cutout
-        cutout = trim_pointcloud(pc, range=1.5 * 15)
-        cutout_image = discretize_pointcloud(cutout, array_size=450, trim_range=1.5 * 15, padding=False)
+        cutout = trim_pointcloud(pc)
+        #cutout_image = discretize_pointcloud(cutout, array_size=450, trim_range=1.5 * 15, padding=False)
+        cutout_image = discretize_pointcloud(cutout)
 
         # concatenate the sweep and the cutout image into one image and save.
         sweep_and_cutout_image = np.concatenate((sweep_image, cutout_image))
