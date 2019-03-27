@@ -30,9 +30,9 @@ class LiDARDataSet(Dataset):
 
     def __getitem__(self, idx):
         sample_file = os.path.join(self.sample_dir, str(idx))
-        t1 = time.time()
+        #t1 = time.time()
         sample = np.load(sample_file + '.npy')
-        t2 = time.time()
+        #t2 = time.time()
         sample = torch.from_numpy(sample).float()
 
 
