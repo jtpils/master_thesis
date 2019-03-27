@@ -24,7 +24,7 @@ def create_loss_and_optimizer(net, learning_rate=0.001):
 def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batch_size):
     data_set_path = '/home/master04/Desktop/Dataset/point_cloud/pc_small_set'
     #data_set_path = '/Users/sabinalinderoth/Desktop/Dataset/point_cloud/pc_small_set'
-    number_of_samples = 2 #int(input('Type number of samples: '))
+    number_of_samples = 10 #int(input('Type number of samples: '))
 
     net = PointPillars(batch_size)
     #print('=======> NETWORK NAME: =======> ', net.name())
@@ -112,7 +112,7 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
             running_loss += loss_size.item()
             total_train_loss += loss_size.item()
 
-            if (i + 1) % print_every == 0:
+            if True:#(i + 1) % print_every == 0:
                 print('Epoch [{}/{}], Batch [{}/{}], Loss: {:.4f}, Time: '
                       .format(epoch + 1, n_epochs, i, n_batches, running_loss / print_every), time.time() - time_epoch)
                 running_loss = 0.0

@@ -193,30 +193,19 @@ class PointPillars(torch.nn.Module):
 
     def forward(self, sweep, map):
 
-        sweep_outputs = self.PFNlayer_sweep.forward(sweep)
-        map_outputs = self.PFNlayer_map.forward(map)
-
-        # sweep_canvas = PointPillarsScatter.forward(sweep, sweep_outputs)
-        # map_canvas = PointPillarsScatter.forward(map, map_outputs)
-
-        #t1 = time.time()
-        #sweep_canvas = PointPillarsScatter(sweep, sweep_outputs, self.batch_size)
-        #t2 = time.time()
-        #map_canvas = PointPillarsScatter(map, map_outputs, self.batch_size)
-        #t3 = time.time()
         t1 = time.time()
-        sweep_canvas = fasterScatter(sweep, sweep_outputs, self.batch_size)
+        sweep_outputs = self.PFNlayer_sweep.forward(sweep)
         t2 = time.time()
-        map_canvas = fasterScatter(map, map_outputs, self.batch_size)
+        map_outputs = self.PFNlayer_map.forward(map)
         t3 = time.time()
-
+        sweep_canvas = fasterScatter(sweep, sweep_outputs, self.batch_size)
+        map_canvas = fasterScatter(map, map_outputs, self.batch_size)
         zipped_canvas = list(zip(sweep_canvas,map_canvas))
-        t4 = time.time()
         concatenated_canvas = torch.zeros(self.batch_size, 128, 282, 282)
 
-        print('Time sweep_canvas:', t2 - t1)
-        print('Time map_canvas:', t3 - t2)
-        print('Time zipped_canvas:', t4 - t3)
+        #print('Time sweep_canvas:', t2 - t1)
+        #print('Time map_canvas:', t3 - t2)
+        #print('Time zipped_canvas:', t4 - t3)
 
         for i in np.arange(self.batch_size):
             sweep_layers = zipped_canvas[i][0]
@@ -224,10 +213,15 @@ class PointPillars(torch.nn.Module):
             concatenated_layers = torch.cat((sweep_layers , map_layers ), 0)
 
             concatenated_canvas[i, :, :, :] = concatenated_layers
-
+        t4 = time.time()
 
         output = self.Backbone.forward(concatenated_canvas)
+        t5 = time.time()
 
+        #print('PFNlayer for sweep: ', t2-t1)
+        #print('PFNlayer for map: ', t3-t2)
+        #print('Scatter to pseudo image: ', t4-t3)
+        #print('Backbone: ', t5-t4)
         del sweep_canvas, map_canvas, zipped_canvas, concatenated_layers, sweep_outputs, map_outputs
         return output
 
