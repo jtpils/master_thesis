@@ -40,7 +40,7 @@ def PointPillarsScatter(PFN_input, PFN_output, batch_size):
             canvas[:, xgrid, ygrid] = pillar_vector
         batch_canvas.append(canvas)
 
-    return canvas
+    return batch_canvas
 
 
 def fasterScatter(PFN_input, PFN_output, batch_size):
@@ -76,7 +76,7 @@ def fasterScatter(PFN_input, PFN_output, batch_size):
     batch_canvas.append(canvas)
 
 
-    return canvas
+    return batch_canvas
 
 
 

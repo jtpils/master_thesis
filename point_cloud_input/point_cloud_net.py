@@ -43,6 +43,41 @@ def PointPillarsScatter(PFN_input, PFN_output, batch_size):
     return batch_canvas
 
 
+def fasterScatter(PFN_input, PFN_output, batch_size):
+
+    num_channels = 64
+    height = 282
+    width = 282
+    pillar_size = 0.16
+    range = 22
+
+    batch_canvas = []
+    for batch in np.arange(batch_size):
+
+        pillar_list = np.nonzero(PFN_input[batch, 0, :, 0])[0] # ???? List or array??? collect all non-empty pillars
+        #pillars = np.resize(PFN_output, (64, 12000))
+
+        x_coords = PFN_input[batch,0,pillar_list,0]  # 1 xcoord from each pillar # should we use the pillar_list here instead of ":" ?
+        xgrids = np.floor((x_coords + range) / pillar_size).astype(int)
+        y_coords = PFN_input[batch,1,pillar_list,0]  # first xvalue in each pillar
+        ygrids = np.floor((y_coords + range) / pillar_size).astype(int)
+
+        #convert these 2D-indices to 1D indices by declaring canvas as:
+        canvas = np.zeros((num_channels, height*width))
+        indices = xgrids*width + ygrids  # new indices along 1D-canvas. or maybe swap x and y here?
+        #indices = (height-xgrids)*height -ygrids-1
+        indices = np.squeeze(indices)
+        #pillar_vector = np.resize(pillars, (64, height*width)) # reshape to 1 row
+        pillars_to_canvas = PFN_output[batch,:,pillar_list]
+
+        canvas[:, indices] = np.transpose(pillars_to_canvas)  # np.transpose(PFN_output[batch,:,pillar_list])
+        canvas = np.resize(canvas, (num_channels, height, width))
+
+    batch_canvas.append(canvas)
+
+    return batch_canvas
+
+
 '''
 class PointPillarsScatter(nn.Module):
     def __init__(self, batch_size, output_shape = [64,188,188]):
