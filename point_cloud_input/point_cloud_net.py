@@ -59,23 +59,22 @@ def fasterScatter(PFN_input, PFN_output, batch_size):
         #pillars = np.resize(PFN_output, (64, 12000))
 
         x_coords = PFN_input[batch,0,pillar_list,0]  # 1 xcoord from each pillar # should we use the pillar_list here instead of ":" ?
-        xgrids = np.floor((x_coords + range) / pillar_size)
+        xgrids = torch.floor((x_coords + range) / pillar_size)
         y_coords = PFN_input[batch,1,pillar_list,0]  # first xvalue in each pillar
-        ygrids = np.floor((y_coords + range) / pillar_size)
+        ygrids = torch.floor((y_coords + range) / pillar_size)
 
         #convert these 2D-indices to 1D indices by declaring canvas as:
         canvas = torch.zeros((num_channels, height*width))
         indices = xgrids*width + ygrids  # new indices along 1D-canvas. or maybe swap x and y here?
         #indices = (height-xgrids)*height -ygrids-1
-        indices = np.squeeze(indices).long()
+        indices = torch.squeeze(indices).long()
         #pillar_vector = np.resize(pillars, (64, height*width)) # reshape to 1 row
-        pillars_to_canvas = np.squeeze(PFN_output[batch,:,pillar_list])
+        pillars_to_canvas = torch.squeeze(PFN_output[batch,:,pillar_list])
 
         canvas[:, indices] = pillars_to_canvas
-        canvas = np.resize(canvas, (num_channels, height, width))
+        canvas = torch.reshape(canvas, (num_channels, height, width))
 
-    batch_canvas.append(canvas)
-
+        batch_canvas.append(canvas)
 
     return batch_canvas
 
@@ -226,11 +225,10 @@ class PointPillars(torch.nn.Module):
 
             concatenated_canvas[i, :, :, :] = concatenated_layers
 
-        # concatenate the canvases, one sample should be a sweep+map
-        samples = concatenated_canvas  #concatenate... [batchsize, 64*2, 288, 288] type toch.Tensor
 
-        output = self.Backbone.forward(samples)
+        output = self.Backbone.forward(concatenated_canvas)
 
+        del sweep_canvas, map_canvas, zipped_canvas, concatenated_layers, sweep_outputs, map_outputs
         return output
 
 
