@@ -25,10 +25,10 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
 
     path_training_data = '/home/annika_lundqvist144/Low_resolution_001/fake_training_set' #input('Path to training data set folder: ')
     path_validation_data = '/home/annika_lundqvist144/Low_resolution_001/fake_validation_set'
-    #path_training_data = '/home/master04/Desktop/Dataset/Low_resolution_001/fake_training_set'  # '/home/master04/Desktop/Dataset/fake_training_data_torch'#
-    #path_validation_data = '/home/master04/Desktop/Dataset/Low_resolution_001/fake_validation_set'
+    path_training_data = '/home/master04/Desktop/Dataset/small_samples/fake_training_set'  # '/home/master04/Desktop/Dataset/fake_training_data_torch'#
+    path_validation_data = '/home/master04/Desktop/Dataset/small_samples/fake_validation_set'
 
-    CNN = Duchess()
+    CNN = SmallDuchess()
     print('=======> NETWORK NAME: =======> ', CNN.name())
     if use_cuda:
         CNN.cuda()
@@ -64,7 +64,7 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
 
     # Create our loss and optimizer functions
     loss, optimizer = create_loss_and_optimizer(CNN, learning_rate)
-    scheduler = StepLR(optimizer, step_size=30, gamma=0.5)
+    scheduler = StepLR(optimizer, step_size=20, gamma=0.5)
 
     # Time for printing
     training_start_time = time.time()
@@ -92,7 +92,7 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
                 sample, labels = sample.cuda(async=True), labels.cuda(async=True)
             sample, labels = Variable(sample), Variable(labels)
             t2_get_data = time.time()
-            #print('get data: ', t2_get_data-t1_get_data)
+            print('get data: ', t2_get_data-t1_get_data)
 
             t1 = time.time()
             # Set the parameter gradients to zero
