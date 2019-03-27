@@ -13,15 +13,14 @@ import pickle
 class LiDARDataSet_PC(Dataset):
     """Lidar sample dataset."""
 
-    def __init__(self, sample_dir):
+    def __init__(self, sample_dir, number_of_samples):
         """
         Args:
             sample_dir (string): Directory with all the samples.
         """
-
         self.sample_dir = sample_dir
         self.length = len(os.listdir(sample_dir))
-
+        self.number_of_samples = number_of_samples
 
     def __len__(self):
         return self.length
@@ -48,8 +47,8 @@ def get_train_loader_pc(batch_size, data_set_path, number_of_samples, kwargs):
     :return: train_loader: data loader
     '''
 
-    training_data_set = LiDARDataSet_PC(data_set_path)
-    n_training_samples = len(training_data_set)
+    training_data_set = LiDARDataSet_PC(data_set_path, number_of_samples)
+    n_training_samples = number_of_samples
     print('Number of training samples: ', n_training_samples)
     train_sampler = SubsetRandomSampler(np.arange(n_training_samples, dtype=np.int64))
     train_loader = torch.utils.data.DataLoader(training_data_set, batch_size=batch_size, sampler=train_sampler, **kwargs)
