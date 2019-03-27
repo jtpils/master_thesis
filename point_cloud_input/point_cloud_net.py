@@ -5,8 +5,10 @@ import torch.nn.parallel
 import torch.utils.data
 from torch.autograd import Variable
 import numpy as np
+import time
 import torch.nn.functional as F
 from preprocessing_data_functions import get_grid
+
 
 def PointPillarsScatter(PFN_input, PFN_output, batch_size):
     '''
@@ -40,31 +42,6 @@ def PointPillarsScatter(PFN_input, PFN_output, batch_size):
 
     return batch_canvas
 
-
-class PFNLayer(torch.nn.Module):
-    """
-    Pillar Feature Net Layer (PFN) (The PFN could be composed of a series of these layers)
-    Ïn the PointPillar paper a single layer of PFN is used.
-    For each point, a linear layer is applied followed by BatchNorm and ReLU. This generates a (C=8,P,N) sized tensor.
-    Then a max operator is applied over the channels to create an output tensor of size (C=8,P).
-    """
-
-    def __init__(self):
-
-        super(PFNLayer, self).__init__()
-        #self.name = "PFNLayer"
-
-        # Linear Layer:  The linear layer can be formulated as a 1*1 convolution layer across the tensor
-        self.conv1 = torch.nn.Conv2d(8, 64, kernel_size=1, stride=1, padding=0)
-        # Batch Norm
-        self.conv1_bn = torch.nn.BatchNorm2d(64)
-
-    def forward(self, inputs):
-
-        x = F.relu(self.conv1_bn(self.conv1(inputs))) # shape (1,64,1200,100)
-        x = torch.max(x, dim=3, keepdim=True)[0]  # shape (1,64,1200,1)
-        x = x.view(np.shape(x)[:3])
-        return x
 
 '''
 class PointPillarsScatter(nn.Module):
@@ -106,20 +83,64 @@ class PointPillarsScatter(nn.Module):
         return batch_canvas
 '''
 
+
+class PFNLayer(torch.nn.Module):
+    """
+    Pillar Feature Net Layer (PFN) (The PFN could be composed of a series of these layers)
+    Ïn the PointPillar paper a single layer of PFN is used.
+    For each point, a linear layer is applied followed by BatchNorm and ReLU. This generates a (C=8,P,N) sized tensor.
+    Then a max operator is applied over the channels to create an output tensor of size (C=8,P).
+    """
+
+    def __init__(self):
+
+        super(PFNLayer, self).__init__()
+
+        # Linear Layer:  The linear layer can be formulated as a 1*1 convolution layer across the tensor
+        self.conv1 = torch.nn.Conv2d(8, 64, kernel_size=1, stride=1, padding=0)
+        # Batch Norm
+        self.conv1_bn = torch.nn.BatchNorm2d(64)
+
+    def forward(self, inputs):
+
+        x = F.relu(self.conv1_bn(self.conv1(inputs))) # shape (1,64,1200,100)
+        x = torch.max(x, dim=3, keepdim=True)[0]  # shape (1,64,1200,1)
+        x = x.view(np.shape(x)[:3])
+        return x
+
+
 class Backbone(nn.Module):
     def __init__(self):
         """
         Backbone. output a rigid transformation.
         """
         super(Backbone, self).__init__()
-        #self.name = 'Backbone'
-        self.conv1 = torch.nn.Conv2d(8, 64, kernel_size=1, stride=1, padding=0)
+        # input : [128, 282, 282]
+        self.conv1 = torch.nn.Conv2d(128, 64, kernel_size=5, stride=1, padding=0)
+        self.conv2 = torch.nn.Conv2d(64, 16, kernel_size=4, stride=1, padding=0)
 
-    def forward(self, inputs):
+        self.conv1_bn = torch.nn.BatchNorm2d(64)
+        self.conv2_bn = torch.nn.BatchNorm2d(16)
 
-        outputs = self.conv1(inputs)
+        self.pool2 = torch.nn.MaxPool2d(kernel_size=2, stride=2, padding=0)
 
-        return outputs
+        self.fc1 = torch.nn.Linear(16 * 68 * 68, 32)
+        self.fc1_bn = torch.nn.BatchNorm1d(32)
+        self.fc_out = torch.nn.Linear(32, 3)
+
+    def forward(self, x):
+
+        x = F.relu(self.conv1_bn(self.conv1(x)))  # 64, 278, 278
+        x = self.pool2(x) # 64, 139, 139
+
+        x = F.relu(self.conv2_bn(self.conv2(x)))  # 16, 136, 136
+        x = self.pool2(x)  # 16, 68, 68
+
+        x = x.view(-1, 16 * 68 * 68)
+        x = torch.tanh(self.fc1_bn(self.fc1(x)))
+        x = self.fc_out(x)
+
+        return x
 
 
 class PointPillars(torch.nn.Module):
@@ -129,14 +150,11 @@ class PointPillars(torch.nn.Module):
 
     def __init__(self, batch_size):
         super(PointPillars, self).__init__()
-        #self.name = "PointPillars"
         self.batch_size = batch_size
         self.PFNlayer_sweep = PFNLayer()
         self.PFNlayer_map = PFNLayer()
-        #self.PointPillarsScatter = PointPillarsScatter(self.batch_size)
         self.Backbone = Backbone()
 
-    #def forward(self, sweep, map, PointPillarsScatter):
     def forward(self, sweep, map):
 
         sweep_outputs = self.PFNlayer_sweep.forward(sweep)
@@ -145,15 +163,20 @@ class PointPillars(torch.nn.Module):
         # sweep_canvas = PointPillarsScatter.forward(sweep, sweep_outputs)
         # map_canvas = PointPillarsScatter.forward(map, map_outputs)
 
+        t1 = time.time()
         sweep_canvas = PointPillarsScatter(sweep, sweep_outputs, self.batch_size)
+        t2 = time.time()
         map_canvas = PointPillarsScatter(map, map_outputs, self.batch_size)
-
+        t3 = time.time()
         zipped_canvas = list(zip(sweep_canvas,map_canvas))
-
+        t4 = time.time()
         concatenated_canvas = torch.zeros(self.batch_size, 128, 282, 282)
 
+        print('Time sweep_canvas:', t2 - t1)
+        print('Time map_canvas:', t3 - t2)
+        print('Time zipped_canvas:', t4 - t3)
+
         for i in np.arange(self.batch_size):
-            print(i)
             sweep_layers = zipped_canvas[i][0]
             map_layers = zipped_canvas[i][1]
             concatenated_layers = torch.cat((sweep_layers , map_layers ), 0)
