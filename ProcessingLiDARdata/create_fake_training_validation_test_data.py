@@ -5,6 +5,7 @@ import os
 
 ###############################################################################
 # CREATE FAKE TRAINING SAMPLES (of one single sweep) WITHOUT A NEED FOR A MAP #
+# Creates all data sets; training, validation, test
 ###############################################################################
 
 # The folders where the fake data is saved
