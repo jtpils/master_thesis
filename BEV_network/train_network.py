@@ -23,10 +23,10 @@ def create_loss_and_optimizer(net, learning_rate=0.001):
 # def train_network(net, train_loader, val_loader, n_epochs, learning_rate, patience, folder_path, device, use_cuda):
 def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batch_size, load_weights, load_weights_path):
 
-    path_training_data = '/home/annika_lundqvist144/Low_resolution_001/fake_training_set' #input('Path to training data set folder: ')
-    path_validation_data = '/home/annika_lundqvist144/Low_resolution_001/fake_validation_set'
-    path_training_data = '/home/master04/Desktop/Dataset/small_samples/fake_training_set'  # '/home/master04/Desktop/Dataset/fake_training_data_torch'#
-    path_validation_data = '/home/master04/Desktop/Dataset/small_samples/fake_validation_set'
+    path_training_data = '/home/annika_lundqvist144/small_samples/fake_training_set' #input('Path to training data set folder: ')
+    path_validation_data = '/home/annika_lundqvist144/small_samples/fake_validation_set'
+    #path_training_data = '/home/master04/Desktop/Dataset/small_samples/fake_training_set'  # '/home/master04/Desktop/Dataset/fake_training_data_torch'#
+    #path_validation_data = '/home/master04/Desktop/Dataset/small_samples/fake_validation_set'
 
     CNN = SmallDuchess()
     print('=======> NETWORK NAME: =======> ', CNN.name())
