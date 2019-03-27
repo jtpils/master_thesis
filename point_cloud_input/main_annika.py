@@ -54,23 +54,23 @@ def fasterScatter(PFN_input, PFN_output, batch_size):
     batch_canvas = []
     for batch in np.arange(batch_size):
 
-        pillar_list = np.nonzero(PFN_input[batch, 0, :, 0])[0] # ???? List or array??? collect all non-empty pillars
+        pillar_list = np.nonzero(PFN_input[batch, 0, :, 0]) # ???? List or array??? collect all non-empty pillars
         #pillars = np.resize(PFN_output, (64, 12000))
 
         x_coords = PFN_input[batch,0,pillar_list,0]  # 1 xcoord from each pillar # should we use the pillar_list here instead of ":" ?
-        xgrids = np.floor((x_coords + range) / pillar_size).astype(int)
+        xgrids = np.floor((x_coords + range) / pillar_size)
         y_coords = PFN_input[batch,1,pillar_list,0]  # first xvalue in each pillar
-        ygrids = np.floor((y_coords + range) / pillar_size).astype(int)
+        ygrids = np.floor((y_coords + range) / pillar_size)
 
         #convert these 2D-indices to 1D indices by declaring canvas as:
-        canvas = np.zeros((num_channels, height*width))
+        canvas = torch.zeros((num_channels, height*width))
         indices = xgrids*width + ygrids  # new indices along 1D-canvas. or maybe swap x and y here?
         #indices = (height-xgrids)*height -ygrids-1
-        indices = np.squeeze(indices)
+        indices = np.squeeze(indices).long()
         #pillar_vector = np.resize(pillars, (64, height*width)) # reshape to 1 row
-        pillars_to_canvas = PFN_output[batch,:,pillar_list]
+        pillars_to_canvas = np.squeeze(PFN_output[batch,:,pillar_list])
 
-        canvas[:, indices] = np.transpose(pillars_to_canvas)  # np.transpose(PFN_output[batch,:,pillar_list])
+        canvas[:, indices] = pillars_to_canvas
         canvas = np.resize(canvas, (num_channels, height, width))
 
     batch_canvas.append(canvas)
@@ -84,27 +84,32 @@ path_data_set = '/home/master04/Desktop/Dataset/point_cloud/pc_small_set'
 sample = pickle.load(open('/home/master04/Desktop/Dataset/point_cloud/pc_small_set/training_sample_0','rb'))
 cutout0 = sample['map']
 sweep0 = sample['sweep']
-input0 = np.resize(sweep0, (1,8,12000,100))
+input0 = torch.from_numpy(sweep0)
+input0 = input0.view((1,8,12000,100))#torch.reshape(sweep0, (1,8,12000,100))
+
 path_data_set = '/home/master04/Desktop/Dataset/point_cloud/pc_small_set'
 sample = pickle.load(open('/home/master04/Desktop/Dataset/point_cloud/pc_small_set/training_sample_1','rb'))
 cutout1 = sample['map']
 sweep1 = sample['sweep']
-input1 = np.resize(sweep1, (1,8,12000,100))
-sample = np.concatenate((input0,input1), axis=0)
+input1 = torch.from_numpy(sweep1)
+input1 = input1.view((1,8,12000,100))  #torch.reshape(sweep1, (1,8,12000,100))
+
+sample = torch.cat((input0,input1), 0)
 
 #input = np.ones((1,8,12000,100)) # (BATCH, D, P, N)
 #input[:,:,2,:] = input[:,:,2,:]*5
-output = np.ones((2,64,12000))*3  # 1 batch, (BATCH, C, P)
+output = torch.ones((2,64,12000))*3  # 1 batch, (BATCH, C, P)
+
 
 t1 = time.time()
-c1 = PointPillarsScatter(sample, output, 2)
+#c1 = PointPillarsScatter(sample, output, 2)
 t2 = time.time()
 c2 = fasterScatter(sample, output, 2)
 t3 = time.time()
 
-flag = (c1[0]==c2[0]).all()
+#flag = (c1[0]==c2[0]).all()
 
-print('Done', flag)
+#print('Done', flag)
 print(t2-t1, t3-t2)
 
 
