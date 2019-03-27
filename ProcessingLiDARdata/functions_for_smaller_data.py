@@ -84,7 +84,7 @@ def translate_pointcloud_to_global(pointcloud, global_coordinates):
     return global_pointcloud
 
 
-def trim_pointcloud(point_cloud, range=10, roof=10, floor=0):  # the hard coded numbers are not absolute.
+def trim_pointcloud(point_cloud, range=15, roof=10, floor=0):  # the hard coded numbers are not absolute.
     '''
     Trim pointcloud to a range given by range_of_interest. Trim detections that are more than (roof) meters above LiDAR,
     and more than (floor) meters below LiDAR. After this, remove z.
@@ -119,7 +119,7 @@ def trim_pointcloud(point_cloud, range=10, roof=10, floor=0):  # the hard coded 
     return point_cloud
 
 
-def discretize_pointcloud(trimmed_point_cloud, array_size=200, trim_range=10, spatial_resolution=0.1, padding=False, pad_size=150):
+def discretize_pointcloud(trimmed_point_cloud, array_size=300, trim_range=15, spatial_resolution=0.1, padding=False, pad_size=150):
     '''
     Discretize into a grid structure with different channels.
     Create layers:

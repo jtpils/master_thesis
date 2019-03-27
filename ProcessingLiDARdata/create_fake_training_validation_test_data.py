@@ -23,7 +23,7 @@ path_to_lidar_data_test = '/home/master04/Desktop/Ply_files/validation_and_test/
 
 
 path_to_lidar_data_list = [path_to_lidar_data_training, path_to_lidar_data_validation, path_to_lidar_data_test]
-number_of_files_to_load_list = [1400, 400, 1]
+number_of_files_to_load_list = [1400, 400, 200]
 
 k = 0
 for foldername in input_folder_name:
