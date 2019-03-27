@@ -8,16 +8,14 @@ import torch
 from point_cloud_net import *
 from sabina_data_set import *
 
+
 def create_loss_and_optimizer(net, learning_rate=0.001):
     # Loss function
-    # loss = torch.nn.CrossEntropyLoss()
-    # loss = torch.nn.MSELoss()
+
     loss = torch.nn.SmoothL1Loss()
 
     # Optimizer
     optimizer = torch.optim.Adam(net.parameters(), lr=learning_rate, weight_decay=1e-5)
-    # optimizer = optim.Adagrad(net.parameters(), lr=learning_rate, lr_decay=1e-3)
-    # optimizer = optim.SGD(net.parameters(), lr=learning_rate)
 
     return loss, optimizer
 
@@ -28,8 +26,6 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
     data_set_path = '/Users/sabinalinderoth/Desktop/Dataset/point_cloud/pc_small_set'
     number_of_samples = 2 #int(input('Type number of samples: '))
 
-
-    #scatter = PointPillarsScatter(batch_size)
     net = PointPillars(batch_size)
     #print('=======> NETWORK NAME: =======> ', net.name())
     if use_cuda:
