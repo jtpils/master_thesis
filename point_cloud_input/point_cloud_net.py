@@ -10,15 +10,16 @@ import torch.nn.functional as F
 from preprocessing_data_functions import get_grid
 
 
+'''
 def PointPillarsScatter(PFN_input, PFN_output, batch_size):
-    '''
+    
     :param PFN_input: <tensor> size: [number_of_batches, 8, max_number_of_pillars, max_number_of_points]. The feature
             tensor that used as an input to the PFN layer. This is used to find the original location of the pillars
     :param PFN_output: <tensor> size: [number_of_batches, 64, max_number_of_pillars]. The output from the PFN layer.
             Containing the pillars that should be scattered back.
     :param batch_size: <int> size of the batch
     :return: batch_canvas: <list> lsit of canvas from each batch.
-    '''
+    
 
     num_channels = 64
     height = 282
@@ -39,6 +40,42 @@ def PointPillarsScatter(PFN_input, PFN_output, batch_size):
             pillar_vector = torch.squeeze(pillar_vector)
             canvas[:, ygrid, xgrid] = pillar_vector
         batch_canvas.append(canvas)
+
+    return batch_canvas'''
+
+
+def fasterScatter(PFN_input, PFN_output, batch_size):
+
+    num_channels = 64
+    height = 282
+    width = 282
+    pillar_size = 0.16
+    range = 22
+
+    batch_canvas = []
+    for batch in np.arange(batch_size):
+
+        pillar_list = np.nonzero(PFN_input[batch, 0, :, 0]) # ???? List or array??? collect all non-empty pillars
+        #pillars = np.resize(PFN_output, (64, 12000))
+
+        x_coords = PFN_input[batch,0,pillar_list,0]  # 1 xcoord from each pillar # should we use the pillar_list here instead of ":" ?
+        xgrids = np.floor((x_coords + range) / pillar_size)
+        y_coords = PFN_input[batch,1,pillar_list,0]  # first xvalue in each pillar
+        ygrids = np.floor((y_coords + range) / pillar_size)
+
+        #convert these 2D-indices to 1D indices by declaring canvas as:
+        canvas = torch.zeros((num_channels, height*width))
+        indices = xgrids*width + ygrids  # new indices along 1D-canvas. or maybe swap x and y here?
+        #indices = (height-xgrids)*height -ygrids-1
+        indices = np.squeeze(indices).long()
+        #pillar_vector = np.resize(pillars, (64, height*width)) # reshape to 1 row
+        pillars_to_canvas = np.squeeze(PFN_output[batch,:,pillar_list])
+
+        canvas[:, indices] = pillars_to_canvas
+        canvas = np.resize(canvas, (num_channels, height, width))
+
+    batch_canvas.append(canvas)
+
 
     return batch_canvas
 
@@ -163,11 +200,17 @@ class PointPillars(torch.nn.Module):
         # sweep_canvas = PointPillarsScatter.forward(sweep, sweep_outputs)
         # map_canvas = PointPillarsScatter.forward(map, map_outputs)
 
+        #t1 = time.time()
+        #sweep_canvas = PointPillarsScatter(sweep, sweep_outputs, self.batch_size)
+        #t2 = time.time()
+        #map_canvas = PointPillarsScatter(map, map_outputs, self.batch_size)
+        #t3 = time.time()
         t1 = time.time()
-        sweep_canvas = PointPillarsScatter(sweep, sweep_outputs, self.batch_size)
+        sweep_canvas = fasterScatter(sweep, sweep_outputs, self.batch_size)
         t2 = time.time()
-        map_canvas = PointPillarsScatter(map, map_outputs, self.batch_size)
+        map_canvas = fasterScatter(map, map_outputs, self.batch_size)
         t3 = time.time()
+
         zipped_canvas = list(zip(sweep_canvas,map_canvas))
         t4 = time.time()
         concatenated_canvas = torch.zeros(self.batch_size, 128, 282, 282)
