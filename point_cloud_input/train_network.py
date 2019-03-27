@@ -22,8 +22,8 @@ def create_loss_and_optimizer(net, learning_rate=0.001):
 
 # def train_network(net, train_loader, val_loader, n_epochs, learning_rate, patience, folder_path, device, use_cuda):
 def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batch_size):
-    data_set_path = '/home/master04/Desktop/Dataset/point_cloud/pc_small_set'
-    #data_set_path = '/Users/sabinalinderoth/Desktop/Dataset/point_cloud/pc_small_set'
+    #data_set_path = '/home/master04/Desktop/Dataset/point_cloud/pc_small_set'
+    data_set_path = '/Users/sabinalinderoth/Desktop/Dataset/point_cloud/pc_small_set'
     number_of_samples = 2 #int(input('Type number of samples: '))
 
     net = PointPillars(batch_size)
