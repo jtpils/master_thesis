@@ -63,8 +63,8 @@ while x < max_x + grid_size:
      x = x + grid_size
 
 number_y_grids = int(np.ceil((max_y - min_y)/grid_size))
-#number_of_y_edges = number_y_grids + 1
-#y_edges = [min_y + y for y in np.arange(number_of_y_edges) * grid_size if y < max_y + grid_size] #creates list with all the edge values of the grids
+number_of_y_edges = number_y_grids + 1
+y_edges = [min_y + y for y in np.arange(number_of_y_edges) * grid_size if y < max_y + grid_size] #creates list with all the edge values of the grids
 
 # Sabina's ploebel solution not tested properly but it seems to work for this case.
 #y_edges = []
