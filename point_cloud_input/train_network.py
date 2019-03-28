@@ -27,9 +27,9 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
     #data_set_path = '/Users/sabinalinderoth/Desktop/Dataset/point_cloud/pc_small_set'
 
     #data_set_path = '/home/master04/Desktop/Dataset/point_cloud/pc_small_set'
-    #data_set_path = '/Users/sabinalinderoth/Desktop/Dataset/point_cloud/pc_small_set'
 
-    number_of_samples = 10 #int(input('Type number of samples: '))
+    data_set_path = '/Users/sabinalinderoth/Desktop/Dataset/point_cloud/pc_small_set'
+    number_of_samples = 25 #int(input('Type number of samples: '))
 
     net = PointPillars(batch_size)
     #print('=======> NETWORK NAME: =======> ', net.name())
