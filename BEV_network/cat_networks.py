@@ -82,7 +82,7 @@ class Duchess(torch.nn.Module):
         x = self.pool(x) # 8,18,18
 
         # FC
-        x = x.view(-1, 8*18,18)
+        x = x.view(-1, 8*18*18)
         x = torch.tanh(self.fc1_bn(self.fc1(x)))
         x = self.dropout_1d(x)
         x = torch.tanh(self.fc2_bn(self.fc2(x)))
