@@ -156,7 +156,6 @@ class PointCloudDataSet(Dataset):
             selection_rule = np.random.choice(np.arange(len(sweep)), max_num_points_sweep)
             sweep = sweep[selection_rule, :]
         else:
-            #np.pad(sweep, (3000-len(sweep), 0), 'constant', constant_values=(0,0))
             zeros = np.zeros((max_num_points_sweep-len(sweep), 3))
             sweep = np.concatenate((sweep, zeros), 0)
 
@@ -165,7 +164,6 @@ class PointCloudDataSet(Dataset):
             selection_rule = np.random.choice(np.arange(len(map_cutout)), max_num_points_map)
             map_cutout = map_cutout[selection_rule, :]
         else:
-            #np.pad(map_cutout, (300000-len(sweep), 0), 'constant', constant_values=(0,0))
             zeros = np.zeros((max_num_points_map-len(map_cutout), 3))
             map_cutout = np.concatenate((map_cutout, zeros), 0)
 
