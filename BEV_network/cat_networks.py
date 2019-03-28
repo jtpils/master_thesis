@@ -47,8 +47,8 @@ class Duchess(torch.nn.Module):
         self.fc2 = torch.nn.Linear(256, 64)
         self.fc_out = torch.nn.Linear(64, 3)
 
-        self.fc1_bn = torch.nn.BatchNorm2d(256)
-        self.fc2_bn = torch.nn.BatchNorm2d(64)
+        self.fc1_bn = torch.nn.BatchNorm1d(256)
+        self.fc2_bn = torch.nn.BatchNorm1d(64)
 
     def forward(self, x):
         # ENCODER
