@@ -43,7 +43,7 @@ class Duchess(torch.nn.Module):
 
         # FC
         self.dropout_1d = torch.nn.Dropout2d(p=0.2)
-        self.fc1 = torch.nn.Linear(8*18,18, 256)
+        self.fc1 = torch.nn.Linear(8*18*18, 256)
         self.fc2 = torch.nn.Linear(256, 64)
         self.fc_out = torch.nn.Linear(64, 3)
 
