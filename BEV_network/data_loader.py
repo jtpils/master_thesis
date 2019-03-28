@@ -33,3 +33,22 @@ def get_loaders(path_training_data, path_validation_data, batch_size, use_cuda):
     print(' ')
 
     return train_loader, val_loader
+
+
+def get_test_loader(path_test_data, batch_size, use_cuda):
+    csv_file = path_test_data + '/labels.csv'
+    sample_dir = path_test_data + '/samples/'
+    test_data_set = LiDARDataSet(csv_file, sample_dir, use_cuda)
+
+    kwargs = {'pin_memory': True} if use_cuda else {}
+    workers = 8
+    print('Number of workers: ', workers)
+
+    n_test_samples = 200 #len(test_data_set)
+    print('Number of training samples: ', n_test_samples)
+    test_sampler = SubsetRandomSampler(np.arange(1, n_test_samples+1, dtype=np.int64))
+    test_loader = torch.utils.data.DataLoader(test_data_set, batch_size=batch_size, sampler=test_sampler, num_workers=workers, **kwargs)
+
+    print(' ')
+
+    return test_loader
