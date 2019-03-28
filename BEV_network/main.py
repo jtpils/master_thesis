@@ -4,12 +4,12 @@ import os
 
 def main():
     # load old weights! change here manually
-    load_weights = False
-    load_weights_path = '/home/annika_lundqvist144/master_thesis/BEV_network/Duchess_190326_1/parameters/epoch_0_checkpoint.pt'
+    load_weights = True
+    load_weights_path = '/home/annika_lundqvist144/master_thesis/BEV_network/Duchess_190328/parameters/epoch_9_checkpoint.pt'
 
     save_parameters_folder = input('Type name of new folder: ')
     n_epochs = int(input('Number of epochs: '))
-    learning_rate = 0.01 #float(input('Learning rate: '))
+    learning_rate = float(input('Learning rate: '))
     patience = int(input('Input patience for EarlyStopping: ')) # Threshold for early stopping. Number of epochs that we will wait until brake
     batch_size = int(input('Input batch size: '))
     plot_flag = 'n' #input('Plot results? y / n: ')
