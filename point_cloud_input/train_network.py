@@ -6,7 +6,7 @@ import os
 # from early_stopping import EarlyStopping
 import torch
 from point_cloud_net import *
-from sabina_data_set import *
+from data_set_pc_samples import *
 
 
 def create_loss_and_optimizer(net, learning_rate=0.001):

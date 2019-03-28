@@ -124,7 +124,7 @@ class PointCloudDataSet(Dataset):
         sweep = trim_pointcloud(sweep)
 
         # load all the files in range of our sweep.
-        pc_super_array = np.zeros((1, 3))  # REMOVE THE ZEROS LATER?
+        pc_super_array = np.zeros((1, 3))  # zeros are removed later
         # get the neighbouring grids
         grids_to_load = get_neighbouring_grids(x_grid, y_grid)
         for grid in grids_to_load:
@@ -141,6 +141,7 @@ class PointCloudDataSet(Dataset):
                 pc = translate_pointcloud_to_global(pc, global_coordinates)
                 pc_super_array = np.concatenate((pc_super_array, pc))
 
+        pc_super_array = pc_super_array[1:,:]  # remove the first row of zeros
         # our initial guess in the map
         initial_guess = np.array((ply_coordinates[1]+self.labels[idx][0], -(ply_coordinates[2]+self.labels[idx][1]), 0))
         # translate all the points in the super_array such that the initial guess becomes the origin
@@ -188,9 +189,3 @@ def get_train_loader(batch_size, data_set_path, number_of_samples, kwargs):
     train_loader = torch.utils.data.DataLoader(training_data_set, batch_size=batch_size, sampler=train_sampler, **kwargs)
 
     return train_loader
-
-
-#def get_val_loader(data_set_path, csv_path, number_of_samples):
-
-
-#def get_test_loader(data_set_path, csv_path, number_of_samples):

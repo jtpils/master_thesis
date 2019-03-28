@@ -1,158 +1,97 @@
 from data_set_point_cloud import *
-from lidar_processing_functions import *
-from preprocessing_data_functions import *
-import numpy as np
-import pandas as pd
 import time
-import matplotlib.pyplot as plt
-from tqdm import tqdm
-import pickle
-from train_network import *
-
-def PointPillarsScatter(PFN_input, PFN_output, batch_size):
-    '''
-    :param PFN_input: <tensor> size: [number_of_batches, 8, max_number_of_pillars, max_number_of_points]. The feature
-            tensor that used as an input to the PFN layer. This is used to find the original location of the pillars
-    :param PFN_output: <tensor> size: [number_of_batches, 64, max_number_of_pillars]. The output from the PFN layer.
-            Containing the pillars that should be scattered back.
-    :param batch_size: <int> size of the batch
-    :return: batch_canvas: <list> lsit of canvas from each batch.
-    '''
-
-    num_channels = 64
-    height = 282
-    width = 282
-    pillar_size = 0.16
-    x_edges = np.arange(-22, 22, pillar_size)
-    y_edges = np.arange(-22, 22, pillar_size)
-
-    batch_canvas = []
-    for batch in np.arange(batch_size):
-
-        pillar_list = np.nonzero(PFN_input[batch, 0, :, 0])
-        canvas = np.zeros((num_channels, height, width))
-        for pillar in pillar_list[0]:
-            x, y = PFN_input[batch, 0, pillar, 0], PFN_input[batch, 1, pillar, 0]
-            xgrid, ygrid = get_grid(x, y, x_edges, y_edges)
-            pillar_vector = PFN_output[batch, :, pillar]
-            pillar_vector = np.squeeze(pillar_vector)
-            #canvas[:, ygrid, xgrid] = pillar_vector  # swap x and y?
-            canvas[:, xgrid, ygrid] = pillar_vector
-        batch_canvas.append(canvas)
-
-    return batch_canvas
 
 
-def fasterScatter(PFN_input, PFN_output, batch_size):
-
-    num_channels = 64
-    height = 282
-    width = 282
-    pillar_size = 0.16
-    range = 22
-
-    batch_canvas = []
-    for batch in np.arange(batch_size):
-
-        pillar_list = np.nonzero(PFN_input[batch, 0, :, 0]) # ???? List or array??? collect all non-empty pillars
-        #pillars = np.resize(PFN_output, (64, 12000))
-
-        x_coords = PFN_input[batch,0,pillar_list,0]  # 1 xcoord from each pillar # should we use the pillar_list here instead of ":" ?
-        xgrids = np.floor((x_coords + range) / pillar_size)
-        y_coords = PFN_input[batch,1,pillar_list,0]  # first xvalue in each pillar
-        ygrids = np.floor((y_coords + range) / pillar_size)
-
-        #convert these 2D-indices to 1D indices by declaring canvas as:
-        canvas = torch.zeros((num_channels, height*width))
-        indices = xgrids*width + ygrids  # new indices along 1D-canvas. or maybe swap x and y here?
-        #indices = (height-xgrids)*height -ygrids-1
-        indices = np.squeeze(indices).long()
-        #pillar_vector = np.resize(pillars, (64, height*width)) # reshape to 1 row
-        pillars_to_canvas = np.squeeze(PFN_output[batch,:,pillar_list])
-
-        canvas[:, indices] = pillars_to_canvas
-        canvas = np.resize(canvas, (num_channels, height, width))
-
-    batch_canvas.append(canvas)
-
-
-    return batch_canvas
-
-
-
-path_data_set = '/home/master04/Desktop/Dataset/point_cloud/pc_small_set'
-sample = pickle.load(open('/home/master04/Desktop/Dataset/point_cloud/pc_small_set/training_sample_0','rb'))
-cutout0 = sample['map']
-sweep0 = sample['sweep']
-input0 = torch.from_numpy(sweep0)
-input0 = input0.view((1,8,12000,100))#torch.reshape(sweep0, (1,8,12000,100))
-
-path_data_set = '/home/master04/Desktop/Dataset/point_cloud/pc_small_set'
-sample = pickle.load(open('/home/master04/Desktop/Dataset/point_cloud/pc_small_set/training_sample_1','rb'))
-cutout1 = sample['map']
-sweep1 = sample['sweep']
-input1 = torch.from_numpy(sweep1)
-input1 = input1.view((1,8,12000,100))  #torch.reshape(sweep1, (1,8,12000,100))
-
-sample = torch.cat((input0,input1), 0)
-
-#input = np.ones((1,8,12000,100)) # (BATCH, D, P, N)
-#input[:,:,2,:] = input[:,:,2,:]*5
-output = torch.ones((2,64,12000))*3  # 1 batch, (BATCH, C, P)
-
+data_set_path = '/home/master04/Desktop/Dataset/ply_grids/Town02_sorted_grid_ply'
+number_of_samples = 10
+data_set = PointCloudDataSet(data_set_path, number_of_samples)
 
 t1 = time.time()
-#c1 = PointPillarsScatter(sample, output, 2)
+sample = data_set.__getitem__(0)
 t2 = time.time()
-c2 = fasterScatter(sample, output, 2)
-t3 = time.time()
+print('Time to load 1 sample: ', t2-t1)
 
-#flag = (c1[0]==c2[0]).all()
+sweep = sample['sweep']
+map_cutout = sample['map']
 
-#print('Done', flag)
-print(t2-t1, t3-t2)
+# sort into pillars
+def createPillarsFast(point_cloud, pillar_size=0.16, range=22):
+    pillar_list = []
 
-
-
-'''
-range = 22
-pillar_size = 0.16
-# find x_grids
-x_coords = input[0,0,:,0]  # first xvalue in each pillar
-# translate all points so that they begion from zero (add the range to move points from (-15,15) to (0,30)
-# divide by pillar size, which will yield deciaml values where each new integer is a new pillar
-# floor these values to get the actual grid indices
-xgrids = np.floor((x_coords + range) / pillar_size).astype(int)
-y_coords = input[0,1,:,0]  # first xvalue in each pillar
-ygrids = np.floor((y_coords + range) / pillar_size).astype(int)
-
-x_edges = np.arange(-22, 22, pillar_size)
-y_edges = np.arange(-22, 22, pillar_size)
-
-i = 111
-x2,y2=get_grid(x_coords[i],y_coords[i],x_edges,y_edges)
-
-print(xgrids[i],ygrids[i])
-print(x2,y2)
-
-'''
+    xgrids = torch.floor((point_cloud[:,0] + range) / pillar_size)
+    ygrids = torch.floor((point_cloud[:,1] + range) / pillar_size)
+    grids = list(zip(xgrids,ygrids))
 
 
 
+    return pillar_list
 
-'''
-print('discretizing sweep: ')
-sweep = discretize_pointcloud(sample_dict['sweep'], array_size=60, trim_range=15, spatial_resolution=0.5, padding=False)
-print(' ')
-print('Creating png: ')
-array_to_png(sweep, 'sweep_png')
-del sweep
 
-print('discretizing map: ')
-cutout = discretize_pointcloud(sample_dict['map'], array_size=90, trim_range=22, spatial_resolution=0.5, padding=False)
-print(' ')
-print('Creating png: ')
-array_to_png(cutout, 'map_png')
-del cutout
-'''
+def create_pillars(point_cloud, pillar_size=0.16):
+    x_edges = np.arange(-22, 22, pillar_size)
+    y_edges = np.arange(-22, 22, pillar_size)
+    pillar_dict = {}
+    #For-loop for every coordinate tripe in the list
+    for row in range(len(point_cloud[:,0])): # TODO: maybe we should sort for x and y as we did before? /A
+        # Get which grid the current point belongs to. The key in the dict has the name of the grid. ex 0,0
+        x_grid, y_grid = get_grid(point_cloud[row,0], point_cloud[row,1], x_edges, y_edges)
+        cell_name = str(x_grid) + ',' + str(y_grid)
+
+        # If the cell name has been used before concatenate the points and update the value of the key. Else create
+        # a new key and add the coordinates of the point.
+        if cell_name in pillar_dict.keys():
+
+            cell_value = pillar_dict[cell_name]
+            cell_value = np.vstack((cell_value, point_cloud[row,:]))
+
+            pillar_dict.update({cell_name: cell_value})
+
+        else:
+            pillar_dict.update({cell_name : point_cloud[row,:]})
+
+    # Calculate the features for each point in the point cloud.
+    for key in pillar_dict.keys():
+
+        key_value = pillar_dict[key]
+        num_points = len(key_value)
+
+        if np.shape(key_value) == (3,):
+            key_value = key_value.reshape((1,np.shape(key_value)[0]))
+
+        x_grid, y_grid = get_grid(key_value[0,0], key_value[0,1], x_edges, y_edges)
+
+        # 1. calculate distance to the arithmetic mean for x,y,z
+        # And then calculate the features xc, yc, zc which is the distance from the arithmetic mean. Reshape to be able
+        # to stack them later.
+        x_mean = key_value[:, 0].sum(axis=0)/num_points
+        y_mean = key_value[:, 1].sum(axis=0)/num_points
+        z_mean = key_value[:, 2].sum(axis=0)/num_points
+
+        xc = key_value[:, 0] - x_mean
+        xc = xc.reshape((np.shape(xc)[0],1))
+
+        yc = key_value[:, 1] - y_mean
+        yc = yc.reshape((np.shape(yc)[0], 1))
+
+        zc = key_value[:, 2] - z_mean
+        zc = zc.reshape((np.shape(zc)[0], 1))
+
+        # 2. calculate the offset from the pillar x,y center i.e xp and yp.
+        # Reshape to be able to stack them later.
+        x_offset = x_edges[x_grid] + pillar_size/2
+        y_offset = y_edges[y_grid] + pillar_size/2
+
+        xp = key_value[:, 0] - x_offset
+        xp = xp.reshape((np.shape(xp)[0],1))
+
+        yp = key_value[:, 1] - y_offset
+        yp = yp.reshape((np.shape(yp)[0],1))
+
+        # 3. Append the new features column wise to the array with the point coordinates.
+        features = np.hstack((key_value, xc, yc, zc, xp, yp))
+
+        # 4. Update the dict key with the complete feature array
+        pillar_dict.update({key: features})
+
+    return pillar_dict
 
