@@ -188,3 +188,77 @@ class Gustav(torch.nn.Module):
     def name(self):
         return "Gustav"
 
+
+
+class Caltagirone(torch.nn.Module):
+
+    def __init__(self):
+        super(Caltagirone, self).__init__()
+        # Our batch shape for input x is (batch_size, 4, 300, 300)
+
+        # ENCODER
+        self.conv1 = torch.nn.Conv2d(2, 32, kernel_size=3, stride=1, padding=1)
+        self.conv2 = torch.nn.Conv2d(32, 32, kernel_size=3, stride=1, padding=1)
+
+        self.pool = torch.nn.MaxPool2d(kernel_size=2, stride=2, padding=0)
+
+        # CONTEXT
+        self.dropout_2d = torch.nn.Dropout2d(p=0.2)
+        self.conv3 = torch.nn.Conv2d(32, 128, kernel_size=3, stride=1, padding=1, dilation=1)
+        self.conv4 = torch.nn.Conv2d(128, 128, kernel_size=3, stride=1, padding=1, dilation=2)
+        self.conv5 = torch.nn.Conv2d(128, 128, kernel_size=3, stride=1, padding=1, dilation=4)
+        self.conv6 = torch.nn.Conv2d(128, 128, kernel_size=3, stride=1, padding=1, dilation=8)
+        self.conv7 = torch.nn.Conv2d(128, 128, kernel_size=3, stride=1, padding=1, dilation=16)
+        self.conv8 = torch.nn.Conv2d(128, 128, kernel_size=3, stride=1, padding=1, dilation=32)
+        self.conv9 = torch.nn.Conv2d(128, 128, kernel_size=3, stride=1, padding=1, dilation=64)
+
+        self.conv10 = torch.nn.Conv2d(128, 32, kernel_size=1, stride=1, padding=0)
+
+
+        # FC
+        self.dropout_1d = torch.nn.Dropout2d(p=0.25)
+        self.fc1 = torch.nn.Linear(32*75*75, 1024)
+        self.fc2 = torch.nn.Linear(1024, 256)
+        self.fc3 = torch.nn.Linear(256, 64)
+        self.fc_out = torch.nn.Linear(64, 3)
+
+
+    def forward(self, x):
+        # ENCODER
+        x = F.elu(self.conv1(x))  # 32,300,300
+        x = F.elu(self.conv2(x))  # 32,300,300
+        x = self.pool(x)  # 32,150,150
+
+        # CONTEXT
+        x = F.elu(self.conv3(x))  # 128,150,150
+        x = self.dropout_2d(x)
+        x = F.elu(self.conv4(x))  # 128,150,150
+        x = self.dropout_2d(x)
+        x = F.elu(self.conv5(x)) # 128,150,150
+        x = self.dropout_2d(x)
+        x = F.elu(self.conv6(x))  # 128,150,150
+        x = self.dropout_2d(x)
+        x = F.elu(self.conv7(x))  # 128,150,150
+        x = self.dropout_2d(x)
+        x = F.elu(self.conv8(x))  # 128,150,150
+        x = self.dropout_2d(x)
+        x = F.elu(self.conv9(x))  # 128,150,150
+        x = self.dropout_2d(x)
+
+        x = F.elu(self.conv10(x))  # 32,150,150
+
+        x = self.pool(x) # 32,75,75
+
+        # FC
+        x = x.view(-1, 32*75*75)
+        x = torch.tanh(self.fc1(x))
+        x = torch.tanh(self.fc2(x))
+        x = torch.tanh(self.fc3(x))
+
+        x = self.fc_out(x)
+
+        return x
+
+    def name(self):
+        return "Caltagirone"
+
