@@ -253,7 +253,7 @@ class Caltagirone(torch.nn.Module):
         x = x.view(-1, 32*75*75)
         x = torch.tanh(self.fc1(x))
         x = torch.tanh(self.fc2(x))
-        x = torch.tanh(self.fc3(x))
+        x = self.fc3(x)
 
         x = self.fc_out(x)
 
