@@ -3,17 +3,16 @@ from torch.autograd import Variable
 from torch.optim.lr_scheduler import StepLR
 import numpy as np
 import os
-# from early_stopping import EarlyStopping
+from early_stopping import EarlyStopping
 import torch
 from point_cloud_net import *
-from sabina_data_set import *
+from data_set_pc_samples import *
 
 
 def create_loss_and_optimizer(net, learning_rate=0.001):
+
     # Loss function
-
     loss = torch.nn.SmoothL1Loss()
-
     # Optimizer
     optimizer = torch.optim.Adam(net.parameters(), lr=learning_rate, weight_decay=1e-5)
 
@@ -29,10 +28,11 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
     #data_set_path = '/home/master04/Desktop/Dataset/point_cloud/pc_small_set'
 
     data_set_path = '/Users/sabinalinderoth/Desktop/Dataset/point_cloud/pc_small_set'
-    number_of_samples = 25 #int(input('Type number of samples: '))
+
+    number_of_samples = len(os.listdir(data_set_path))  # int(input('Type number of samples: '))
 
     net = PointPillars(batch_size)
-    #print('=======> NETWORK NAME: =======> ', net.name())
+    print('=======> NETWORK NAME: =======> ', net.name())
     if use_cuda:
         net.cuda()
     #print('Are model parameters on CUDA? ', next(net.parameters()).is_cuda)
@@ -59,11 +59,11 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
     train_loss = []
 
     # initialize the early_stopping object
-    # early_stopping = EarlyStopping(folder_path, patience, verbose=True)
+    early_stopping = EarlyStopping(folder_path, patience, verbose=True)
 
     # Get training data
     n_batches = len(train_loader)
-    # print('Number of batches: ', n_batches)
+    print('Number of batches: ', n_batches)
 
     # Create our loss and optimizer functions
     loss, optimizer = create_loss_and_optimizer(net, learning_rate)

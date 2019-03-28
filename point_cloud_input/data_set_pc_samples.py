@@ -1,12 +1,9 @@
-import pandas as pd
 import numpy as np
 import os
 import torch
 from torch.utils.data import Dataset
 from torch.autograd import Variable
-import time
 from torch.utils.data.sampler import SubsetRandomSampler
-
 import pickle
 
 
@@ -16,7 +13,8 @@ class LiDARDataSet_PC(Dataset):
     def __init__(self, sample_dir, number_of_samples):
         """
         Args:
-            sample_dir (string): Directory with all the samples.
+            sample_dir <string>: Directory with all the samples.
+            number_of_samples <int>: number of samples in the folder
         """
         self.sample_dir = sample_dir
         self.length = len(os.listdir(sample_dir))
@@ -38,10 +36,9 @@ class LiDARDataSet_PC(Dataset):
 
 def get_train_loader_pc(batch_size, data_set_path, number_of_samples, kwargs):
     '''
-    Get a training data loader.
+    Create training data loader.
     :param batch_size: batch size when making a forward pass through network
     :param data_set_path: Path to directory with all the folder containing ply-files for each grid over town.
-    :param csv_path: Path to csv-file that describes the folder structure for the grids over town.
     :param number_of_samples: Number of samples to create in the dataset
     :param kwargs: use cpu or gpu
     :return: train_loader: data loader

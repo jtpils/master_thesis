@@ -151,28 +151,59 @@ class Backbone(nn.Module):
         Backbone. output a rigid transformation.
         """
         super(Backbone, self).__init__()
-        # input : [128, 282, 282]
-        self.conv1 = torch.nn.Conv2d(128, 64, kernel_size=5, stride=1, padding=0)
-        self.conv2 = torch.nn.Conv2d(64, 16, kernel_size=4, stride=1, padding=0)
 
-        self.conv1_bn = torch.nn.BatchNorm2d(64)
-        self.conv2_bn = torch.nn.BatchNorm2d(16)
+        # input size: (128, 282, 282)
+        # Block 1:
+        # relu + 4 conv + bn
+        self.conv1 = torch.nn.Conv2d(128, 64, kernel_size=3, stride=1, padding=0)
+        self.conv2 = torch.nn.Conv2d(64, 64, kernel_size=3, stride=1, padding=0)
 
-        self.pool2 = torch.nn.MaxPool2d(kernel_size=2, stride=2, padding=0)
+        self.bn1 = torch.nn.BatchNorm2d(64)
 
-        self.fc1 = torch.nn.Linear(16 * 68 * 68, 32)
+        # Block 2:
+        # relu + 6 conv + stride 2 + bn
+        self.conv3 = torch.nn.Conv2d(64, 128, kernel_size=3, stride=2, padding=0)  # (128, 282, 282)
+        self.conv4 = torch.nn.Conv2d(128, 128, kernel_size=3, stride=2, padding=0)
+        self.conv5 = torch.nn.Conv2d(64, 128, kernel_size=3, stride=1, padding=0)  # (64, 282, 282)
+        self.conv6 = torch.nn.Conv2d(32, 64, kernel_size=3, stride=1, padding=0)  # (64, 282, 282)
+        self.conv7 = torch.nn.Conv2d(16, 32, kernel_size=3, stride=1, padding=0)  # (64, 282, 282)
+        self.conv8 = torch.nn.Conv2d(8, 16, kernel_size=3, stride=1, padding=0)  # (64, 282, 282)
+
+        self.bn2 = torch.nn.BatchNorm2d(128)
+        self.bn3 = torch.nn.BatchNorm2d(64)
+        self.bn4 = torch.nn.BatchNorm2d(32)
+        self.bn5 = torch.nn.BatchNorm2d(16)
+
+        # Block 3:
+        # 2 fully connected with drop out.
+
+        self.fc1 = torch.nn.Linear( 8 * 59 * 59, 32)
         self.fc1_bn = torch.nn.BatchNorm1d(32)
         self.fc_out = torch.nn.Linear(32, 3)
 
     def forward(self, x):
 
-        x = F.relu(self.conv1_bn(self.conv1(x)))  # 64, 278, 278
-        x = self.pool2(x) # 64, 139, 139
+        # input (128,282,282)
 
-        x = F.relu(self.conv2_bn(self.conv2(x)))  # 16, 136, 136
-        x = self.pool2(x)  # 16, 68, 68
+        # Block 1:
+        x = F.relu(self.bn1(self.conv1(x)))  # (64, 280, 280)
+        x = F.relu(self.bn1(self.conv2(x)))  # (64, 278, 278)
+        x = F.relu(self.bn1(self.conv2(x)))  # (64, 276, 276)
+        x = F.relu(self.bn1(self.conv2(x)))  # (64, 274, 274)
+        #x = self.pool2(x)  # (64, 140, 140)
 
-        x = x.view(-1, 16 * 68 * 68)
+        # Block 2:
+        x = F.relu(self.bn3(self.conv3(x)))  # (128, 136, 136)
+        x = F.relu(self.bn2(self.conv4(x)))  # (128, 67, 67)
+        x = F.relu(self.bn2(self.conv5(x)))  # (64, 65, 65)
+        x = F.relu(self.bn3(self.conv6(x)))  # (32, 63, 63)
+        x = F.relu(self.bn4(self.conv7(x)))  # (16, 61, 61)
+        x = F.relu(self.bn5(self.conv8(x)))  # (8, 59, 59)
+
+
+        # Block 3:
+
+        x = x.view(-1, 8 * 59 * 59)
         x = torch.tanh(self.fc1_bn(self.fc1(x)))
         x = self.fc_out(x)
 
@@ -193,19 +224,12 @@ class PointPillars(torch.nn.Module):
 
     def forward(self, sweep, map):
 
-        t1 = time.time()
         sweep_outputs = self.PFNlayer_sweep.forward(sweep)
-        t2 = time.time()
         map_outputs = self.PFNlayer_map.forward(map)
-        t3 = time.time()
         sweep_canvas = fasterScatter(sweep, sweep_outputs, self.batch_size)
         map_canvas = fasterScatter(map, map_outputs, self.batch_size)
         zipped_canvas = list(zip(sweep_canvas,map_canvas))
         concatenated_canvas = torch.zeros(self.batch_size, 128, 282, 282)
-
-        #print('Time sweep_canvas:', t2 - t1)
-        #print('Time map_canvas:', t3 - t2)
-        #print('Time zipped_canvas:', t4 - t3)
 
         for i in np.arange(self.batch_size):
             sweep_layers = zipped_canvas[i][0]
@@ -213,16 +237,13 @@ class PointPillars(torch.nn.Module):
             concatenated_layers = torch.cat((sweep_layers , map_layers ), 0)
 
             concatenated_canvas[i, :, :, :] = concatenated_layers
-        t4 = time.time()
 
         output = self.Backbone.forward(concatenated_canvas)
-        t5 = time.time()
 
-        #print('PFNlayer for sweep: ', t2-t1)
-        #print('PFNlayer for map: ', t3-t2)
-        #print('Scatter to pseudo image: ', t4-t3)
-        #print('Backbone: ', t5-t4)
         del sweep_canvas, map_canvas, zipped_canvas, concatenated_layers, sweep_outputs, map_outputs
         return output
+
+    def name(self):
+        return "PointPillars"
 
 
