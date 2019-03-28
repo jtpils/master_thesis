@@ -11,7 +11,7 @@ import pickle
 
 
 class LiDARDataSet_PC(Dataset):
-    """Lidar sample dataset."""
+    """Lidar sample dataset, load from existing sample files."""
 
     def __init__(self, sample_dir, number_of_samples):
         """

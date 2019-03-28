@@ -8,6 +8,11 @@ from lidar_processing_functions import *
 import matplotlib.pyplot as plt
 
 
+#########################################################################################################
+# This dataset return a dict containing a sweep and a dense map and labels. Use this to create pillars. #
+#########################################################################################################
+
+
 def get_file_name_from_frame_number(frame_number_array):
     '''
     return a file name as a string given the file's frame number.
