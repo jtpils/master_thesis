@@ -22,34 +22,12 @@ def get_grid(x, y, x_edges, y_edges):
     return x_grid_number, y_grid_number
 
 
-def create_pillars(point_cloud, pillar_size=0.16):
+def create_pillars(point_cloud, pillar_size=0.5):
     '''
     Function that creates a dict containing the 8 features for each pillar in a point cloud. Each pillar is grid_size large.
     :param point_cloud: <nd.array> [nx3] nd array containing the x, y, z coordinates of a point cloud
     :param pillar_size: <float> The size of the pillar.
     :return: pillar_dict: <dict> A dict containing the features for each pillar
-    '''
-
-    '''
-    # OLD CODE 
-    min_x = np.min(point_cloud[:, 0])
-    max_x = np.max(point_cloud[:,0])
-    min_y = np.min(point_cloud[:,1])
-    max_y = np.max(point_cloud[:, 1])
-
-    x_edges = []
-    x = min_x
-
-    while x <= max_x + pillar_size:  # creates list with the x-edge values of the grids
-        x_edges.append(x)
-        x = x + pillar_size
-
-    y_edges = []
-    y = min_y
-
-    while y <= max_y + pillar_size:  # creates list with the y-edge values of the grids
-        y_edges.append(y)
-        y = y + pillar_size
     '''
 
     x_edges = np.arange(-15, 15, pillar_size)
@@ -121,7 +99,7 @@ def create_pillars(point_cloud, pillar_size=0.16):
     return pillar_dict
 
 
-def get_feature_tensor(pillar_dict, max_number_of_pillars=12000, max_number_of_points_per_pillar=100, dimension=8):
+def get_feature_tensor(pillar_dict, max_number_of_pillars=12000, max_number_of_points_per_pillar=100, dimension=3):
     '''
     Function that creates the feature tensor with dimension (D,P,N)
     D = Dimension (8)
