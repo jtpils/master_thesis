@@ -28,7 +28,7 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
     #path_training_data = '/home/master04/Desktop/Dataset/small_samples/fake_training_set'  # '/home/master04/Desktop/Dataset/fake_training_data_torch'#
     #path_validation_data = '/home/master04/Desktop/Dataset/small_samples/fake_validation_set'
 
-    CNN = SmallDuchess()
+    CNN = Duchess()
     print('=======> NETWORK NAME: =======> ', CNN.name())
     if use_cuda:
         CNN.cuda()
