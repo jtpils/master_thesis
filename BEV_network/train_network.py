@@ -14,9 +14,9 @@ def create_loss_and_optimizer(net, learning_rate=0.001):
     #loss = torch.nn.SmoothL1Loss()
 
     # Optimizer
-    # optimizer = torch.optim.Adam(net.parameters(), lr=learning_rate)#, weight_decay=1e-5)
+    optimizer = torch.optim.Adam(net.parameters(), lr=learning_rate)#, weight_decay=1e-5)
     # optimizer = optim.Adagrad(net.parameters(), lr=learning_rate, lr_decay=1e-3)
-    optimizer = torch.optim.SGD(net.parameters(), lr=learning_rate)
+    # optimizer = torch.optim.SGD(net.parameters(), lr=learning_rate)
     return loss, optimizer
 
 
