@@ -12,8 +12,8 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
 
     path_training_data = '/home/annika_lundqvist144/BEV_samples/fake_training_set' #input('Path to training data set folder: ')
     path_validation_data = '/home/annika_lundqvist144/BEV_samples/fake_validation_set'
-    path_training_data = '/home/master04/Desktop/Dataset/BEV_samples/fake_training_set'  # '/home/master04/Desktop/Dataset/fake_training_data_torch'#
-    path_validation_data = '/home/master04/Desktop/Dataset/BEV_samples/fake_validation_set'
+    #path_training_data = '/home/master04/Desktop/Dataset/BEV_samples/fake_training_set'  # '/home/master04/Desktop/Dataset/fake_training_data_torch'#
+    #path_validation_data = '/home/master04/Desktop/Dataset/BEV_samples/fake_validation_set'
 
     CNN = Caltagirone()
     print('=======> NETWORK NAME: =======> ', CNN.name())
