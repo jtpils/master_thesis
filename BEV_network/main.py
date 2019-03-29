@@ -4,7 +4,7 @@ import os
 
 def main():
     # load old weights! change here manually
-    load_weights = True
+    load_weights = False
     load_weights_path = '/home/annika_lundqvist144/master_thesis/BEV_network/Gustav_190328_1/parameters/epoch_9_checkpoint.pt'
 
     save_parameters_folder = input('Type name of new folder: ')
