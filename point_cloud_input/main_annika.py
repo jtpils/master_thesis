@@ -1,6 +1,6 @@
-from data_set_point_cloud import *
+from data_set_point_cloud import PointCloudDataSet
 import time
-
+import numpy as np
 
 data_set_path = '/home/master04/Desktop/Dataset/ply_grids/Town02_sorted_grid_ply'
 number_of_samples = 10
@@ -14,22 +14,54 @@ print('Time to load 1 sample: ', t2-t1)
 sweep = sample['sweep']
 map_cutout = sample['map']
 
+
+def get_grid(x, y, x_edges, y_edges):
+    k = 0
+    for edge in x_edges:
+        if x >= edge:
+            x_grid_number = k
+        k = k + 1
+
+    k = 0
+    for edge in y_edges:
+        if y >= edge:
+            y_grid_number = k
+        k = k + 1
+
+    return x_grid_number, y_grid_number
+
+
 # sort into pillars
-def createPillarsFast(point_cloud, pillar_size=0.16, range=22):
+def createPillarsFast(point_cloud, pillar_size=0.5, trim_range=15):
+    t1 = time.time()
+    num_points = 300  # maximum number of points in each pillar
     pillar_list = []
 
-    xgrids = torch.floor((point_cloud[:,0] + range) / pillar_size)
-    ygrids = torch.floor((point_cloud[:,1] + range) / pillar_size)
-    grids = list(zip(xgrids,ygrids))
+    #point_cloud = np.array(((1,1,1),(2,2,2),(3,3,3),(3,3,3),(1,1,1),(1,1,1)))
 
+    xgrids = np.floor((point_cloud[:,0] + trim_range) / pillar_size)
+    ygrids = np.floor((point_cloud[:,1] + trim_range) / pillar_size)
+    grid_list = list(zip(xgrids, ygrids))   # return grid index for each lidar point
+    unique_grids = list(set(zip(xgrids, ygrids)))  # return set of unique grid combinations. This variable should be kept around to translate the features to a pseudo image later on.
 
+    get_indices = lambda x, xs: [i for (y, i) in zip(xs, range(len(xs))) if x == y]
+
+    # Sort all points into a list. One element in the list per unique grid.
+    for grid in unique_grids:
+        #indices = grid_list.index(grid)  # find all coordinates within this specific grid
+        indices = get_indices(grid, grid_list)
+        pillar_list.append(point_cloud[indices,:])
+
+    t2 = time.time()
+    print('createPillarsFast: ', t2-t1)
 
     return pillar_list
 
 
-def create_pillars(point_cloud, pillar_size=0.16):
-    x_edges = np.arange(-22, 22, pillar_size)
-    y_edges = np.arange(-22, 22, pillar_size)
+def create_pillars(point_cloud, pillar_size=0.5):
+    t1 = time.time()
+    x_edges = np.arange(-15, 15, pillar_size)
+    y_edges = np.arange(-15, 15, pillar_size)
     pillar_dict = {}
     #For-loop for every coordinate tripe in the list
     for row in range(len(point_cloud[:,0])): # TODO: maybe we should sort for x and y as we did before? /A
@@ -49,6 +81,8 @@ def create_pillars(point_cloud, pillar_size=0.16):
         else:
             pillar_dict.update({cell_name : point_cloud[row,:]})
 
+    t2 = time.time()
+    print('create_pillars: ', t2-t1)
     # Calculate the features for each point in the point cloud.
     for key in pillar_dict.keys():
 
@@ -95,3 +129,7 @@ def create_pillars(point_cloud, pillar_size=0.16):
 
     return pillar_dict
 
+
+
+a = create_pillars(map_cutout) # 0.8 s
+a = createPillarsFast(map_cutout) # 7.4 s, not so fast...
