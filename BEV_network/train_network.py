@@ -69,8 +69,8 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
 
     # Time for printing
     training_start_time = time.time()
-    train_loss_save = len(train_loader)  # append train loss for each mini batch later on, save this information to plot correctly
-    val_loss_save = len(val_loader)
+    train_loss_save = [len(train_loader)]  # append train loss for each mini batch later on, save this information to plot correctly
+    val_loss_save = [len(val_loader)]
 
     # Loop for n_epochs
     for epoch in range(n_epochs):
