@@ -10,8 +10,8 @@ import numpy as np
 def create_loss_and_optimizer(net, learning_rate=0.001):
     # Loss function
     # loss = torch.nn.CrossEntropyLoss()
-    #loss = torch.nn.MSELoss()
-    loss = torch.nn.SmoothL1Loss()
+    loss = torch.nn.MSELoss()
+    #loss = torch.nn.SmoothL1Loss()
 
     # Optimizer
     optimizer = torch.optim.Adam(net.parameters(), lr=learning_rate)#, weight_decay=1e-5)
@@ -25,8 +25,8 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
 
     path_training_data = '/home/annika_lundqvist144/BEV_samples/fake_training_set' #input('Path to training data set folder: ')
     path_validation_data = '/home/annika_lundqvist144/BEV_samples/fake_validation_set'
-    #path_training_data = '/home/master04/Desktop/Dataset/BEV_samples/fake_training_set'  # '/home/master04/Desktop/Dataset/fake_training_data_torch'#
-    #path_validation_data = '/home/master04/Desktop/Dataset/BEV_samples/fake_validation_set'
+    path_training_data = '/home/master04/Desktop/Dataset/BEV_samples/fake_training_set'  # '/home/master04/Desktop/Dataset/fake_training_data_torch'#
+    path_validation_data = '/home/master04/Desktop/Dataset/BEV_samples/fake_validation_set'
 
     CNN = Duchess()
     print('=======> NETWORK NAME: =======> ', CNN.name())

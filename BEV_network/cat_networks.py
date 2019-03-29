@@ -205,12 +205,12 @@ class Caltagirone(torch.nn.Module):
         # CONTEXT
         self.dropout_2d = torch.nn.Dropout2d(p=0.2)
         self.conv3 = torch.nn.Conv2d(32, 128, kernel_size=3, stride=1, padding=1, dilation=1)
-        self.conv4 = torch.nn.Conv2d(128, 128, kernel_size=3, stride=1, padding=1, dilation=2)
-        self.conv5 = torch.nn.Conv2d(128, 128, kernel_size=3, stride=1, padding=1, dilation=4)
-        self.conv6 = torch.nn.Conv2d(128, 128, kernel_size=3, stride=1, padding=1, dilation=8)
-        self.conv7 = torch.nn.Conv2d(128, 128, kernel_size=3, stride=1, padding=1, dilation=16)
-        self.conv8 = torch.nn.Conv2d(128, 128, kernel_size=3, stride=1, padding=1, dilation=32)
-        self.conv9 = torch.nn.Conv2d(128, 128, kernel_size=3, stride=1, padding=1, dilation=32)
+        self.conv4 = torch.nn.Conv2d(128, 128, kernel_size=3, stride=1, padding=2, dilation=2)
+        self.conv5 = torch.nn.Conv2d(128, 128, kernel_size=3, stride=1, padding=4, dilation=4)
+        self.conv6 = torch.nn.Conv2d(128, 128, kernel_size=3, stride=1, padding=8, dilation=8)
+        self.conv7 = torch.nn.Conv2d(128, 128, kernel_size=3, stride=1, padding=16, dilation=16)
+        self.conv8 = torch.nn.Conv2d(128, 128, kernel_size=3, stride=1, padding=32, dilation=32)
+        self.conv9 = torch.nn.Conv2d(128, 128, kernel_size=3, stride=1, padding=64, dilation=64)
 
         self.conv10 = torch.nn.Conv2d(128, 32, kernel_size=1, stride=1, padding=0)
 
