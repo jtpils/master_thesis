@@ -140,7 +140,7 @@ def discretize_pointcloud(trimmed_point_cloud, array_size=300, trim_range=15, sp
     '''
 
     array_size = int(array_size)
-    discretized_pointcloud = np.zeros([2, array_size, array_size])
+    discretized_pointcloud = np.zeros([1, array_size, array_size])
 
     if len(trimmed_point_cloud) is 0:
 
@@ -175,7 +175,7 @@ def discretize_pointcloud(trimmed_point_cloud, array_size=300, trim_range=15, sp
                     # if there are detections save these in right channel
                     if np.shape(y_interval)[0] is not 0:
                         discretized_pointcloud[0, x_cell, y_cell] = np.shape(y_interval)[0]
-                        discretized_pointcloud[1, x_cell, y_cell] = np.mean(y_interval[:, 2])
+                        #discretized_pointcloud[1, x_cell, y_cell] = np.mean(y_interval[:, 2])
 
                     # if there are no detections not necessary already initialized to zero
                     #else:
@@ -379,7 +379,7 @@ def normalize_sample(sample):
     '''
 
     # Normalize number of detections:
-    for layer in (0, 2):  # normalize number of detections in layer 0 and layer 2
+    for layer in (0, 1):#, 2):  # normalize number of detections in layer 0 and layer 2
         max_value = np.max(sample[layer, :, :])
 
         # avoid division with 0
@@ -390,7 +390,7 @@ def normalize_sample(sample):
         sample[layer, :, :] = sample[layer, :, :] * scale
 
     # Normalize height wrt to max value of both map and sweep:
-    max_height = 0
+    '''max_height = 0
     for layer in (1, 3):  # max height in sweep and cutout
         max_height_temp = np.max(sample[layer, :, :])
         if max_height_temp > max_height:
@@ -404,9 +404,9 @@ def normalize_sample(sample):
     for layer in (1, 3):  # height channels normalized wrt to the same max value
         sample[layer, :, :] = sample[layer, :, :] * scale
 
-        normalized_sample = sample
+        normalized_sample = sample'''
 
-    return normalized_sample
+    return sample
 
 
 def rounding(n, r=0.05):

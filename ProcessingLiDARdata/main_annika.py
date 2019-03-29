@@ -4,24 +4,13 @@ from matplotlib import pyplot as plt
 import pandas as pd
 
 
-path_to_ply = '/home/master04/Desktop/Ply_files/_out_Town02_190306_1/pc/002198.ply'
-path_to_csv = '/home/master04/Desktop/Ply_files/_out_Town02_190306_1/Town02_190306_1.csv'
+path = '/home/master04/Documents/master_thesis/ProcessingLiDARdata/fake_training_set/samples/1.npy'
+pc = np.load(path)
+visualize_detections(pc,layer=0, fig_num=1)
 
-
-pc, global_lidar_coordinates = load_data(path_to_ply, path_to_csv)
-
-# trim the point cloud
-pc = trim_pointcloud(pc, range=15, roof=20, floor=0)
-
-#plt.plot(pc[:,0], pc[:,1], '.')
-#plt.show()
-
-# discretize the sweep with padding
-pc = discretize_pointcloud(pc, array_size=600, trim_range=15, spatial_resolution=0.05, padding=False, pad_size=150)
-
-visualize_detections(pc,1)
-
-visualize_detections(pc,2)
+path = '/home/master04/Documents/master_thesis/ProcessingLiDARdata/fake_training_set/samples/1.npy'
+pc = np.load(path)
+visualize_detections(pc,layer=1, fig_num=2)
 plt.show()
 
 #plt.imshow(pc[0,:,:], cmap='gray')

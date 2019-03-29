@@ -23,7 +23,7 @@ path_to_lidar_data_test = '/home/master04/Desktop/Ply_files/validation_and_test/
 
 
 path_to_lidar_data_list = [path_to_lidar_data_training, path_to_lidar_data_validation, path_to_lidar_data_test]
-number_of_files_to_load_list = [1400, 400, 200]
+number_of_files_to_load_list = [2800, 800, 400]
 
 k = 0
 for foldername in input_folder_name:
@@ -51,7 +51,7 @@ for foldername in input_folder_name:
             path_to_csv = os.path.join(path_to_lidar_data, file)
 
     translation = float(1)
-    rotation = float(2.5)
+    rotation = float(0.0)
     number_of_files_to_load = number_of_files_to_load_list[k]
     print('number of files to load', number_of_files_to_load)
     ########################################################################################################
