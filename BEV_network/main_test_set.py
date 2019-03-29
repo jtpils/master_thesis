@@ -3,11 +3,12 @@ import matplotlib.pyplot as plt
 import torch
 from cat_networks import *
 from torch.autograd import Variable
+import torch
 
 
 # load old weights! change here manually
 load_weights = True
-load_weights_path = '/home/master04/Desktop/network_parameters/Duchess_190238_2/parameters/epoch_2_checkpoint.pt'
+load_weights_path = '/home/master04/Desktop/network_parameters/Duchess_12/parameters/epoch_33_checkpoint.pt'
 
 path_test_data = '/home/master04/Desktop/Dataset/BEV_samples/fake_test_set'#'/home/master04/Desktop/Dataset/BEV_samples/fake_test_set'
 
@@ -116,7 +117,7 @@ plt.ylabel('Difference in degrees')
 plt.show()
 
 
-model_dict = np.load(load_weights_path)
+model_dict = torch.load(load_weights_path, map_location='cpu')
 train_loss = model_dict['train_loss']
 val_loss = model_dict['val_loss']
 train_vec = np.arange(1,len(train_loss)+1)

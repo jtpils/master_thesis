@@ -153,7 +153,12 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
         # save the loss for each epoch
         train_loss.append(total_train_loss / len(train_loader))
         val_loss.append(total_val_loss / len(val_loader))
-        
+
+        train_path = folder_path + '/train_loss.npy'
+        val_path = folder_path + '/val_loss.npy'
+        np.save(train_path, train_loss)
+        np.save(val_path, val_loss)
+
         # see if validation loss has decreased, if it has a checkpoint will be saved of the current model.
         early_stopping(epoch, total_train_loss, total_val_loss, CNN, optimizer)
 

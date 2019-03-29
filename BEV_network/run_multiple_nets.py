@@ -163,7 +163,7 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
             break
 
     print("Training finished, took {:.2f}s".format(time.time() - training_start_time))
-    del CNN, optimizer, loss, loss_size, val_loss_size, early_stopping
+    del CNN, optimizer, loss, early_stopping
     return train_loss, val_loss
 
 
