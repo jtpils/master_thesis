@@ -14,9 +14,9 @@ def create_loss_and_optimizer(net, learning_rate=0.001):
     #loss = torch.nn.SmoothL1Loss()
 
     # Optimizer
-    optimizer = torch.optim.Adam(net.parameters(), lr=learning_rate)#, weight_decay=1e-5)
+    # optimizer = torch.optim.Adam(net.parameters(), lr=learning_rate)#, weight_decay=1e-5)
     # optimizer = optim.Adagrad(net.parameters(), lr=learning_rate, lr_decay=1e-3)
-    # optimizer = optim.SGD(net.parameters(), lr=learning_rate)
+    optimizer = torch.optim.SGD(net.parameters(), lr=learning_rate)
     return loss, optimizer
 
 
@@ -28,7 +28,7 @@ def train_network(CNN, n_epochs, learning_rate, patience, folder_path, use_cuda,
     #path_training_data = '/home/master04/Desktop/Dataset/BEV_samples/fake_training_set'  # '/home/master04/Desktop/Dataset/fake_training_data_torch'#
     #path_validation_data = '/home/master04/Desktop/Dataset/BEV_samples/fake_validation_set'
 
-    CNN = Caltagirone()
+    CNN = Duchess()
     print('=======> NETWORK NAME: =======> ', CNN.name())
     if use_cuda:
         CNN.cuda()
