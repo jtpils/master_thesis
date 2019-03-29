@@ -15,7 +15,7 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
     #path_training_data = '/home/master04/Desktop/Dataset/BEV_samples/fake_training_set'  # '/home/master04/Desktop/Dataset/fake_training_data_torch'#
     #path_validation_data = '/home/master04/Desktop/Dataset/BEV_samples/fake_validation_set'
 
-    CNN = Caltagirone()
+    CNN = Duchess()
     print('=======> NETWORK NAME: =======> ', CNN.name())
     if use_cuda:
         CNN.cuda()
@@ -172,9 +172,9 @@ def main():
     load_weights = False
     load_weights_path = '/home/annika_lundqvist144/master_thesis/BEV_network/Gustav_190328_1/parameters/epoch_9_checkpoint.pt'
 
-    optimizer_list = [1,2,1,2] #1 is Adam, 2 is SGD
-    loss_list = [1,1,2,2] #1 is smoothl1, 2 is MSE
-    model_names = ['Caltagirone_11', 'Caltagirone_21', 'Caltagirone_12', 'Caltagirone_22'] #combine all optimizers with all losses
+    loss_list = [1,2] #1 is smoothl1, 2 is MSE
+    optimizer_list = [2,2] #1 is Adam, 2 is SGD
+    model_names = ['Duchess_12', 'Duchess_22'] #combine all optimizers with all losses
 
     for i in np.arange(4):
         save_parameters_folder = model_names[i]
