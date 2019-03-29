@@ -8,9 +8,9 @@ def main():
     load_weights_path = '/home/annika_lundqvist144/master_thesis/BEV_network/Gustav_190328_1/parameters/epoch_9_checkpoint.pt'
 
     save_parameters_folder = input('Type name of new folder: ')
-    n_epochs = int(input('Number of epochs: '))
-    learning_rate = float(input('Learning rate: '))
-    patience = int(input('Input patience for EarlyStopping: ')) # Threshold for early stopping. Number of epochs that we will wait until brake
+    n_epochs = 50 #int(input('Number of epochs: '))
+    learning_rate = 0.01 #float(input('Learning rate: '))
+    patience = 15 #int(input('Input patience for EarlyStopping: ')) # Threshold for early stopping. Number of epochs that we will wait until brake
     batch_size = int(input('Input batch size: '))
     plot_flag = 'n' #input('Plot results? y / n: ')
 
