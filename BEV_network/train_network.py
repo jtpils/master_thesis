@@ -21,7 +21,7 @@ def create_loss_and_optimizer(net, learning_rate=0.001):
 
 
 # def train_network(net, train_loader, val_loader, n_epochs, learning_rate, patience, folder_path, device, use_cuda):
-def train_network(CNN, n_epochs, learning_rate, patience, folder_path, use_cuda, batch_size, load_weights, load_weights_path, optimizer_selection, loss_selection):
+def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batch_size, load_weights, load_weights_path):
 
     path_training_data = '/home/annika_lundqvist144/BEV_samples/fake_training_set' #input('Path to training data set folder: ')
     path_validation_data = '/home/annika_lundqvist144/BEV_samples/fake_validation_set'
