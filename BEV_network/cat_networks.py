@@ -11,10 +11,10 @@ class Duchess(torch.nn.Module):
 
     def __init__(self):
         super(Duchess, self).__init__()
-        # Our batch shape for input x is (batch_size, 4, 300, 300)
+        # Our batch shape for input x is (batch_size, 2, 300, 300)
 
         # ENCODER
-        self.conv1 = torch.nn.Conv2d(4, 32, kernel_size=3, stride=1, padding=1)
+        self.conv1 = torch.nn.Conv2d(2, 32, kernel_size=3, stride=1, padding=1)
         self.conv2 = torch.nn.Conv2d(32, 32, kernel_size=3, stride=1, padding=1)
         self.conv1_bn = torch.nn.BatchNorm2d(32)
         self.conv2_bn = torch.nn.BatchNorm2d(32)
@@ -232,15 +232,15 @@ class Caltagirone(torch.nn.Module):
         # CONTEXT
         x = F.elu(self.conv3(x))  # 128,150,150
         x = self.dropout_2d(x)
-        x = F.elu(self.conv4(x))  # 128,150,150
+        x = F.elu(self.conv4(x))  # 128,148,148
         x = self.dropout_2d(x)
-        x = F.elu(self.conv5(x)) # 128,150,150
+        x = F.elu(self.conv5(x)) # 128,142,142
         x = self.dropout_2d(x)
-        x = F.elu(self.conv6(x))  # 128,150,150
+        x = F.elu(self.conv6(x))  # 128,128,128
         x = self.dropout_2d(x)
-        x = F.elu(self.conv7(x))  # 128,150,150
+        x = F.elu(self.conv7(x))  # 128,98,98
         x = self.dropout_2d(x)
-        x = F.elu(self.conv8(x))  # 128,150,150
+        x = F.elu(self.conv8(x))  # 128,36,36
         x = self.dropout_2d(x)
         x = F.elu(self.conv9(x))  # 128,150,150
         x = self.dropout_2d(x)
