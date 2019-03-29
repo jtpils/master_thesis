@@ -8,12 +8,12 @@ from data_loader import *
 import torch
 import numpy as np
 
-def train_network(CNN, n_epochs, learning_rate, patience, folder_path, use_cuda, batch_size, load_weights, load_weights_path, optimizer_selection, loss_selection):
+def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batch_size, load_weights, load_weights_path, optimizer_selection, loss_selection):
 
     path_training_data = '/home/annika_lundqvist144/BEV_samples/fake_training_set' #input('Path to training data set folder: ')
     path_validation_data = '/home/annika_lundqvist144/BEV_samples/fake_validation_set'
-    #path_training_data = '/home/master04/Desktop/Dataset/BEV_samples/fake_training_set'  # '/home/master04/Desktop/Dataset/fake_training_data_torch'#
-    #path_validation_data = '/home/master04/Desktop/Dataset/BEV_samples/fake_validation_set'
+    path_training_data = '/home/master04/Desktop/Dataset/BEV_samples/fake_training_set'  # '/home/master04/Desktop/Dataset/fake_training_data_torch'#
+    path_validation_data = '/home/master04/Desktop/Dataset/BEV_samples/fake_validation_set'
 
     CNN = Caltagirone()
     print('=======> NETWORK NAME: =======> ', CNN.name())
@@ -163,6 +163,7 @@ def train_network(CNN, n_epochs, learning_rate, patience, folder_path, use_cuda,
             break
 
     print("Training finished, took {:.2f}s".format(time.time() - training_start_time))
+    del CNN, optimizer, loss, loss_size, val_loss_size, early_stopping
     return train_loss, val_loss
 
 
@@ -198,9 +199,7 @@ def main():
         os.mkdir(parameter_path)
 
         # train!
-
-        train_loss, val_loss = train_network(n_epochs, learning_rate, patience, parameter_path, use_cuda, batch_size,
-                                             load_weights, load_weights_path, optimizer_list[i], loss_list[i])
+        train_loss, val_loss = train_network(n_epochs, learning_rate, patience, parameter_path, use_cuda, batch_size,load_weights, load_weights_path, optimizer_list[i], loss_list[i])
 
 
 
