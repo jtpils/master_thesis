@@ -181,7 +181,7 @@ def main():
         n_epochs = 50
         learning_rate = 0.01
         patience = 15
-        batch_size = 45
+        batch_size = 32
 
         print(' ')
         print(' ===== NEW MODEL ===== ')
