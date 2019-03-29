@@ -69,6 +69,8 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
 
     # Time for printing
     training_start_time = time.time()
+    train_loss_save = len(train_loader)  # append train loss for each mini batch later on, save this information to plot correctly
+    val_loss_save = len(val_loader)
 
     # Loop for n_epochs
     for epoch in range(n_epochs):
@@ -110,6 +112,8 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
             running_loss += loss_size.item()
             total_train_loss += loss_size.item()
 
+            train_loss_save.append(loss_size.item())
+
             if (i+1) % print_every == 0:
                 print('Epoch [{}/{}], Batch [{}/{}], Loss: {:.4f}, Time: '
                        .format(epoch+1, n_epochs, i, n_batches, running_loss/print_every), time.time()-time_epoch)
@@ -140,6 +144,8 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
                 val_loss_size = loss(val_outputs, labels.float())
                 total_val_loss += val_loss_size.item()
 
+                val_loss_save.append(val_loss_size.item())
+
                 if (i+1) % 5 == 0:
                     print('Validation: Batch [{}/{}], Time: '.format(i, val_batches), time.time()-val_time)
                     val_time = time.time()
@@ -156,8 +162,8 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
 
         train_path = folder_path + '/train_loss.npy'
         val_path = folder_path + '/val_loss.npy'
-        np.save(train_path, train_loss)
-        np.save(val_path, val_loss)
+        np.save(train_path, train_loss_save)
+        np.save(val_path, val_loss_save)
 
         # see if validation loss has decreased, if it has a checkpoint will be saved of the current model.
         early_stopping(epoch, total_train_loss, total_val_loss, CNN, optimizer)
