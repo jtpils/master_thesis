@@ -210,7 +210,7 @@ class Caltagirone(torch.nn.Module):
         self.conv6 = torch.nn.Conv2d(128, 128, kernel_size=3, stride=1, padding=1, dilation=8)
         self.conv7 = torch.nn.Conv2d(128, 128, kernel_size=3, stride=1, padding=1, dilation=16)
         self.conv8 = torch.nn.Conv2d(128, 128, kernel_size=3, stride=1, padding=1, dilation=32)
-        self.conv9 = torch.nn.Conv2d(128, 128, kernel_size=3, stride=1, padding=1, dilation=64)
+        self.conv9 = torch.nn.Conv2d(128, 128, kernel_size=3, stride=1, padding=1, dilation=32)
 
         self.conv10 = torch.nn.Conv2d(128, 32, kernel_size=1, stride=1, padding=0)
 
