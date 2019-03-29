@@ -176,12 +176,12 @@ def main():
     optimizer_list = [2,2] #1 is Adam, 2 is SGD
     model_names = ['Duchess_12', 'Duchess_22'] #combine all optimizers with all losses
 
-    for i in np.arange(4):
+    for i in np.arange(len(model_names)):
         save_parameters_folder = model_names[i]
         n_epochs = 50
         learning_rate = 0.01
         patience = 15
-        batch_size = 32
+        batch_size = 45
 
         print(' ')
         print(' ===== NEW MODEL ===== ')
