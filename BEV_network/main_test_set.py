@@ -6,7 +6,7 @@ from torch.autograd import Variable
 
 
 # load old weights! change here manually
-load_weights = False
+load_weights = True
 load_weights_path = '/home/master04/Desktop/network_parameters/Duchess_190238_2/parameters/epoch_2_checkpoint.pt'
 
 path_test_data = '/home/master04/Desktop/Dataset/BEV_samples/fake_test_set'#'/home/master04/Desktop/Dataset/BEV_samples/fake_test_set'
