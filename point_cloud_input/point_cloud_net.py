@@ -157,22 +157,29 @@ class Backbone(nn.Module):
         # relu + 4 conv + bn
         self.conv1 = torch.nn.Conv2d(128, 64, kernel_size=3, stride=1, padding=0)
         self.conv2 = torch.nn.Conv2d(64, 64, kernel_size=3, stride=1, padding=0)
+        self.conv3 = torch.nn.Conv2d(64, 64, kernel_size=3, stride=1, padding=0)
+        self.conv4 = torch.nn.Conv2d(64, 64, kernel_size=3, stride=1, padding=0)
 
         self.bn1 = torch.nn.BatchNorm2d(64)
+        self.bn2 = torch.nn.BatchNorm2d(64)
+        self.bn3 = torch.nn.BatchNorm2d(64)
+        self.bn4 = torch.nn.BatchNorm2d(64)
 
         # Block 2:
         # relu + 6 conv + stride 2 + bn
-        self.conv3 = torch.nn.Conv2d(64, 128, kernel_size=3, stride=2, padding=0)  # (128, 282, 282)
-        self.conv4 = torch.nn.Conv2d(128, 128, kernel_size=3, stride=2, padding=0)
-        self.conv5 = torch.nn.Conv2d(64, 128, kernel_size=3, stride=1, padding=0)  # (64, 282, 282)
-        self.conv6 = torch.nn.Conv2d(32, 64, kernel_size=3, stride=1, padding=0)  # (64, 282, 282)
-        self.conv7 = torch.nn.Conv2d(16, 32, kernel_size=3, stride=1, padding=0)  # (64, 282, 282)
-        self.conv8 = torch.nn.Conv2d(8, 16, kernel_size=3, stride=1, padding=0)  # (64, 282, 282)
+        self.conv5 = torch.nn.Conv2d(64, 128, kernel_size=3, stride=2, padding=0)
+        self.conv6 = torch.nn.Conv2d(128, 128, kernel_size=3, stride=2, padding=0)
+        self.conv7 = torch.nn.Conv2d(128, 64, kernel_size=3, stride=1, padding=0)
+        self.conv8 = torch.nn.Conv2d(64, 32, kernel_size=3, stride=1, padding=0)
+        self.conv9 = torch.nn.Conv2d(32, 16, kernel_size=3, stride=1, padding=0)
+        self.conv10 = torch.nn.Conv2d(16, 8, kernel_size=3, stride=1, padding=0)
 
-        self.bn2 = torch.nn.BatchNorm2d(128)
-        self.bn3 = torch.nn.BatchNorm2d(64)
-        self.bn4 = torch.nn.BatchNorm2d(32)
-        self.bn5 = torch.nn.BatchNorm2d(16)
+        self.bn5 = torch.nn.BatchNorm2d(128)
+        self.bn6 = torch.nn.BatchNorm2d(128)
+        self.bn7 = torch.nn.BatchNorm2d(64)
+        self.bn8 = torch.nn.BatchNorm2d(32)
+        self.bn9 = torch.nn.BatchNorm2d(16)
+        self.bn10 = torch.nn.BatchNorm2d(8)
 
         # Block 3:
         # 2 fully connected with drop out.
@@ -187,22 +194,21 @@ class Backbone(nn.Module):
 
         # Block 1:
         x = F.relu(self.bn1(self.conv1(x)))  # (64, 280, 280)
-        x = F.relu(self.bn1(self.conv2(x)))  # (64, 278, 278)
-        x = F.relu(self.bn1(self.conv2(x)))  # (64, 276, 276)
-        x = F.relu(self.bn1(self.conv2(x)))  # (64, 274, 274)
+        x = F.relu(self.bn2(self.conv2(x)))  # (64, 278, 278)
+        x = F.relu(self.bn3(self.conv3(x)))  # (64, 276, 276)
+        x = F.relu(self.bn4(self.conv4(x)))  # (64, 274, 274)
         #x = self.pool2(x)  # (64, 140, 140)
 
         # Block 2:
-        x = F.relu(self.bn3(self.conv3(x)))  # (128, 136, 136)
-        x = F.relu(self.bn2(self.conv4(x)))  # (128, 67, 67)
-        x = F.relu(self.bn2(self.conv5(x)))  # (64, 65, 65)
-        x = F.relu(self.bn3(self.conv6(x)))  # (32, 63, 63)
-        x = F.relu(self.bn4(self.conv7(x)))  # (16, 61, 61)
-        x = F.relu(self.bn5(self.conv8(x)))  # (8, 59, 59)
+        x = F.relu(self.bn5(self.conv5(x)))  # (128, 136, 136)
+        x = F.relu(self.bn6(self.conv6(x)))  # (128, 67, 67)
+        x = F.relu(self.bn7(self.conv7(x)))  # (64, 65, 65)
+        x = F.relu(self.bn8(self.conv8(x)))  # (32, 63, 63)
+        x = F.relu(self.bn9(self.conv9(x)))  # (16, 61, 61)
+        x = F.relu(self.bn10(self.conv10(x)))  # (8, 59, 59)
 
 
         # Block 3:
-
         x = x.view(-1, 8 * 59 * 59)
         x = torch.tanh(self.fc1_bn(self.fc1(x)))
         x = self.fc_out(x)

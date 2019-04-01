@@ -34,7 +34,7 @@ def create_pillars(point_cloud, pillar_size=0.5):
     y_edges = np.arange(-15, 15, pillar_size)
 
     pillar_dict = {}
-
+    coordinate_dict = {}
     for row in range(len(point_cloud[:,0])): # TODO: maybe we should sort for x and y as we did before? /A
         # Get which grid the current point belongs to. The key in the dict has the name of the grid. ex 0,0
         x_grid, y_grid = get_grid(point_cloud[row,0], point_cloud[row,1], x_edges, y_edges)
@@ -42,20 +42,30 @@ def create_pillars(point_cloud, pillar_size=0.5):
 
         # If the cell name has been used before concatenate the points and update the value of the key. Else create
         # a new key and add the coordinates of the point.
-        if cell_name in pillar_dict.keys():
+        #if cell_name in pillar_dict.keys():
+            #cell_value = pillar_dict[cell_name]
+            #cell_value = np.vstack((cell_value, point_cloud[row, :]))
 
-            cell_value = pillar_dict[cell_name]
-            cell_value = np.vstack((cell_value, point_cloud[row,:]))
+            #pillar_dict.update({cell_name: cell_value})
+        #else:
+            #pillar_dict.update({cell_name : point_cloud[row,:]})
 
-            pillar_dict.update({cell_name: cell_value})
+        if cell_name not in coordinate_dict.keys():
 
-        else:
-            pillar_dict.update({cell_name : point_cloud[row,:]})
+            coordinate_dict.update({cell_name : point_cloud[row,:]})
+            #cell_value = coordinate_dict[cell_name]
+            #cell_value = np.vstack((cell_value, point_cloud[row, :]))
 
+            #coordinate_dict.update({cell_name: cell_value})
+
+       # else:
+       #     coordinate_dict.update({cell_name : point_cloud[row,:]})
+
+    #coordinate_dict = pillar_dict.copy()
     # Calculate the features for each point in the point cloud.
-    for key in pillar_dict.keys():
+    for key in coordinate_dict.keys():
 
-        key_value = pillar_dict[key]
+        key_value = coordinate_dict[key]
         num_points = len(key_value)
 
         if np.shape(key_value) == (3,):
@@ -66,18 +76,21 @@ def create_pillars(point_cloud, pillar_size=0.5):
         # 1. calculate distance to the arithmetic mean for x,y,z
         # And then calculate the features xc, yc, zc which is the distance from the arithmetic mean. Reshape to be able
         # to stack them later.
-        x_mean = key_value[:, 0].sum(axis=0)/num_points
-        y_mean = key_value[:, 1].sum(axis=0)/num_points
-        z_mean = key_value[:, 2].sum(axis=0)/num_points
+        #x_mean = key_value[:, 0].sum(axis=0)/num_points
+        #y_mean = key_value[:, 1].sum(axis=0)/num_points
+        #z_mean = key_value[:, 2].sum(axis=0)/num_points
 
-        xc = key_value[:, 0] - x_mean
-        xc = xc.reshape((np.shape(xc)[0],1))
+        #xc = key_value[:, 0] - x_mean
+        #xc = xc.reshape((np.shape(xc)[0],1))
 
-        yc = key_value[:, 1] - y_mean
-        yc = yc.reshape((np.shape(yc)[0], 1))
+        #yc = key_value[:, 1] - y_mean
+        #yc = yc.reshape((np.shape(yc)[0], 1))
 
-        zc = key_value[:, 2] - z_mean
-        zc = zc.reshape((np.shape(zc)[0], 1))
+        #zc = key_value[:, 2] - z_mean
+        #zc = zc.reshape((np.shape(zc)[0], 1))
+
+        z = key_value[:, 2]
+        z = z.reshape((np.shape(z)[0], 1))
 
         # 2. calculate the offset from the pillar x,y center i.e xp and yp.
         # Reshape to be able to stack them later.
@@ -91,18 +104,19 @@ def create_pillars(point_cloud, pillar_size=0.5):
         yp = yp.reshape((np.shape(yp)[0],1))
 
         # 3. Append the new features column wise to the array with the point coordinates.
-        features = np.hstack((key_value, xc, yc, zc, xp, yp))
+        #features = np.hstack((key_value, xc, yc, zc, xp, yp))
+        features = np.hstack((xp, yp, z))
 
         # 4. Update the dict key with the complete feature array
         pillar_dict.update({key: features})
 
-    return pillar_dict
+    return pillar_dict, coordinate_dict
 
 
 def get_feature_tensor(pillar_dict, max_number_of_pillars=3600, max_number_of_points_per_pillar=300, dimension=3):
     '''
     Function that creates the feature tensor with dimension (D,P,N)
-    D = Dimension (8)
+    D = Dimension (3) xp, yp, z
     P = max antal pillars (12000)
     N = maximum points per pillar (100)
     :param pillar_dicts: <dict> Dict containing features for each pillar.
