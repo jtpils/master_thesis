@@ -116,7 +116,7 @@ def create_pillars(point_cloud, pillar_size=0.5):
 def get_feature_tensor(pillar_dict, max_number_of_pillars=3600, max_number_of_points_per_pillar=300, dimension=3):
     '''
     Function that creates the feature tensor with dimension (D,P,N)
-    D = Dimension (8)
+    D = Dimension (3) xp, yp, z
     P = max antal pillars (12000)
     N = maximum points per pillar (100)
     :param pillar_dicts: <dict> Dict containing features for each pillar.
