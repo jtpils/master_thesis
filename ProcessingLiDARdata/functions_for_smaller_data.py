@@ -151,7 +151,8 @@ def discretize_pointcloud(trimmed_point_cloud, array_size=300, trim_range=15, sp
         # sort the point cloud by x in increasing order
         x_sorted_point_cloud = np.asarray(sorted(trimmed_point_cloud, key=lambda row: row[0]))
 
-        for x_cell in tqdm(range(array_size)):
+        #for x_cell in tqdm(range(array_size)):
+        for x_cell in range(array_size):
 
             # get the x-values in the spatial resolution interval
             lower_bound = spatial_resolution * x_cell - trim_range

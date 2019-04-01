@@ -2,10 +2,11 @@ from functions_for_smaller_data import *
 import csv
 import random
 import os
+from tqdm import tqdm
 
 ###############################################################################
 # CREATE FAKE TRAINING SAMPLES (of one single sweep) WITHOUT A NEED FOR A MAP #
-# Creates all data sets; training, validation, test
+# Creates all data sets; training, validation, test                           #
 ###############################################################################
 
 # The folders where the fake data is saved
@@ -73,7 +74,7 @@ for foldername in input_folder_name:
         additional_files = np.random.choice(ply_files, number_additional_files)
         ply_files = np.concatenate((ply_files, additional_files))
 
-    for file_name in ply_files[:number_of_files_to_load]:
+    for file_name in tqdm(ply_files[:number_of_files_to_load]):
 
         # Load data:
         try:
@@ -81,9 +82,9 @@ for foldername in input_folder_name:
             path_to_ply = os.path.join(path_to_pc, file_name)
             pc, global_lidar_coordinates = load_data(path_to_ply, path_to_csv)
             i = i + 1
-            print('Creating sample ', i, ' of ', number_of_files_to_load)
+            #print('Creating sample ', i, ' of ', number_of_files_to_load)
         except:
-            print('Failed to load file ', file_name, '. Moving on to next file.')
+            #print('Failed to load file ', file_name, '. Moving on to next file.')
             continue
 
         # create the sweep, transform a bit to create training sample
@@ -93,12 +94,12 @@ for foldername in input_folder_name:
         sweep = trim_pointcloud(sweep)
         # discretize and pad sweep
         #sweep_image = discretize_pointcloud(sweep, array_size=300, trim_range=15, spatial_resolution=0.05, padding=True, pad_size=75)
-        sweep_image = discretize_pointcloud(sweep)
+        sweep_image = discretize_pointcloud(sweep, array_size=600, trim_range=15, spatial_resolution=0.05)
 
         # fake a map cutout
         cutout = trim_pointcloud(pc)
         #cutout_image = discretize_pointcloud(cutout, array_size=450, trim_range=1.5 * 15, padding=False)
-        cutout_image = discretize_pointcloud(cutout)
+        cutout_image = discretize_pointcloud(cutout, array_size=600, trim_range=15, spatial_resolution=0.05)
 
         # concatenate the sweep and the cutout image into one image and save.
         sweep_and_cutout_image = np.concatenate((sweep_image, cutout_image))
