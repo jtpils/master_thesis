@@ -24,7 +24,7 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
 
     # data_set_path = '/home/master04/Desktop/Dataset/point_cloud/pc_small_set'
     # data_set_path = '/Users/sabinalinderoth/Desktop/Dataset/point_cloud/pc_small_set'
-    data_set_path = '/Users/sabinalinderoth/Documents/master_thesis/point_cloud_input/samples'
+    data_set_path = '/Users/sabinalinderoth/Documents/master_thesis/point_cloud_input/test_training_data'
 
     #data_set_path = '/home/master04/Desktop/Dataset/point_cloud/pc_small_set'
 
