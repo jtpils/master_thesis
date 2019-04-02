@@ -250,7 +250,7 @@ class PointPillars(torch.nn.Module):
 
         output = self.Backbone.forward(concatenated_canvas)
 
-        del sweep_canvas, map_canvas, zipped_canvas, concatenated_layers, sweep_outputs, map_outputs
+        del sweep_canvas, map_canvas, zipped_canvas, concatenated_layers, sweep_outputs, map_outputs, sweep, map
         return output
 
     def name(self):

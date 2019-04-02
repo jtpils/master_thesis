@@ -1,7 +1,27 @@
 from data_set_point_cloud import PointCloudDataSet
 import time
 import numpy as np
+import os
+import time
+from plyfile import PlyData, PlyElement
+from tqdm import tqdm
+import pandas as pd
 
+
+#data_path = '/home/master04/Desktop/Ply_files/validation_and_test/test_set/pc/'
+#ply_files = os.listdir(data_path)
+plydata = PlyData.read('001619.ply')
+#pc = plydata.elements[0].data
+
+
+
+
+el = PlyElement.describe(pc, 'vertex')
+PlyData([el], text=True).write('test_file.ply')
+
+print('Done')
+
+'''
 data_set_path = '/home/master04/Desktop/Dataset/ply_grids/Town02_sorted_grid_ply'
 number_of_samples = 10
 data_set = PointCloudDataSet(data_set_path, number_of_samples)
@@ -133,3 +153,4 @@ def create_pillars(point_cloud, pillar_size=0.5):
 
 a = create_pillars(map_cutout) # 0.8 s
 a = createPillarsFast(map_cutout) # 7.4 s, not so fast...
+'''
