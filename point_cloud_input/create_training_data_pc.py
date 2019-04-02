@@ -39,7 +39,7 @@ for i, data in tqdm(enumerate(train_loader, 1)):
     map_pillars, map_coordinates = create_pillars(map_cutout, pillar_size=0.5)
 
     # get the feature tensor
-    map_tensor = get_feature_tensor(map_pillars, max_number_of_pillars=12000, max_number_of_points_per_pillar=100,
+    map_tensor = get_feature_tensor(map_pillars, max_number_of_pillars=3600, max_number_of_points_per_pillar=300,
                                     dimension=3)
 
     # Do the same for the sweep
@@ -48,7 +48,7 @@ for i, data in tqdm(enumerate(train_loader, 1)):
     sweep = np.squeeze(sweep, axis=0)
 
     sweep_pillars, sweep_coordinates = create_pillars(sweep, pillar_size=0.5)
-    sweep_tensor = get_feature_tensor(sweep_pillars, max_number_of_pillars=12000, max_number_of_points_per_pillar=100,
+    sweep_tensor = get_feature_tensor(sweep_pillars, max_number_of_pillars=3600, max_number_of_points_per_pillar=300,
                                     dimension=3)
 
     labels = data['labels']
