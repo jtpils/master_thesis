@@ -14,7 +14,7 @@ input_folder_name = ['fake_training_set', 'fake_validation_set', 'fake_test_set'
 
 
 # fill in the paths to the training, validtation and test folder
-path_to_lidar_data_training = '/home/master04/Desktop/Ply_files/_out_Town01_190308_1'
+path_to_lidar_data_training = '/home/master04/Desktop/Ply_files/new_lidar_data'
 path_to_lidar_data_validation = '/home/master04/Desktop/Ply_files/validation_and_test/validation_set'
 path_to_lidar_data_test = '/home/master04/Desktop/Ply_files/validation_and_test/test_set'
 
@@ -93,13 +93,13 @@ for foldername in input_folder_name:
         sweep = training_sample_rotation_translation(pc, rand_trans)
         sweep = trim_pointcloud(sweep)
         # discretize and pad sweep
-        #sweep_image = discretize_pointcloud(sweep, array_size=300, trim_range=15, spatial_resolution=0.05, padding=True, pad_size=75)
-        sweep_image = discretize_pointcloud(sweep, array_size=600, trim_range=15, spatial_resolution=0.05)
+        sweep_image = discretize_pointcloud(sweep, array_size=300, trim_range=15, spatial_resolution=0.1)
+        #sweep_image = discretize_pointcloud(sweep, array_size=600, trim_range=15, spatial_resolution=0.05)
 
         # fake a map cutout
         cutout = trim_pointcloud(pc)
-        #cutout_image = discretize_pointcloud(cutout, array_size=450, trim_range=1.5 * 15, padding=False)
-        cutout_image = discretize_pointcloud(cutout, array_size=600, trim_range=15, spatial_resolution=0.05)
+        cutout_image = discretize_pointcloud(cutout, array_size=300, trim_range=15, spatial_resolution=0.1)
+        #cutout_image = discretize_pointcloud(cutout, array_size=600, trim_range=15, spatial_resolution=0.05)
 
         # concatenate the sweep and the cutout image into one image and save.
         sweep_and_cutout_image = np.concatenate((sweep_image, cutout_image))
