@@ -29,7 +29,7 @@ class LiDARDataSet(Dataset):
         return self.length
 
     def __getitem__(self, idx):
-        idx = idx + 1
+        #idx = idx + 1
         sample_file = os.path.join(self.sample_dir, str(idx))
         #t1 = time.time()
         sample = np.load(sample_file + '.npy')
