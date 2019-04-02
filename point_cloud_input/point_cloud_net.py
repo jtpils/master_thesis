@@ -44,7 +44,7 @@ def PointPillarsScatter(PFN_input, PFN_output, batch_size):
     return batch_canvas'''
 
 
-def fasterScatter(PFN_input, PFN_output, batch_size):
+def fasterScatter(PFN_input, coordinates, PFN_output,  batch_size):
 
     num_channels = 64
     height = 282
@@ -55,12 +55,16 @@ def fasterScatter(PFN_input, PFN_output, batch_size):
     batch_canvas = []
     for batch in np.arange(batch_size):
 
-        pillar_list = np.nonzero(PFN_input[batch, 0, :, 0]) # ???? List or array??? collect all non-empty pillars
+        # Find all nonzero elements in the coordinate tensor
+        pillar_list = np.nonzero(coordinates[batch, :, 0])#np.nonzero(PFN_input[batch, 0, :, 0]) # ???? List or array??? collect all non-empty pillars
         #pillars = np.resize(PFN_output, (64, 12000))
+        #x_coords = PFN_input[batch,0,pillar_list,0]  # 1 xcoord from each pillar # should we use the pillar_list here instead of ":" ?
 
-        x_coords = PFN_input[batch,0,pillar_list,0]  # 1 xcoord from each pillar # should we use the pillar_list here instead of ":" ?
+        # NEW: x_coords and y_coords uses the new pillar list.
+        x_coords = coordinates[batch, pillar_list, 0]
         xgrids = torch.floor((x_coords + range) / pillar_size)
-        y_coords = PFN_input[batch,1,pillar_list,0]  # first xvalue in each pillar
+        #y_coords = PFN_input[batch,1,pillar_list,0]  # first xvalue in each pillar
+        y_coords = coordinates[batch, pillar_list, 1]
         ygrids = torch.floor((y_coords + range) / pillar_size)
 
         #convert these 2D-indices to 1D indices by declaring canvas as:
@@ -133,7 +137,8 @@ class PFNLayer(torch.nn.Module):
         super(PFNLayer, self).__init__()
 
         # Linear Layer:  The linear layer can be formulated as a 1*1 convolution layer across the tensor
-        self.conv1 = torch.nn.Conv2d(8, 64, kernel_size=1, stride=1, padding=0)
+        # Changed the input to 3 channels
+        self.conv1 = torch.nn.Conv2d(3, 64, kernel_size=1, stride=1, padding=0)
         # Batch Norm
         self.conv1_bn = torch.nn.BatchNorm2d(64)
 
@@ -190,14 +195,11 @@ class Backbone(nn.Module):
 
     def forward(self, x):
 
-        # input (128,282,282)
-
         # Block 1:
         x = F.relu(self.bn1(self.conv1(x)))  # (64, 280, 280)
         x = F.relu(self.bn2(self.conv2(x)))  # (64, 278, 278)
         x = F.relu(self.bn3(self.conv3(x)))  # (64, 276, 276)
         x = F.relu(self.bn4(self.conv4(x)))  # (64, 274, 274)
-        #x = self.pool2(x)  # (64, 140, 140)
 
         # Block 2:
         x = F.relu(self.bn5(self.conv5(x)))  # (128, 136, 136)
@@ -228,12 +230,14 @@ class PointPillars(torch.nn.Module):
         self.PFNlayer_map = PFNLayer()
         self.Backbone = Backbone()
 
-    def forward(self, sweep, map):
+    def forward(self, sweep, map, sweep_coordinates, map_coordinates):
 
         sweep_outputs = self.PFNlayer_sweep.forward(sweep)
         map_outputs = self.PFNlayer_map.forward(map)
-        sweep_canvas = fasterScatter(sweep, sweep_outputs, self.batch_size)
-        map_canvas = fasterScatter(map, map_outputs, self.batch_size)
+        #sweep_canvas = fasterScatter(sweep, sweep_outputs, self.batch_size)
+        sweep_canvas = fasterScatter(sweep, sweep_coordinates, sweep_outputs, self.batch_size)
+        #map_canvas = fasterScatter(map, map_outputs, self.batch_size)
+        map_canvas = fasterScatter(map, map_coordinates, map_outputs, self.batch_size)
         zipped_canvas = list(zip(sweep_canvas,map_canvas))
         concatenated_canvas = torch.zeros(self.batch_size, 128, 282, 282)
 

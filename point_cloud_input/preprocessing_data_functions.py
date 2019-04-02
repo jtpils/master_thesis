@@ -51,17 +51,9 @@ def create_pillars(point_cloud, pillar_size=0.5):
             #pillar_dict.update({cell_name : point_cloud[row,:]})
 
         if cell_name not in coordinate_dict.keys():
-
+            # NEW: save the one coordinate for each pillar
             coordinate_dict.update({cell_name : point_cloud[row,:]})
-            #cell_value = coordinate_dict[cell_name]
-            #cell_value = np.vstack((cell_value, point_cloud[row, :]))
 
-            #coordinate_dict.update({cell_name: cell_value})
-
-       # else:
-       #     coordinate_dict.update({cell_name : point_cloud[row,:]})
-
-    #coordinate_dict = pillar_dict.copy()
     # Calculate the features for each point in the point cloud.
     for key in coordinate_dict.keys():
 
@@ -89,6 +81,7 @@ def create_pillars(point_cloud, pillar_size=0.5):
         #zc = key_value[:, 2] - z_mean
         #zc = zc.reshape((np.shape(zc)[0], 1))
 
+        # 1. Get the z value
         z = key_value[:, 2]
         z = z.reshape((np.shape(z)[0], 1))
 
@@ -105,15 +98,18 @@ def create_pillars(point_cloud, pillar_size=0.5):
 
         # 3. Append the new features column wise to the array with the point coordinates.
         #features = np.hstack((key_value, xc, yc, zc, xp, yp))
+
+        # NEW: Only save the z, xp and yp
         features = np.hstack((xp, yp, z))
 
         # 4. Update the dict key with the complete feature array
         pillar_dict.update({key: features})
 
+    # NEW: output coordinate dict
     return pillar_dict, coordinate_dict
 
 
-def get_feature_tensor(pillar_dict, max_number_of_pillars=3600, max_number_of_points_per_pillar=300, dimension=3):
+def get_feature_tensor(pillar_dict, coordinate_dict, max_number_of_pillars=3600, max_number_of_points_per_pillar=300, dimension=3):
     '''
     Function that creates the feature tensor with dimension (D,P,N)
     D = Dimension (3) xp, yp, z
@@ -128,7 +124,7 @@ def get_feature_tensor(pillar_dict, max_number_of_pillars=3600, max_number_of_po
 
     # Initialize feature tensor
     feature_tensor = np.zeros((dimension, max_number_of_pillars, max_number_of_points_per_pillar))
-
+    coordinate_tensor = np.zeros((max_number_of_pillars,3))
     # 1. Check how many keys in the dict. If more than max number of pillars pick random max_numer_of_pillars
     number_of_pillars = len(pillar_dict.keys())
 
@@ -160,8 +156,12 @@ def get_feature_tensor(pillar_dict, max_number_of_pillars=3600, max_number_of_po
         for point in points:
             for feature in range(0 , dimension):
                 feature_tensor[feature, pillar, lidar_point] = key_value[point,feature]
+
             lidar_point += 1
+        # NEW: save the coordinates in a tensor
+        coordinate_tensor[pillar,:] = coordinate_dict[key]
         pillar += 1
 
-    return feature_tensor
+    # NEW: Output a tensor
+    return feature_tensor, coordinate_tensor
 

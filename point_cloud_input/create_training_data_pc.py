@@ -18,7 +18,7 @@ else:
     print('Successfully created new directory with subdirectory, at ', folder_path)
 
 batch_size = 1
-path_to_lidar_data = input('Type complete path to the folder that contains grid-folders with LiDAR data and a csv file, '
+path_to_lidar_data = input('Type complete path to the folder that contains grid-folders with LiDAR data and a csv file,'
                            'e.g. in the Ply_files/sorted_grid :')
 
 number_of_samples = int(input('Type number of samples to create:'))
@@ -36,11 +36,13 @@ for i, data in tqdm(enumerate(train_loader, 1)):
     map_cutout = np.squeeze(map_cutout, axis=0)
 
     # create pillars
+    # The function now gives 2 outputs. A feature dict and coordinate dict
     map_pillars, map_coordinates = create_pillars(map_cutout, pillar_size=0.5)
 
     # get the feature tensor
-    map_tensor = get_feature_tensor(map_pillars, max_number_of_pillars=12000, max_number_of_points_per_pillar=100,
-                                    dimension=3)
+    # and also the map coordinate tensor
+    map_tensor, map_coordinates_tensor = get_feature_tensor(map_pillars,map_coordinates, max_number_of_pillars=3600,
+                                                            max_number_of_points_per_pillar=100, dimension=3)
 
     # Do the same for the sweep
     sweep = data['sweep']
@@ -48,15 +50,18 @@ for i, data in tqdm(enumerate(train_loader, 1)):
     sweep = np.squeeze(sweep, axis=0)
 
     sweep_pillars, sweep_coordinates = create_pillars(sweep, pillar_size=0.5)
-    sweep_tensor = get_feature_tensor(sweep_pillars, max_number_of_pillars=12000, max_number_of_points_per_pillar=100,
-                                    dimension=3)
+
+    sweep_tensor , sweep_coordinates_tensor= get_feature_tensor(sweep_pillars, sweep_coordinates,
+                                                                max_number_of_pillars=3600,
+                                                                max_number_of_points_per_pillar=100, dimension=3)
 
     labels = data['labels']
     labels = labels.numpy()
 
     # Save the map cutout and the sweep in a folder together with the labels
-    training_sample = {'sweep': sweep_tensor, 'sweep_coordinates': sweep_coordinates, 'map': map_tensor,
-                       'map_coordinates': map_coordinates, 'labels': labels}
+    # Now save additional 2 more things, sweep_coordinates and map_coordinates
+    training_sample = {'sweep': sweep_tensor, 'sweep_coordinates': sweep_coordinates_tensor, 'map': map_tensor,
+                       'map_coordinates': map_coordinates_tensor, 'labels': labels}
 
     file_name = 'training_sample_' + str(i-1)
 
@@ -69,9 +74,8 @@ for i, data in tqdm(enumerate(train_loader, 1)):
     print('')
     print('Created sample: ', i)
 
-    '''
-    code to load the file later: 
-    file_name = 'type path to file'
-    pickle_in = open(file_name, "rb")
-    dict_sample = pickle.load(pickle_in)
-    '''
+
+    #code to load the file later:
+    #file_name = 'type path to file'
+    #pickle_in = open(file_name, "rb")
+    #dict_sample = pickle.load(pickle_in)

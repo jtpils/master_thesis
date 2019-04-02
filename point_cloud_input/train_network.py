@@ -22,12 +22,13 @@ def create_loss_and_optimizer(net, learning_rate=0.001):
 # def train_network(net, train_loader, val_loader, n_epochs, learning_rate, patience, folder_path, device, use_cuda):
 def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batch_size):
 
-    data_set_path = '/home/master04/Desktop/Dataset/point_cloud/pc_small_set'
-    #data_set_path = '/Users/sabinalinderoth/Desktop/Dataset/point_cloud/pc_small_set'
+    # data_set_path = '/home/master04/Desktop/Dataset/point_cloud/pc_small_set'
+    # data_set_path = '/Users/sabinalinderoth/Desktop/Dataset/point_cloud/pc_small_set'
+    data_set_path = '/Users/sabinalinderoth/Documents/master_thesis/point_cloud_input/samples'
 
     #data_set_path = '/home/master04/Desktop/Dataset/point_cloud/pc_small_set'
 
-    data_set_path = '/Users/sabinalinderoth/Desktop/Dataset/point_cloud/pc_small_set'
+
 
     number_of_samples = len(os.listdir(data_set_path))  # int(input('Type number of samples: '))
 
@@ -92,20 +93,26 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
             t2_get_data = time.time()
             # print('get data from loader: ', t2_get_data-t1_get_data)
 
+
+            # The training samples contains 5 things. 1. sweep features (xp,yp,z) 2. sweep coordinates (x,y,z)
+            # 3. map features (xp,yp,z) 4. map coordinates (x,y,z) 5. labels.
             sweep = data['sweep']
+            sweep_coordinates = data['sweep_coordinates']
             map = data['map']
+            map_coordinates = data['map_coordinates']
             labels = data['labels']
+
 
             if use_cuda:
                 sweep, map, labels = sweep.cuda(async=True), map.cuda(async=True), labels.cuda(async=True)
-            sweep, map, labels = Variable(sweep), Variable(map), Variable(labels)
+            sweep, sweep_coordinates, map, map_coordinates, labels = Variable(sweep), Variable(sweep_coordinates), Variable(map), Variable(map_coordinates), Variable(labels)
 
             t1 = time.time()
             # Set the parameter gradients to zero
             optimizer.zero_grad()
             # Forward pass, backward pass, optimize
             print('here we go')
-            outputs = net.forward(sweep.float(), map.float())#, scatter)
+            outputs = net.forward(sweep.float(), map.float(), sweep_coordinates.float(), map_coordinates.float())#, scatter)
             print('done')
             loss_size = loss(outputs, labels.float())
             loss_size.backward()
