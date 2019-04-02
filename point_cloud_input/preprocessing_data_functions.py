@@ -34,6 +34,7 @@ def create_pillars(point_cloud, pillar_size=0.5):
     y_edges = np.arange(-15, 15, pillar_size)
 
     pillar_dict = {}
+    pillar_feature_dict = {}
     coordinate_dict = {}
     for row in range(len(point_cloud[:,0])): # TODO: maybe we should sort for x and y as we did before? /A
         # Get which grid the current point belongs to. The key in the dict has the name of the grid. ex 0,0
@@ -42,22 +43,22 @@ def create_pillars(point_cloud, pillar_size=0.5):
 
         # If the cell name has been used before concatenate the points and update the value of the key. Else create
         # a new key and add the coordinates of the point.
-        #if cell_name in pillar_dict.keys():
-            #cell_value = pillar_dict[cell_name]
-            #cell_value = np.vstack((cell_value, point_cloud[row, :]))
+        if cell_name in pillar_dict.keys():
+            cell_value = pillar_dict[cell_name]
+            cell_value = np.vstack((cell_value, point_cloud[row, :]))
 
-            #pillar_dict.update({cell_name: cell_value})
-        #else:
-            #pillar_dict.update({cell_name : point_cloud[row,:]})
+            pillar_dict.update({cell_name: cell_value})
+        else:
+            pillar_dict.update({cell_name : point_cloud[row,:]})
 
         if cell_name not in coordinate_dict.keys():
             # NEW: save the one coordinate for each pillar
             coordinate_dict.update({cell_name : point_cloud[row,:]})
 
     # Calculate the features for each point in the point cloud.
-    for key in coordinate_dict.keys():
+    for key in pillar_dict.keys():
 
-        key_value = coordinate_dict[key]
+        key_value = pillar_dict[key]
         num_points = len(key_value)
 
         if np.shape(key_value) == (3,):
@@ -103,10 +104,10 @@ def create_pillars(point_cloud, pillar_size=0.5):
         features = np.hstack((xp, yp, z))
 
         # 4. Update the dict key with the complete feature array
-        pillar_dict.update({key: features})
+        pillar_feature_dict.update({key: features})
 
     # NEW: output coordinate dict
-    return pillar_dict, coordinate_dict
+    return pillar_feature_dict, coordinate_dict
 
 
 def get_feature_tensor(pillar_dict, coordinate_dict, max_number_of_pillars=3600, max_number_of_points_per_pillar=300, dimension=3):
@@ -152,6 +153,7 @@ def get_feature_tensor(pillar_dict, coordinate_dict, max_number_of_pillars=3600,
         else:
             points = np.array(range(0,number_of_points))
 
+        # this can be done in one row
         lidar_point = 0
         for point in points:
             for feature in range(0 , dimension):
