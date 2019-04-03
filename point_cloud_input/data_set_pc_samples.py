@@ -41,7 +41,7 @@ class LiDARDataSet_PC(Dataset):
 
         label = labels[idx, :]
 
-        training_sample = {'sweep': sweep_features.float(),'sweep_coordinates': sweep_coordinates, 'cutout': cutout_features.float(),
+        training_sample = {'sweep': torch.from_numpy(sweep_features).float(),'sweep_coordinates': sweep_coordinates, 'cutout': torch.from_numpy(cutout_features).float(),
                            'cutout_coordinates': cutout_coordinates, 'labels': label}
 
         return training_sample
