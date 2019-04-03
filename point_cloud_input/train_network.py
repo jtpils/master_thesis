@@ -101,7 +101,7 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
                                                                                cutout.cuda(async=True), \
                                                                                cutout_coordinates.cuda(async=True), \
                                                                                labels.cuda(async=True)
-                
+
             sweep, sweep_coordinates, cutout, cutout_coordinates, labels = Variable(sweep), Variable(sweep_coordinates), \
                                                                      Variable(cutout), Variable(cutout_coordinates), \
                                                                            Variable(labels)
