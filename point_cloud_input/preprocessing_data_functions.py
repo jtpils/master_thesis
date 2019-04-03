@@ -146,7 +146,7 @@ def get_feature_tensor(pillar_dict, coordinate_dict, max_number_of_pillars=3600,
         if number_of_points > max_number_of_points_per_pillar:
 
             number_of_points_index = list(range(0,number_of_points-1))
-            random_index = sample(number_of_points_index, max_number_of_points_per_pillar)
+            random_index = random.sample(number_of_points_index, max_number_of_points_per_pillar)
 
             points = [number_of_points_index[i] for i in random_index]
 
