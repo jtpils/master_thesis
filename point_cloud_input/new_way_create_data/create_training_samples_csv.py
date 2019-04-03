@@ -39,14 +39,14 @@ def get_file_name_from_frame_number(frame_number_array):
     return file_name_list
 
 # path to all ply-grid-files, we will pick our sweeps from here
-ply_path = '/home/master04/Desktop/Dataset/ply_grids/Town01_sorted_grid_ply'
+ply_path = '/Users/sabinalinderoth/Documents/Ply_files/TEST_sorted_grid_ply'
 
 # path to corresponding csv-grid-files
-data_set_path = '/home/master04/Desktop/Dataset/ply_grids/in_global_coords/Town01/'
+data_set_path = '/Users/sabinalinderoth/Documents/CSV_grids/'
 
 
-save_data_path = '/home/master04/Desktop/Dataset/point_cloud/new_set/'
-number_of_samples = 2
+save_data_path = '/Users/sabinalinderoth/Documents/training_samples_190403'
+number_of_samples = 50
 grid_size = 15
 
 # load all global coordinates for all ply-files

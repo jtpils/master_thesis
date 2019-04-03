@@ -22,15 +22,8 @@ def create_loss_and_optimizer(net, learning_rate=0.001):
 # def train_network(net, train_loader, val_loader, n_epochs, learning_rate, patience, folder_path, device, use_cuda):
 def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batch_size):
 
-    # data_set_path = '/home/master04/Desktop/Dataset/point_cloud/pc_small_set'
-    # data_set_path = '/Users/sabinalinderoth/Desktop/Dataset/point_cloud/pc_small_set'
-    data_set_path = '/Users/sabinalinderoth/Documents/master_thesis/point_cloud_input/test_training_data'
+    data_set_path = '/Users/sabinalinderoth/Documents/training_samples_190403/'
 
-    #data_set_path = '/home/master04/Desktop/Dataset/point_cloud/pc_small_set'
-    #data_set_path = '/Users/sabinalinderoth/Desktop/Dataset/point_cloud/pc_small_set'
-
-
-    number_of_samples = len(os.listdir(data_set_path))  # int(input('Type number of samples: '))
 
     net = PointPillars(batch_size)
     print('=======> NETWORK NAME: =======> ', net.name())
@@ -39,7 +32,7 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
     #print('Are model parameters on CUDA? ', next(net.parameters()).is_cuda)
     print(' ')
 
-    train_loader = get_train_loader_pc(batch_size, data_set_path, number_of_samples, {})
+    train_loader = get_train_loader_pc(batch_size, data_set_path, {'num_workers': 8})
 
     '''# Load weights
     if load_weights:
@@ -97,8 +90,8 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
             # 3. map features (xp,yp,z) 4. map coordinates (x,y,z) 5. labels.
             sweep = data['sweep']
             sweep_coordinates = data['sweep_coordinates']
-            map = data['map']
-            map_coordinates = data['map_coordinates']
+            map = data['cutout']
+            map_coordinates = data['cutout_coordinates']
             labels = data['labels']
 
 
