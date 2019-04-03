@@ -72,7 +72,6 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
 
     # Time for printing
     training_start_time = time.time()
-    start_time = time.time()
 
     # Loop for n_epochs
     for epoch in range(n_epochs):
@@ -91,7 +90,7 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
         t1_get_data = time.time()
         for i, data in enumerate(train_loader, 1):
             t2_get_data = time.time()
-            #print('get data from loader: ', t2_get_data-t1_get_data)
+            print('get data from loader: ', t2_get_data-t1_get_data)
 
 
             # The training samples contains 5 things. 1. sweep features (xp,yp,z) 2. sweep coordinates (x,y,z)
@@ -107,20 +106,29 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
                 sweep, map, labels = sweep.cuda(async=True), map.cuda(async=True), labels.cuda(async=True)
             sweep, sweep_coordinates, map, map_coordinates, labels = Variable(sweep), Variable(sweep_coordinates), Variable(map), Variable(map_coordinates), Variable(labels)
 
-            t1 = time.time()
+
             # Set the parameter gradients to zero
             optimizer.zero_grad()
             # Forward pass, backward pass, optimize
-
-            print('here we go')
+            t1 = time.time()
             outputs = net.forward(sweep.float(), map.float(), sweep_coordinates.float(), map_coordinates.float())#, scatter)
-            print('done')
+            t2 = time.time()
+            print('time for forward: ', t2 - t1)
 
+            t1 = time.time()
             loss_size = loss(outputs, labels.float())
+            t2 = time.time()
+            print('time for get loss size: ', t2 - t1)
+
+            t1 = time.time()
             loss_size.backward()
+            t2 = time.time()
+            print('time for backprop: ', t2-t1)
+
+            t1 = time.time()
             optimizer.step()
             t2 = time.time()
-            #print('time for forward, backprop, update: ', t2-t1)
+            print('update: ', t2-t1)
 
             # Print statistics
             running_loss += loss_size.item()
@@ -132,9 +140,9 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
                 running_loss = 0.0
                 time_epoch = time.time()
 
-            t1_get_data = time.time()
+            #t1_get_data = time.time()
             del data, sweep, map, labels, outputs, loss_size
-
+            t1_get_data = time.time()
         # At the end of the epoch, do a pass on the validation set
         '''
         total_val_loss = 0
