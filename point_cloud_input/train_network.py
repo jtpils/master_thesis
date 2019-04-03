@@ -110,25 +110,25 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
             # Set the parameter gradients to zero
             optimizer.zero_grad()
             # Forward pass, backward pass, optimize
-            t1 = time.time()
+            #t1 = time.time()
             outputs = net.forward(sweep.float(), cutout.float(), sweep_coordinates.float(), cutout_coordinates.float())#, scatter)
-            t2 = time.time()
-            print('time for forward: ', t2 - t1)
+            #t2 = time.time()
+            #print('time for forward: ', t2 - t1)
 
-            t1 = time.time()
+            #t1 = time.time()
             loss_size = loss(outputs, labels.float())
-            t2 = time.time()
-            print('time for get loss size: ', t2 - t1)
+            #t2 = time.time()
+            #print('time for get loss size: ', t2 - t1)
 
-            t1 = time.time()
+            #t1 = time.time()
             loss_size.backward()
-            t2 = time.time()
-            print('time for backprop: ', t2-t1)
+            #t2 = time.time()
+            #print('time for backprop: ', t2-t1)
 
-            t1 = time.time()
+            #t1 = time.time()
             optimizer.step()
-            t2 = time.time()
-            print('update: ', t2-t1)
+            #t2 = time.time()
+            #print('update: ', t2-t1)
 
             # Print statistics
             running_loss += loss_size.item()
