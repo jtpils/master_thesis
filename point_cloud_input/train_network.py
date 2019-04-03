@@ -22,7 +22,7 @@ def create_loss_and_optimizer(net, learning_rate=0.001):
 # def train_network(net, train_loader, val_loader, n_epochs, learning_rate, patience, folder_path, device, use_cuda):
 def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batch_size):
 
-    data_set_path = '/Users/sabinalinderoth/Documents/training_samples_190403/'
+    data_set_path = '/home/annika_lundqvist144/pc_samples/training_samples_190403'
 
 
     net = PointPillars(batch_size)
