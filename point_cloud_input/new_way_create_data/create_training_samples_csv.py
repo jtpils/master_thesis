@@ -65,7 +65,7 @@ list_of_sweeps_to_load = get_file_name_from_frame_number(array_of_frame_numbers)
 sweeps_global_coordinates = global_coordinates.values[selection_rule, :]
 
 # create list with array of labels
-labels = [random_rigid_transformation(1, 0) for x in np.arange(number_of_samples)]
+labels = [random_rigid_transformation(1, 1) for x in np.arange(number_of_samples)]
 #### SAVE LABELS AS CSV FILE!!!!!!! #####
 csv_name = 'labels.csv'
 csv_path = os.path.join(save_data_path, csv_name)
