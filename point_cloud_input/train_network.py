@@ -22,15 +22,8 @@ def create_loss_and_optimizer(net, learning_rate=0.001):
 # def train_network(net, train_loader, val_loader, n_epochs, learning_rate, patience, folder_path, device, use_cuda):
 def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batch_size):
 
-    # data_set_path = '/home/master04/Desktop/Dataset/point_cloud/pc_small_set'
-    # data_set_path = '/Users/sabinalinderoth/Desktop/Dataset/point_cloud/pc_small_set'
-    data_set_path = '/Users/sabinalinderoth/Documents/master_thesis/point_cloud_input/test_training_data'
+    data_set_path = '/home/annika_lundqvist144/pc_samples/training_samples_190403'
 
-    #data_set_path = '/home/master04/Desktop/Dataset/point_cloud/pc_small_set'
-    #data_set_path = '/Users/sabinalinderoth/Desktop/Dataset/point_cloud/pc_small_set'
-
-
-    number_of_samples = len(os.listdir(data_set_path))  # int(input('Type number of samples: '))
 
     net = PointPillars(batch_size)
     print('=======> NETWORK NAME: =======> ', net.name())
@@ -39,7 +32,7 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
     #print('Are model parameters on CUDA? ', next(net.parameters()).is_cuda)
     print(' ')
 
-    train_loader = get_train_loader_pc(batch_size, data_set_path, number_of_samples, {})
+    train_loader = get_train_loader_pc(batch_size, data_set_path, {'num_workers': 8})
 
     '''# Load weights
     if load_weights:
@@ -72,7 +65,6 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
 
     # Time for printing
     training_start_time = time.time()
-    start_time = time.time()
 
     # Loop for n_epochs
     for epoch in range(n_epochs):
@@ -91,36 +83,52 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
         t1_get_data = time.time()
         for i, data in enumerate(train_loader, 1):
             t2_get_data = time.time()
-            #print('get data from loader: ', t2_get_data-t1_get_data)
+            print('get data from loader: ', t2_get_data-t1_get_data)
 
 
             # The training samples contains 5 things. 1. sweep features (xp,yp,z) 2. sweep coordinates (x,y,z)
             # 3. map features (xp,yp,z) 4. map coordinates (x,y,z) 5. labels.
             sweep = data['sweep']
             sweep_coordinates = data['sweep_coordinates']
-            map = data['map']
-            map_coordinates = data['map_coordinates']
+            cutout = data['cutout']
+            cutout_coordinates = data['cutout_coordinates']
             labels = data['labels']
 
 
             if use_cuda:
-                sweep, map, labels = sweep.cuda(async=True), map.cuda(async=True), labels.cuda(async=True)
-            sweep, sweep_coordinates, map, map_coordinates, labels = Variable(sweep), Variable(sweep_coordinates), Variable(map), Variable(map_coordinates), Variable(labels)
+                sweep, sweep_coordinates, cutout, cutout_coordinates, labels = sweep.cuda(async=True), \
+                                                                               sweep_coordinates.cuda(async=True), \
+                                                                               cutout.cuda(async=True), \
+                                                                               cutout_coordinates.cuda(async=True), \
+                                                                               labels.cuda(async=True)
 
-            t1 = time.time()
+            sweep, sweep_coordinates, cutout, cutout_coordinates, labels = Variable(sweep), Variable(sweep_coordinates), \
+                                                                     Variable(cutout), Variable(cutout_coordinates), \
+                                                                           Variable(labels)
+
+
             # Set the parameter gradients to zero
             optimizer.zero_grad()
             # Forward pass, backward pass, optimize
+            #t1 = time.time()
+            outputs = net.forward(sweep.float(), cutout.float(), sweep_coordinates.float(), cutout_coordinates.float())#, scatter)
+            #t2 = time.time()
+            #print('time for forward: ', t2 - t1)
 
-            print('here we go')
-            outputs = net.forward(sweep.float(), map.float(), sweep_coordinates.float(), map_coordinates.float())#, scatter)
-            print('done')
-
+            #t1 = time.time()
             loss_size = loss(outputs, labels.float())
+            #t2 = time.time()
+            #print('time for get loss size: ', t2 - t1)
+
+            #t1 = time.time()
             loss_size.backward()
+            #t2 = time.time()
+            #print('time for backprop: ', t2-t1)
+
+            #t1 = time.time()
             optimizer.step()
-            t2 = time.time()
-            #print('time for forward, backprop, update: ', t2-t1)
+            #t2 = time.time()
+            #print('update: ', t2-t1)
 
             # Print statistics
             running_loss += loss_size.item()
@@ -132,9 +140,9 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
                 running_loss = 0.0
                 time_epoch = time.time()
 
+            #t1_get_data = time.time()
+            del data, sweep, cutout, labels, outputs, loss_size
             t1_get_data = time.time()
-            del data, sweep, map, labels, outputs, loss_size
-
         # At the end of the epoch, do a pass on the validation set
         '''
         total_val_loss = 0

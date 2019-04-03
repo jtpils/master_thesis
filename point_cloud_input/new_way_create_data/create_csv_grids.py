@@ -9,9 +9,14 @@ from lidar_processing_functions import *
 # This script creates one csv-file per grid, with all the detections in the grid stored in csv-file. The detections are
 # rotated and translated to global coordinates.
 
+
 save_data_path = '/home/master04/Desktop/Dataset/ply_grids/in_global_coords/Town01/' # save new data to this path
 path = '/home/master04/Desktop/Dataset/ply_grids/Town01_sorted_grid_ply/' # path to your ply-grids
 
+
+
+#save_data_path = '/Users/sabinalinderoth/Documents/CSV_grids/'
+#path = '/Users/sabinalinderoth/Documents/Ply_files/TEST_sorted_grid_ply/'
 
 #edges = np.load(path + 'edges.npy')
 shutil.copyfile(path+'edges.npy', save_data_path+'edges.npy')

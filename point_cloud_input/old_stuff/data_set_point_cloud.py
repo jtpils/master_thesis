@@ -5,7 +5,6 @@ import torch
 from torch.utils.data import Dataset
 from torch.utils.data.sampler import SubsetRandomSampler
 from lidar_processing_functions import *
-import matplotlib.pyplot as plt
 
 
 ##########################################################################################################

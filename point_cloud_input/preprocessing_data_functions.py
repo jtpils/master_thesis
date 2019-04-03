@@ -3,7 +3,6 @@ from random import *
 import random
 import pandas as pd
 import time
-import matplotlib.pyplot as plt
 
 
 def get_grid(x, y, x_edges, y_edges):

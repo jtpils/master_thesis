@@ -68,7 +68,7 @@ def fasterScatter(PFN_input, coordinates, PFN_output,  batch_size):
         ygrids = torch.floor((y_coords + range) / pillar_size)
 
         #convert these 2D-indices to 1D indices by declaring canvas as:
-        canvas = torch.zeros((num_channels, height*width))
+        canvas = torch.zeros((num_channels, height*width)).cuda()  ######### CHANGED HERE FOR GOOGLE CLOUD, fix this with some flag use_cuda or something /A
         indices = xgrids*width + ygrids  # new indices along 1D-canvas. or maybe swap x and y here?
         #indices = (height-xgrids)*height -ygrids-1
         indices = torch.squeeze(indices).long()
@@ -248,7 +248,7 @@ class PointPillars(torch.nn.Module):
 
             concatenated_canvas[i, :, :, :] = concatenated_layers
 
-        output = self.Backbone.forward(concatenated_canvas)
+        output = self.Backbone.forward(concatenated_canvas.cuda())
 
         del sweep_canvas, map_canvas, zipped_canvas, concatenated_layers, sweep_outputs, map_outputs, sweep, map
         return output
