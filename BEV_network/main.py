@@ -5,7 +5,7 @@ import os
 def main():
     # load old weights! change here manually
     load_weights = True
-    load_weights_path = '/home/annika_lundqvist144/master_thesis/BEV_network/Duchess_190329_2/parameters/epoch_22_checkpoint.pt'
+    load_weights_path = '/home/annika_lundqvist144/master_thesis/BEV_network/Duchess_190402_1/parameters/epoch_11_checkpoint.pt'
 
     save_parameters_folder = input('Type name of new folder: ')
     n_epochs = 50 #int(input('Number of epochs: '))
