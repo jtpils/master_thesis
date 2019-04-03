@@ -141,7 +141,7 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
                 time_epoch = time.time()
 
             #t1_get_data = time.time()
-            del data, sweep, map, labels, outputs, loss_size
+            del data, sweep, cutout, labels, outputs, loss_size
             t1_get_data = time.time()
         # At the end of the epoch, do a pass on the validation set
         '''
