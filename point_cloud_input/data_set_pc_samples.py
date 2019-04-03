@@ -59,6 +59,6 @@ def get_train_loader_pc(batch_size, data_set_path, kwargs):
     training_data_set = LiDARDataSet_PC(data_set_path)
     print('Number of training samples: ', len(training_data_set))
     train_sampler = SubsetRandomSampler(np.arange(len(training_data_set), dtype=np.int64))
-    train_loader = torch.utils.data.DataLoader(training_data_set, batch_size=batch_size, sampler=train_sampler, **kwargs)
+    train_loader = torch.utils.data.DataLoader(training_data_set, batch_size=batch_size, sampler=train_sampler, drop_last = True, **kwargs)
 
     return train_loader
