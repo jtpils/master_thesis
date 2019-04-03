@@ -94,7 +94,6 @@ for idx in np.arange(len(list_of_sweeps_to_load)):
     ply_coordinates = sweeps_global_coordinates[idx, :]  # get global coordinates for the sweep at row idx
 
     # find in which grid this ply-file exist
-    #x_grid, y_grid = get_grid(ply_coordinates[1], ply_coordinates[2], self.edges)  # global x, y
     x_grid = int(np.floor((ply_coordinates[1]-edges[0][0])/grid_size))
     y_grid = int(np.floor((ply_coordinates[2]-edges[1][0])/grid_size))
     grid_directory = ply_path + '/grid_' + str(x_grid) + '_' + str(y_grid)
