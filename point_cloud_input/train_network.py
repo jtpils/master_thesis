@@ -90,21 +90,28 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
             # 3. map features (xp,yp,z) 4. map coordinates (x,y,z) 5. labels.
             sweep = data['sweep']
             sweep_coordinates = data['sweep_coordinates']
-            map = data['cutout']
-            map_coordinates = data['cutout_coordinates']
+            cutout = data['cutout']
+            cutout_coordinates = data['cutout_coordinates']
             labels = data['labels']
 
 
             if use_cuda:
-                sweep, map, labels = sweep.cuda(async=True), map.cuda(async=True), labels.cuda(async=True)
-            sweep, sweep_coordinates, map, map_coordinates, labels = Variable(sweep), Variable(sweep_coordinates), Variable(map), Variable(map_coordinates), Variable(labels)
+                sweep, sweep_coordinates, cutout, cutout_coordinates, labels = sweep.cuda(async=True), \
+                                                                               sweep_coordinates.cuda(async=True), \
+                                                                               cutout.cuda(async=True), \
+                                                                               cutout_coordinates.cuda(async=True), \
+                                                                               labels.cuda(async=True)
+                
+            sweep, sweep_coordinates, cutout, cutout_coordinates, labels = Variable(sweep), Variable(sweep_coordinates), \
+                                                                     Variable(cutout), Variable(cutout_coordinates), \
+                                                                           Variable(labels)
 
 
             # Set the parameter gradients to zero
             optimizer.zero_grad()
             # Forward pass, backward pass, optimize
             t1 = time.time()
-            outputs = net.forward(sweep.float(), map.float(), sweep_coordinates.float(), map_coordinates.float())#, scatter)
+            outputs = net.forward(sweep.float(), cutout.float(), sweep_coordinates.float(), cutout_coordinates.float())#, scatter)
             t2 = time.time()
             print('time for forward: ', t2 - t1)
 
