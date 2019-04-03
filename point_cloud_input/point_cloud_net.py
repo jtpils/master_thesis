@@ -248,7 +248,7 @@ class PointPillars(torch.nn.Module):
 
             concatenated_canvas[i, :, :, :] = concatenated_layers
 
-        output = self.Backbone.forward(concatenated_canvas)
+        output = self.Backbone.forward(concatenated_canvas.cuda())
 
         del sweep_canvas, map_canvas, zipped_canvas, concatenated_layers, sweep_outputs, map_outputs, sweep, map
         return output
