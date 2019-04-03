@@ -154,10 +154,10 @@ class Gustav(torch.nn.Module):
     def forward(self, x):
         batch_size = np.shape(x)[0]
         sweep = x[:,0,:,:]
-        sweep = torch.reshape(sweep, (batch_size,1,300,300))
+        sweep = torch.reshape(sweep, (batch_size,1,300,300)).cuda()
 
         cutout = x[:,1,:,:] # [batch, 1, 300, 300]
-        cutout = torch.reshape(cutout, (batch_size,1,300,300))
+        cutout = torch.reshape(cutout, (batch_size,1,300,300)).cuda()
 
         sweep = F.relu(self.conv1_bn_input1(self.conv1_input1(sweep)))  # 32,300,300
         sweep = F.relu(self.conv2_bn_input1(self.conv2_input1(sweep)))  # 32,300,300
@@ -169,7 +169,7 @@ class Gustav(torch.nn.Module):
         cutout = self.pool(cutout)  # 32,150,150
         cutout = F.relu(self.conv3_bn_input2(self.conv3_input2(cutout)))  # 64,150,150
 
-        x = torch.zeros((batch_size, 2*64, 150, 150))
+        x = torch.zeros((batch_size, 2*64, 150, 150)).cuda()
         for i in np.arange(batch_size):
             y = torch.cat((sweep[i,:,:,:],cutout[i,:,:,:]), 0)
             x[i, :, :, :] = y
