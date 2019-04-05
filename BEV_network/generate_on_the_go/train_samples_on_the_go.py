@@ -45,8 +45,6 @@ class DataSetGenerateOnTheGo(Dataset):
         pc, global_coords = load_data(os.path.join(self.sample_dir,file_name), self.csv_path)
         rand_trans = random_rigid_transformation(self.translation, self.rotation)
 
-        rand_trans = np.array((10,10,0))
-
         # sweep
         sweep = training_sample_rotation_translation(pc, rand_trans)
         sweep = trim_pointcloud(sweep)

@@ -545,13 +545,14 @@ def discretize_pc_fast(pc, trim_range=15, spatial_resolution=0.1, array_size=300
     y_grids = np.floor((pc[:,1]+trim_range)/spatial_resolution).astype(int)
 
     # not the best way to handle detections outside of array, would be better to make the array bigger like 2 cells larger, do as below, and then crop our image from it.
-    x_grids[x_grids >= 300] = 299
-    y_grids[y_grids >= 300] = 299
+    #x_grids[x_grids >= 300] = 299
+    #y_grids[y_grids >= 300] = 299
     #x_grids[x_grids < 0] = 0 # there might be negative grids?
     #y_grids[y_grids >= 0] = 0
 
-    pc_image = np.zeros((1,array_size,array_size))
+    pc_image = np.zeros((1,array_size+1,array_size+1))
     for i in np.arange(len(pc)):
         pc_image[0, x_grids[i],y_grids[i]] = pc_image[0, x_grids[i], y_grids[i]] + 1
 
+    pc_image = pc_image[:,:-1,:-1]
     return pc_image
