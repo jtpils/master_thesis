@@ -224,7 +224,7 @@ def main():
     n_epochs = 50
     learning_rate = 0.01
     patience = 50
-    batch_size = 32
+    batch_size = 45
     translation, rotation = 3, 1
 
     print(' ')
