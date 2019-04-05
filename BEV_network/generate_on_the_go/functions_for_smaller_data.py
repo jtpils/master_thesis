@@ -410,7 +410,7 @@ def normalize_sample(sample):
     return sample
 
 
-def rounding(n, r=0.05):
+def rounding(n, r=0.05): # do not forget to change this to 0.1!! it should be the same as the spatial resolution
     '''
     Function for round down to nearest r.
 
@@ -427,8 +427,8 @@ def rounding(n, r=0.05):
     return rounded_number
 
 
-def get_cut_out(discretized_point_cloud_map, global_coordinate, max_min_values_map, spatial_resolution=0.05,
-                cut_out_size=900):
+def get_cut_out(discretized_point_cloud_map, global_coordinate, max_min_values_map, spatial_resolution=0.1,
+                cut_out_size=300):
     '''
     Function that creates a cut out from the discretized map.
 

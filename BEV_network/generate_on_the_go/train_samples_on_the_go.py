@@ -68,8 +68,10 @@ class DataSetGenerateOnTheGo(Dataset):
 
 def get_loaders(batch_size, translation, rotation, use_cuda):
     # Training
-    sample_path = '/home/master04/Desktop/Ply_files/_out_Town01_190402_1/pc/'
-    csv_path = '/home/master04/Desktop/Ply_files/_out_Town01_190402_1/Town01_190402_1.csv'
+    # sample_path = '/home/master04/Desktop/Ply_files/_out_Town01_190402_1/pc/'
+    # csv_path = '/home/master04/Desktop/Ply_files/_out_Town01_190402_1/Town01_190402_1.csv'
+    sample_path = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/_out_Town02_190306_1/pc/'
+    csv_path = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/_out_Town02_190306_1/Town02_190306_1.csv'
     training_data_set = DataSetGenerateOnTheGo(sample_path, csv_path, translation, rotation)
     kwargs = {'pin_memory': True} if use_cuda else {}
     workers_train = 0
@@ -80,8 +82,10 @@ def get_loaders(batch_size, translation, rotation, use_cuda):
     train_loader = torch.utils.data.DataLoader(training_data_set, batch_size=batch_size, sampler=train_sampler, num_workers=workers_train, **kwargs)
 
     # validation
-    sample_path = '/home/master04/Desktop/Ply_files/validation_and_test/validation_set/pc/'
-    csv_path = '/home/master04/Desktop/Ply_files/validation_and_test/validation_set/validation_set.csv'
+    #sample_path = '/home/master04/Desktop/Ply_files/validation_and_test/validation_set/pc/'
+    #csv_path = '/home/master04/Desktop/Ply_files/validation_and_test/validation_set/validation_set.csv'
+    sample_path = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/_out_Town02_190306_1/pc/'
+    csv_path = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/_out_Town02_190306_1/Town02_190306_1.csv'
     val_data_set = DataSetGenerateOnTheGo(sample_path, csv_path, translation, rotation)
     kwargs = {'pin_memory': True} if use_cuda else {}
     n_val_samples = 8 #len(val_data_set)
