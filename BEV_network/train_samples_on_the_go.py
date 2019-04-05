@@ -52,7 +52,7 @@ def get_loaders(batch_size, translation, rotation, use_cuda):
     csv_path = '/home/annika_lundqvist144/ply_files/validation_set/validation_set.csv'
     val_data_set = DataSetFakeData(sample_path, csv_path, translation, rotation)
     kwargs = {'pin_memory': True} if use_cuda else {}
-    n_val_samples = len(val_data_set)
+    n_val_samples = len(val_data_set)  # change so that this is 20% of all samples
     print('Number of validation samples: ', n_val_samples)
     val_sampler = SubsetRandomSampler(np.arange(n_val_samples, dtype=np.int64))
     val_loader = torch.utils.data.DataLoader(val_data_set, batch_size=batch_size, sampler=val_sampler, num_workers=workers_train, **kwargs)
@@ -225,7 +225,7 @@ def main():
     learning_rate = 0.01
     patience = 50
     batch_size = 45
-    translation, rotation = 3, 1
+    translation, rotation = 1, 0
 
     print(' ')
     print('Number of GPUs available: ', torch.cuda.device_count())
