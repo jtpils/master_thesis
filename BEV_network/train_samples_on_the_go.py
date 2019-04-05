@@ -33,7 +33,7 @@ def get_loaders(batch_size, translation, rotation, use_cuda):
     csv_path = '/home/annika_lundqvist144/ply_files/_out_Town01_190402_1/Town01_190402_1.csv'
     training_data_set = DataSetFakeData(sample_path, csv_path, translation, rotation)
     kwargs = {'pin_memory': True} if use_cuda else {}
-    workers_train = 0
+    workers_train = 16
     print('Number of workers: ', workers_train)
     n_training_samples = len(training_data_set)
     print('Number of training samples: ', n_training_samples)
@@ -115,7 +115,7 @@ def train_network(n_epochs, learning_rate, patience, use_cuda, batch_size, load_
         print('learning rate: ', params[0]['lr'])
 
         running_loss = 0.0
-        print_every = 1#n_batches // 5  # how many mini-batches if we want to print stats x times per epoch
+        print_every = n_batches // 5  # how many mini-batches if we want to print stats x times per epoch
         start_time = time.time()
         total_train_loss = 0
 
@@ -149,7 +149,7 @@ def train_network(n_epochs, learning_rate, patience, use_cuda, batch_size, load_
 
             train_loss_save.append(loss_size.item())
 
-            if True: #(i+1) % print_every == 0:
+            if (i+1) % print_every == 0:
                 print('Epoch [{}/{}], Batch [{}/{}], Loss: {:.4f}, Time: '
                        .format(epoch+1, n_epochs, i, n_batches, running_loss/print_every), time.time()-time_epoch)
                 running_loss = 0.0
