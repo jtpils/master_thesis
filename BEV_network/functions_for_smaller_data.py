@@ -4,7 +4,7 @@ import os
 import sys
 import pandas as pd
 import math
-from matplotlib import pyplot as plt
+#from matplotlib import pyplot as plt
 from tqdm import tqdm
 
 
@@ -245,6 +245,7 @@ def rounding(n, r=0.05): # do not forget to change this to 0.1!! it should be th
     return rounded_number
 
 
+
 def visualize_detections(discretized_point_cloud, layer=0, fig_num=1):
     '''
     takes as input a discretized point cloud (all channels) and visualizes the detections in channel 0. Every cell with
@@ -258,8 +259,8 @@ def visualize_detections(discretized_point_cloud, layer=0, fig_num=1):
     detection_layer = discretized_point_cloud[layer, :, :]
     detection_layer[detection_layer > 0] = 255
 
-    plt.figure(fig_num)
-    plt.imshow(detection_layer, cmap='gray')
+    #plt.figure(fig_num)
+    #plt.imshow(detection_layer, cmap='gray')
 
 
 def discretize_pc_fast(pc, trim_range=15, spatial_resolution=0.1, array_size=300):
