@@ -539,17 +539,10 @@ def visualize_detections(discretized_point_cloud, layer=0, fig_num=1):
     plt.imshow(detection_layer, cmap='gray')
 
 
-def discretize_pc_fast(pc, add_translation=[False, 0, 0], spatial_resolution=0.1, array_size=300):
+def discretize_pc_fast(pc, trim_range=15, spatial_resolution=0.1, array_size=300):
 
-    flag_translate, xtranslation, ytranslation = add_translation
-    if flag_translate:
-        # adjust for translation
-        x_min, y_min = np.min(pc[:,0])+xtranslation, np.min(pc[:,1])+ytranslation
-    else:
-        x_min, y_min = np.min(pc[:,0]), np.min(pc[:,1]) # discretize as usual starting from the minimum value
-
-    x_grids = np.floor((pc[:,0]-x_min)/spatial_resolution).astype(int)
-    y_grids = np.floor((pc[:,1]-y_min)/spatial_resolution).astype(int)
+    x_grids = np.floor((pc[:,0]+trim_range)/spatial_resolution).astype(int)
+    y_grids = np.floor((pc[:,1]+trim_range)/spatial_resolution).astype(int)
 
     # not the best way to handle detections outside of array, would be better to make the array bigger like 2 cells larger, do as below, and then crop our image from it.
     x_grids[x_grids >= 300] = 299
