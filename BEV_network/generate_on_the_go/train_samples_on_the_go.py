@@ -6,6 +6,7 @@ import torch
 from torch.utils.data import Dataset
 from generate_on_the_go.functions_for_smaller_data import *
 from torch.utils.data.sampler import SubsetRandomSampler
+from generate_on_the_go.DataSetsGenerateOnTheGo import *
 
 
 def create_loss_and_optimizer(net, learning_rate=0.01):
@@ -21,57 +22,18 @@ def create_loss_and_optimizer(net, learning_rate=0.01):
     return loss, optimizer
 
 
-class DataSetGenerateOnTheGo(Dataset):
-    """Lidar sample dataset."""
-
-    def __init__(self, sample_path, csv_path, translation, rotation):
-        """
-        Args:
-            sample_path (string): Directory with all the sweeps.
-            csv_path with global coordinates
-        """
-        self.sample_dir = sample_path
-        self.sweeps_file_names = os.listdir(sample_path)
-        self.length = len(self.sweeps_file_names)
-        self.csv_path = csv_path
-        self.translation = translation
-        self.rotation = rotation
-
-    def __len__(self):
-        return self.length
-
-    def __getitem__(self, idx):
-        file_name = self.sweeps_file_names[idx]
-        pc, global_coords = load_data(os.path.join(self.sample_dir,file_name), self.csv_path)
-        rand_trans = random_rigid_transformation(self.translation, self.rotation)
-
-        # sweep
-        sweep = training_sample_rotation_translation(pc, rand_trans)
-        sweep = trim_pointcloud(sweep)
-        sweep_image = discretize_pc_fast(sweep)
-        # fake a map cutout
-        cutout = trim_pointcloud(pc)
-        cutout_image = discretize_pc_fast(cutout)
-
-        # if we want to try occupancy grid, uncomment below:
-        # sweep_image[sweep_image > 0] = 1
-        # cutout_image[cutout_image > 0] = 1
-
-        # concatenate the sweep and the cutout image into one image and save.
-        sweep_and_cutout_image = np.concatenate((sweep_image, cutout_image))
-        sweep_and_cutout_image = normalize_sample(sweep_and_cutout_image)
-
-        training_sample = {'sample': torch.from_numpy(sweep_and_cutout_image).float(), 'labels': rand_trans}
-        return training_sample
-
-
 def get_loaders(batch_size, translation, rotation, use_cuda):
     # Training
-    # sample_path = '/home/master04/Desktop/Ply_files/_out_Town01_190402_1/pc/'
-    # csv_path = '/home/master04/Desktop/Ply_files/_out_Town01_190402_1/Town01_190402_1.csv'
-    sample_path = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/_out_Town02_190306_1/pc/'
-    csv_path = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/_out_Town02_190306_1/Town02_190306_1.csv'
-    training_data_set = DataSetGenerateOnTheGo(sample_path, csv_path, translation, rotation)
+    #sample_path = '/home/master04/Desktop/Ply_files/_out_Town01_190402_1/pc/'
+    #csv_path = '/home/master04/Desktop/Ply_files/_out_Town01_190402_1/Town01_190402_1.csv'
+    #map_path = '/home/master04/Desktop/Maps/map_Town1_night_run/map.npy'
+    #minmax_path = '/home/master04/Desktop/Maps/map_Town1_night_run/max_min.npy'
+    #grid_csv_path = '/home/master04/Desktop/Dataset/ply_grids/in_global_coords/Town01'
+    #sample_path = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/_out_Town02_190306_1/pc/'
+    #csv_path = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/_out_Town02_190306_1/Town02_190306_1.csv'
+    sample_path = '/home/annika_lundqvist144/ply_files/_out_Town01_190402_1/pc/'
+    csv_path = '/home/annika_lundqvist144/ply_files/_out_Town01_190402_1/Town01_190402_1.csv'
+    training_data_set = DataSetFakeData(sample_path, csv_path, translation, rotation)
     kwargs = {'pin_memory': True} if use_cuda else {}
     workers_train = 0
     print('Number of workers: ', workers_train)
@@ -80,17 +42,23 @@ def get_loaders(batch_size, translation, rotation, use_cuda):
     train_sampler = SubsetRandomSampler(np.arange(n_training_samples, dtype=np.int64))
     train_loader = torch.utils.data.DataLoader(training_data_set, batch_size=batch_size, sampler=train_sampler, num_workers=workers_train, **kwargs)
 
+
     # validation
     #sample_path = '/home/master04/Desktop/Ply_files/validation_and_test/validation_set/pc/'
     #csv_path = '/home/master04/Desktop/Ply_files/validation_and_test/validation_set/validation_set.csv'
-    sample_path = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/_out_Town02_190306_1/pc/'
-    csv_path = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/_out_Town02_190306_1/Town02_190306_1.csv'
-    val_data_set = DataSetGenerateOnTheGo(sample_path, csv_path, translation, rotation)
+    #map_path = '/home/master04/Desktop/Maps/map_Town2_night_run/map.npy'
+    #minmax_path = '/home/master04/Desktop/Maps/map_Town2_night_run/max_min.npy'
+    #sample_path = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/_out_Town02_190306_1/pc/'
+    #csv_path = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/_out_Town02_190306_1/Town02_190306_1.csv'
+    sample_path = '/home/annika_lundqvist144/ply_files/validation_set/pc/'
+    csv_path = '/home/annika_lundqvist144/ply_files/validation_set/validation_set.csv'
+    val_data_set = DataSetFakeData(sample_path, csv_path, translation, rotation)
     kwargs = {'pin_memory': True} if use_cuda else {}
     n_val_samples = len(val_data_set)
     print('Number of validation samples: ', n_val_samples)
     val_sampler = SubsetRandomSampler(np.arange(n_val_samples, dtype=np.int64))
     val_loader = torch.utils.data.DataLoader(val_data_set, batch_size=batch_size, sampler=val_sampler, num_workers=workers_train, **kwargs)
+
 
     return train_loader, val_loader
 
@@ -227,11 +195,12 @@ def train_network(n_epochs, learning_rate, patience, use_cuda, batch_size, load_
               ", Validation loss: {:.4f}".format(total_val_loss / len(val_loader)),
               ", Time: {:.2f}s".format(time.time() - start_time))
         print(' ')
+        '''
         # save the loss for each epoch
         train_loss.append(total_train_loss / len(train_loader))
         val_loss.append(total_val_loss / len(val_loader))
 
-        '''train_path = folder_path + '/train_loss.npy'
+        train_path = folder_path + '/train_loss.npy'
         val_path = folder_path + '/val_loss.npy'
         np.save(train_path, train_loss_save)
         np.save(val_path, val_loss_save)
@@ -242,10 +211,10 @@ def train_network(n_epochs, learning_rate, patience, use_cuda, batch_size, load_
         # If the validation has not improved in patience # of epochs the training loop will break.
         if early_stopping.early_stop:
             print("Early stopping")
-            break'''
+            break
+            '''
 
     print("Training finished, took {:.2f}s".format(time.time() - training_start_time))
-    return train_loss, val_loss
 
 
 
@@ -257,8 +226,8 @@ def main():
     n_epochs = 50
     learning_rate = 0.01
     patience = 50
-    batch_size = 2
-    translation, rotation = 0, 0
+    batch_size = 32
+    translation, rotation = 3, 1
 
     print(' ')
     print('Number of GPUs available: ', torch.cuda.device_count())
@@ -274,8 +243,8 @@ def main():
     #os.mkdir(parameter_path)
 
     # train!
-    train_loss, val_loss = train_network(n_epochs, learning_rate, patience, use_cuda, batch_size,
-                                         load_weights, load_weights_path, translation, rotation)
+    train_network(n_epochs, learning_rate, patience, use_cuda, batch_size, load_weights, load_weights_path,
+                  translation, rotation)
 
 if __name__ == '__main__':
     main()

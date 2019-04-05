@@ -119,212 +119,6 @@ def trim_pointcloud(point_cloud, range=15, roof=10, floor=0):  # the hard coded 
     return point_cloud
 
 
-def discretize_pointcloud(trimmed_point_cloud, array_size=300, trim_range=15, spatial_resolution=0.1, padding=False, pad_size=150):
-    '''
-    Discretize into a grid structure with different channels.
-    Create layers:
-    1 layer with number of detections (normalise at the end), 1 layer with mean height, max height, min height. other layers?
-    :param
-        trimmed_point_cloud: trimmed point cloud
-        array_size: number of cells in each channel in the discretized point cloud (default=600)
-        trim_range: move coordinate system such that it matches the range of the trimmed point cloud (default=15)
-        spatial_resolution: size of grid cell in m (default=0.05)
-        padding: True if padding should be performed False otherwise (default=True)
-        pad_size: size of padding (default=150)
-    :return:
-        discretized_pointcloud: 3d-array with multiple "layers"
-        layer 0 = number of detections
-        layer 1 = mean evaluation
-        layer 2 = maximum evaluation
-        layer 3 = minimum evaluation
-    '''
-
-    array_size = int(array_size)
-    discretized_pointcloud = np.zeros([1, array_size, array_size])
-
-    if len(trimmed_point_cloud) is 0:
-
-        discretized_pointcloud[0, :, :] = 0
-
-    else:
-
-        # sort the point cloud by x in increasing order
-        x_sorted_point_cloud = np.asarray(sorted(trimmed_point_cloud, key=lambda row: row[0]))
-
-        #for x_cell in tqdm(range(array_size)):
-        for x_cell in range(array_size):
-
-            # get the x-values in the spatial resolution interval
-            lower_bound = spatial_resolution * x_cell - trim_range
-            upper_bound = (x_cell + 1) * spatial_resolution - trim_range
-            x_interval = list(map(lambda x: lower_bound < x <= upper_bound, x_sorted_point_cloud[:, 0]))
-
-            x_interval = x_sorted_point_cloud[x_interval]
-            # sort the x-interval by increasing y
-            x_sorted_by_y = np.asarray(sorted(x_interval, key=lambda row: row[1]))
-
-            # loop through the y coordinates in the current x_interval and store values in the output_channel
-            for y_cell in range(array_size):
-
-                # if len(sorted_y) is 0:
-                if len(x_sorted_by_y) is 0:
-                    discretized_pointcloud[0, x_cell, y_cell] = 0
-                else:
-                    lower_bound = spatial_resolution * y_cell - trim_range
-                    upper_bound = (y_cell + 1) * spatial_resolution - trim_range
-                    y_interval = np.asarray(x_sorted_by_y[list(map(lambda x: lower_bound < x <= upper_bound, x_sorted_by_y[:, 1]))])
-                    # if there are detections save these in right channel
-                    if np.shape(y_interval)[0] is not 0:
-                        discretized_pointcloud[0, x_cell, y_cell] = np.shape(y_interval)[0]
-                        #discretized_pointcloud[1, x_cell, y_cell] = np.mean(y_interval[:, 2])
-
-                    # if there are no detections not necessary already initialized to zero
-                    #else:
-                    #    discretized_pointcloud[0, x_cell, y_cell] = 0
-
-    # pad the discretized point cloud
-    if padding:
-        discretized_pointcloud = np.pad(discretized_pointcloud, [(0, 0), (pad_size, pad_size), (pad_size, pad_size)], mode='constant')
-
-
-    # THIS IS DONE IN A SEPARAT FUNCTION INSTEAD
-    # Normalize the channels. The values should be between 0 and 1
-    '''for channel in range(np.shape(discretized_pointcloud)[0]):
-        max_value = np.max(discretized_pointcloud[channel, :, :])
-
-        # avoid division with 0
-        if max_value == 0:
-            max_value = 1
-
-        scale = 1/max_value
-        discretized_pointcloud[channel, :, :] = discretized_pointcloud[channel, :, :] * scale'''
-
-    return discretized_pointcloud
-
-
-def discretize_pointcloud_map(map_point_cloud, min_max_coordinates, spatial_resolution=0.05):
-    '''
-    Discretize into a grid structure with different channels.
-    Create layers:
-    1 layer with number of detections (normalise at the end), 1 layer with mean height, max height, min height. other layers?
-    :param
-        pointcloud_dict:
-        min_max_coordinates: array with [xmin, xmax, ymin, ymax]
-        spatial_resolution: size of grid cell in m
-    :return:
-        discretized_pointcloud: 3d-array with multiple "layers"
-        layer 0 = number of detections
-        layer 1 = mean evaluation
-        layer 2 = maximum evaluation
-        layer 3 = minimum evaluation
-    '''
-
-    # calculate the dimension of the array needed to store all the loaded ply-files
-    x_min, x_max, y_min, y_max = min_max_coordinates
-    number_x_cells = int(np.ceil((x_max - x_min) / spatial_resolution))  # should there be a +1 or -1 or something like that? Now Sabina has set 10 of some reason she can't explain.
-    number_y_cells = int(np.ceil((y_max - y_min) / spatial_resolution))  # should there be a +1 or -1 or something like that?
-    # print('number of cells', number_x_cells)
-
-    discretized_pointcloud = np.zeros([4, number_x_cells, number_y_cells])
-
-    # sort the point cloud by x in increasing order
-    x_sorted_point_cloud = np.asarray(sorted(map_point_cloud, key=lambda row: row[0]))
-    i = 0
-    for x_cell in range(number_x_cells):
-
-        # get the x-values in the spatial resolution interval
-        lower_bound = x_min + spatial_resolution * x_cell
-        upper_bound = x_min + (x_cell + 1) * spatial_resolution
-        x_interval = list(map(lambda x: lower_bound < x <= upper_bound, x_sorted_point_cloud[:, 0]))
-
-        x_interval = x_sorted_point_cloud[x_interval]
-        # sort the x-interval by increasing y
-        x_sorted_by_y = np.asarray(sorted(x_interval, key=lambda row: row[1]))
-
-        # loop through the y coordinates in the current x_interval and store values in the output_channel
-        for y_cell in range(number_y_cells):
-
-            # if len(sorted_y) is 0:
-            if len(x_sorted_by_y) is 0:
-                discretized_pointcloud[0, x_cell, y_cell] = 0
-            else:
-                lower_bound = y_min + spatial_resolution * y_cell
-                upper_bound = y_min + (y_cell + 1) * spatial_resolution
-                y_interval = np.asarray(x_sorted_by_y[list(map(lambda x: lower_bound < x <= upper_bound, x_sorted_by_y[:, 1]))])
-
-                # if there are detections save these in right channel
-                if np.shape(y_interval)[0] is not 0:
-                    discretized_pointcloud[0, x_cell, y_cell] = np.shape(y_interval)[0]
-                    discretized_pointcloud[1, x_cell, y_cell] = np.mean(y_interval[:, 2])
-                    discretized_pointcloud[2, x_cell, y_cell] = np.max(y_interval[:, 2])
-                    discretized_pointcloud[3, x_cell, y_cell] = np.min(y_interval[:, 2])
-
-                # if there are not any detections
-                else:
-                    discretized_pointcloud[0, x_cell, y_cell] = 0
-        i += 1
-
-        if i%100 == 0:
-            print('Number of x cells checked:', i, 'of:', number_x_cells)
-
-    return discretized_pointcloud
-
-
-
-def array_to_png(discretized_pointcloud, max_min_values):
-    '''
-    Create a png-image of a discretized pointcloud. Create one image per layer. This is mostly for visualizing purposes.
-    Also saves the map matrix and the max min values.
-    :param
-        discretized_pointcloud: The discretized point cloud map matrix
-        max_min_values: The max and min values of the point cloud map.
-    :return:
-    '''
-
-    # Ask what the png files should be named and create a folder where to save them
-    input_folder_name = input('Type name of folder to store png files in: "map_date_number" :')
-
-    # create a folder name
-    folder_name = input_folder_name
-
-    # creates folder to store the png files
-    current_path = os.getcwd()
-    folder_path = os.path.join(current_path,folder_name)
-    folder_path_png = folder_path + '/map_png/'
-    try:
-        os.mkdir(folder_path)
-        os.mkdir(folder_path_png)
-    except OSError:
-        print('Failed to create new directory.')
-    else:
-        print('Successfully created new directory with path: ', folder_path, 'and', folder_path_png)
-
-    discretized_pointcloud_BEV = discretized_pointcloud  # Save map in new variable to be scaled
-    # NORMALIZE THE BEV IMAGE
-    for channel in range(np.shape(discretized_pointcloud_BEV)[0]):
-        max_value = np.max(discretized_pointcloud_BEV[channel, :, :])
-        print('Max max_value inarray_to_png: ', max_value)
-
-        # avoid division with 0
-        if max_value == 0:
-            max_value = 1
-
-        scale = 255/max_value
-        discretized_pointcloud_BEV[channel, :, :] = discretized_pointcloud_BEV[channel, :, :] * scale
-        print('Largest pixel value (should be 255) : ', np.max(discretized_pointcloud_BEV[channel, :, :]))
-        # create the png_path
-        png_path = folder_path_png + 'channel_' + str(channel)+'.png'
-
-    # Save images
-        img = Image.fromarray(discretized_pointcloud_BEV[channel, :, :])
-        new_img = img.convert("L")
-        new_img.rotate(180).save(png_path)
-
-    # Save the map array and the max and min values of the map in the same folder as the BEV image
-    np.save(os.path.join(folder_path, 'map.npy'), discretized_pointcloud)
-    np.save(os.path.join(folder_path, 'max_min.npy'), max_min_values)
-
-
 def random_rigid_transformation(bound_translation_meter, bound_rotation_degrees):
     '''
     This functions return an array with values for translation and rotation from ground truth. The values are drawn from
@@ -344,8 +138,9 @@ def random_rigid_transformation(bound_translation_meter, bound_rotation_degrees)
     return rigid_transformation
 
 
+'''
 def training_sample_rotation_translation(pointcloud, rigid_transformation):
-    '''
+    
     Rotate and translate a pointcloud according to the random rigid transform. Use this when creating fake training samples.
     :param pointcloud: a lidar sweep that is to be rotated/translated in order to create training sample.
 
@@ -353,7 +148,7 @@ def training_sample_rotation_translation(pointcloud, rigid_transformation):
 
     :param rigid_transformation: get a random transformation with function random_rigid_transformation
     :return: training_pointcloud
-    '''
+    
     number_of_points = len(pointcloud)  # number of points in the pointcloud
     translation = np.append(rigid_transformation[:2], 0) # add a zero for z, since we do not want to translate the height
     rotation = np.deg2rad(rigid_transformation[-1])
@@ -369,7 +164,30 @@ def training_sample_rotation_translation(pointcloud, rigid_transformation):
     training_pointcloud = rotated_pointcloud + translation # add translation to every coordinate vector
 
     return training_pointcloud
+    '''
 
+
+def training_sample_rotation(pointcloud, rotation_angle):
+    '''
+    Rotate and translate a pointcloud according to the random rigid transform. Use this when creating fake training samples.
+    :param pointcloud: a lidar sweep that is to be rotated/translated in order to create training sample.
+
+    Do this BEFORE trimming the sweep!
+
+    :param rotation_angle: get a random transformation with function random_rigid_transformation
+    :return: training_pointcloud
+    '''
+    number_of_points = len(pointcloud)  # number of points in the pointcloud
+    rotation = np.deg2rad(rotation_angle)
+
+    # rotate:
+    c, s = np.cos(rotation), np.sin(rotation)
+    Rz = np.array(((c, -s, 0), (s, c, 0), (0, 0, 1))) # Rotation matrix
+
+    rotated_pointcloud = Rz @ np.transpose(pointcloud) # rotate each vector with coordinates, transpose to get dimensions correctly
+    rotated_pointcloud = np.transpose(np.reshape(rotated_pointcloud, (3, number_of_points)))  # reshape and transpose back
+
+    return rotated_pointcloud
 
 def normalize_sample(sample):
     '''
@@ -427,101 +245,6 @@ def rounding(n, r=0.05): # do not forget to change this to 0.1!! it should be th
     return rounded_number
 
 
-def get_cut_out(discretized_point_cloud_map, global_coordinate, max_min_values_map, spatial_resolution=0.1,
-                cut_out_size=300):
-    '''
-    Function that creates a cut out from the discretized map.
-
-    :param discretized_point_cloud_map: (np.array) The discretized point cloud map, the map is quadratic.
-    :param global_coordinate: (np.array) The global coordinate representing the initial guess.
-    :param max_min_values_map: (np.array) The maximum and minimum values map defining the corners of the map. (This should be an output from the discretize map function
-    :param spatial_resolution: (int) The spatial resolution of the map, how large a cell is. , should be an output from the map.
-    :param cut_out_size: (int) The size of the cut_out. The cut_out should be quadratic, e.g 900x900
-    :return: cut_out: (np.array) A cut out of the map at the initial guess.
-    '''
-    x_min, x_max, y_min, y_max = max_min_values_map
-
-    # check if we have a global coordinate that is outside the map coordinates. If that's the case stop execution.
-    if global_coordinate[0] < x_min or x_max < global_coordinate[0] or global_coordinate[1] < y_min or y_max < \
-            global_coordinate[1]:
-        print('Global coordinate,', global_coordinate, ', is located outside the map boundaries.')
-
-        print('Maximum x value:', x_max, '. Minimum x value:', x_min, '. Maximum y value:', y_max, '. Minimum y value:',
-              y_min)
-
-        print(' ')
-        return None
-        #sys.exit(0)  # we do not want to exit we just want to brake try exept. leave the function!
-
-    # PAD THE MAP HERE!
-    # Things that need to be considered is if padding the map here the new bounds must be considered!!!
-    # The padding is performed by adding image//2-1 zeros below column 0 and image//2 zeros after last column.
-    # image//2-1 zeros below row 0 and image//2 zeros after last row.
-
-    pad_size_low = cut_out_size // 2 - 1
-    pad_size_high = cut_out_size // 2
-
-    # print('shape of map befor padding',np.shape(discretized_point_cloud_map))
-    discretized_point_cloud_map = np.pad(discretized_point_cloud_map,
-                                         [(0, 0), (pad_size_low, pad_size_high), (pad_size_low, pad_size_high)],
-                                         mode='constant')
-    # print('shape of map after padding', np.shape(discretized_point_cloud_map))
-
-    # Check the x value and "put" it in the right cell of the map
-    # Bounds must be fixed since the map now is bigger and have zeros! Lower bound of x is now (x_min - pad_size_low)
-    # and Upper bound of x is (x_max + pad_size_high)
-
-    cell_check_x = rounding(x_min, spatial_resolution) #- pad_size_low*spatial_resolution
-    # print('start_cell_check', cell_check_x)
-    k = pad_size_low
-    while cell_check_x < global_coordinate[0]:
-        x_cell = k
-        k += 1
-        cell_check_x += spatial_resolution
-    # print('x_cell: ', x_cell)
-
-    # Check the y value and "put" it in the right cell of the map
-    # Bounds must be fixed since the map now is bigger and have zeros! Lower bound of y is now (y_min - pad_size_low)
-    # and Upper bound of y is (y_max + pad_size_high)
-
-    cell_check_y = rounding(y_min, spatial_resolution)
-    # print('start_cell_check', cell_check_y)
-    k = pad_size_low
-    while cell_check_y < global_coordinate[1]:
-        y_cell = k
-        k += 1
-        cell_check_y += spatial_resolution
-    # print('y_cell: ', y_cell)
-
-    # start to find deviation how to cut the map and then cut out a piece.
-    deviation_from_cell_low = cut_out_size // 2 - 1
-    deviation_from_cell_high = cut_out_size // 2
-
-    # print('deviation from cell low:', deviation_from_cell_low)
-    # print('deviation from cell high:', deviation_from_cell_high)
-
-    # variable name change for clarifying row and column bounds.
-    col_cell = x_cell
-    row_cell = y_cell
-
-    lower_bound_row = row_cell - deviation_from_cell_low
-    upper_bound_row = row_cell + deviation_from_cell_high + 1  # +1 to include upper bound
-
-    lower_bound_col = col_cell - deviation_from_cell_low
-    upper_bound_col = col_cell + deviation_from_cell_high + 1  # +1 to include upper bound
-
-    # print('low bound row:', lower_bound_row)
-    # print('high bound row:', upper_bound_row)
-
-    # print('low bound col:', lower_bound_col)
-    # print('high bound col:', upper_bound_col)
-
-    # Create the cut out
-    cut_out = discretized_point_cloud_map[:, lower_bound_row:upper_bound_row, lower_bound_col:upper_bound_col]
-
-    return cut_out
-
-
 def visualize_detections(discretized_point_cloud, layer=0, fig_num=1):
     '''
     takes as input a discretized point cloud (all channels) and visualizes the detections in channel 0. Every cell with
@@ -540,16 +263,11 @@ def visualize_detections(discretized_point_cloud, layer=0, fig_num=1):
 
 
 def discretize_pc_fast(pc, trim_range=15, spatial_resolution=0.1, array_size=300):
-
+    # lidar must be in origin
     x_grids = np.floor((pc[:,0]+trim_range)/spatial_resolution).astype(int)
     y_grids = np.floor((pc[:,1]+trim_range)/spatial_resolution).astype(int)
 
     # not the best way to handle detections outside of array, would be better to make the array bigger like 2 cells larger, do as below, and then crop our image from it.
-    #x_grids[x_grids >= 300] = 299
-    #y_grids[y_grids >= 300] = 299
-    #x_grids[x_grids < 0] = 0 # there might be negative grids?
-    #y_grids[y_grids >= 0] = 0
-
     pc_image = np.zeros((1,array_size+1,array_size+1))
     for i in np.arange(len(pc)):
         pc_image[0, x_grids[i],y_grids[i]] = pc_image[0, x_grids[i], y_grids[i]] + 1
