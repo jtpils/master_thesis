@@ -35,7 +35,7 @@ def get_loaders(batch_size, translation, rotation, use_cuda):
     kwargs = {'pin_memory': True} if use_cuda else {}
     workers_train = 16
     print('Number of workers: ', workers_train)
-    n_training_samples = len(training_data_set)
+    n_training_samples = 2800 #len(training_data_set)
     print('Number of training samples: ', n_training_samples)
     train_sampler = SubsetRandomSampler(np.arange(n_training_samples, dtype=np.int64))
     train_loader = torch.utils.data.DataLoader(training_data_set, batch_size=batch_size, sampler=train_sampler, num_workers=workers_train, **kwargs)
@@ -52,7 +52,7 @@ def get_loaders(batch_size, translation, rotation, use_cuda):
     csv_path = '/home/annika_lundqvist144/ply_files/validation_set/validation_set.csv'
     val_data_set = DataSetFakeData(sample_path, csv_path, translation, rotation)
     kwargs = {'pin_memory': True} if use_cuda else {}
-    n_val_samples = len(val_data_set)
+    n_val_samples = 800 #len(val_data_set)
     print('Number of validation samples: ', n_val_samples)
     val_sampler = SubsetRandomSampler(np.arange(n_val_samples, dtype=np.int64))
     val_loader = torch.utils.data.DataLoader(val_data_set, batch_size=batch_size, sampler=val_sampler, num_workers=workers_train, **kwargs)
