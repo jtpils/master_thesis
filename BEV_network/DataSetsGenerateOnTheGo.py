@@ -1,6 +1,6 @@
 import torch
 from torch.utils.data import Dataset
-from generate_on_the_go.functions_for_smaller_data import *
+from functions_for_smaller_data import *
 from tqdm import tqdm
 
 

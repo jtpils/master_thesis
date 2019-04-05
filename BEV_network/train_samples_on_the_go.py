@@ -2,12 +2,10 @@ import time
 from torch.autograd import Variable
 from torch.optim.lr_scheduler import StepLR
 from cat_networks import *
-import torch
 from torch.utils.data import Dataset
-from generate_on_the_go.functions_for_smaller_data import *
 from torch.utils.data.sampler import SubsetRandomSampler
-from generate_on_the_go.DataSetsGenerateOnTheGo import *
-
+#from generate_on_the_go.DataSetsGenerateOnTheGo import *
+from DataSetsGenerateOnTheGo import *
 
 def create_loss_and_optimizer(net, learning_rate=0.01):
     # Loss function

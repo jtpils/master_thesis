@@ -5,12 +5,45 @@ from cat_networks import *
 from torch.autograd import Variable
 import torch
 from torch.utils.data.sampler import SequentialSampler
-from LiDARDataSet import LiDARDataSet
+
+
+import pandas as pd
+import numpy as np
+import os
+import torch
+from torch.utils.data import Dataset
+from torch.autograd import Variable
+import time
+
+
+class TestDataSet(Dataset):
+    def __init__(self, csv_file, sample_dir, use_cuda):
+        self.csv_labels = csv_file
+        csv = pd.read_csv(csv_file)
+        self.length = len(csv)
+        del csv
+        self.sample_dir = sample_dir
+
+    def __len__(self):
+        return self.length
+
+    def __getitem__(self, idx):
+        idx = idx + 1
+        sample_file = os.path.join(self.sample_dir, str(idx))
+        sample = np.load(sample_file + '.npy')
+        sample = torch.from_numpy(sample).float()
+        labels_csv = pd.read_csv(self.csv_labels)
+        labels = labels_csv.iloc[idx-1, 1:4]
+        training_sample = {'sample': sample, 'labels': labels.values}
+        del sample, labels_csv
+        return training_sample
+
 
 load_weights = True
-path = '/home/master04/Desktop/network_parameters/Duchess_190329_2/parameters'
-load_weights_path = path + '/epoch_22_checkpoint.pt'
-path_test_data = '/home/master04/Desktop/Dataset/BEV_samples/Res_01/fake_test_set'#'/home/master04/Desktop/Dataset/BEV_samples/fake_test_set'
+path = '/home/master04/Desktop/network_parameters/Duchess_190403_2/parameters'
+load_weights_path = path + '/epoch_3_checkpoint.pt'
+#path_test_data = '/home/master04/Desktop/Dataset/BEV_samples/res_01/fake_test_set'
+path_test_data = '/home/master04/Desktop/Dataset/BEV_samples/res_01/trans1_rot1/fake_test_set'
 batch_size = 2 #int(input('Input batch size: '))
 
 print('Number of GPUs available: ', torch.cuda.device_count())
@@ -34,7 +67,7 @@ if load_weights:
 
 csv_file = path_test_data + '/labels.csv'
 sample_dir = path_test_data + '/samples/'
-test_data_set = LiDARDataSet(csv_file, sample_dir, use_cuda)
+test_data_set = TestDataSet(csv_file, sample_dir, use_cuda)
 
 kwargs = {'pin_memory': True} if use_cuda else {}
 workers = 8
