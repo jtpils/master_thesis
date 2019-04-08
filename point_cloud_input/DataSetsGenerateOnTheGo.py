@@ -125,14 +125,14 @@ def get_train_loader_pointpillars(batch_size, data_set_path_train, csv_path_trai
     :param kwargs: use cpu or gpu
     :return: train_loader: data loader
     '''
-    grid_csv_path = '/home/master04/Desktop/Dataset/ply_grids/in_global_coords/Town01/'
+    grid_csv_path = '/home/annika_lundqvist144/pc_samples/csv_grids/Town01'
     training_data_set = LiDARDataSet_PC(data_set_path_train, csv_path_train, grid_csv_path, translation, rotation)
     #training_data_set = LiDARDataSet_PC_fake_data(data_set_path, csv_path, translation, rotation)
     print('Number of training samples: ', len(training_data_set))
     train_sampler = SubsetRandomSampler(np.arange(len(training_data_set), dtype=np.int64))
     train_loader = torch.utils.data.DataLoader(training_data_set, batch_size=batch_size, sampler=train_sampler, drop_last = True, **kwargs)
 
-    grid_csv_path = '/home/master04/Desktop/Dataset/ply_grids/in_global_coords/validation/'
+    grid_csv_path = '/home/annika_lundqvist144/pc_samples/csv_grids/validation'
     validation_data_set = LiDARDataSet_PC(data_set_path_val, csv_path_val, grid_csv_path, translation, rotation)
     #validation_data_set = LiDARDataSet_PC_fake_data(data_set_path, csv_path, translation, rotation)
     print('Number of training samples: ', len(validation_data_set))
