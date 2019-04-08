@@ -5,7 +5,7 @@ model_name = input('Type name of new folder: ')
 n_epochs = 20 #int(input('Number of epochs: '))
 learning_rate = 0.01 #float(input('Learning rate: '))
 patience = 10 #int(input('Input patience for EarlyStopping: ')) # Threshold for early stopping. Number of epochs that we will wait until brake
-batch_size = 16 #int(input('Input batch size: '))
+batch_size = 4 #int(input('Input batch size: '))
 plot_flag = 'n' #input('Plot results? y / n: ')
 
 print(' ')
