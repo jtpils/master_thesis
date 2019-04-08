@@ -33,7 +33,7 @@ def get_loaders(batch_size, translation, rotation, use_cuda):
     #csv_path = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/_out_Town02_190306_1/Town02_190306_1.csv'
     sample_path = '/home/annika_lundqvist144/ply_files/_out_Town01_190402_1/pc/'
     csv_path = '/home/annika_lundqvist144/ply_files/_out_Town01_190402_1/Town01_190402_1.csv'
-    training_data_set = DataSetMapData(sample_path, csv_path, translation, rotation)
+    training_data_set = DataSetMapData(sample_path, csv_path, map_path, minmax_path, translation, rotation)
     kwargs = {'pin_memory': True} if use_cuda else {}
     workers_train = 16
     print('Number of workers: ', workers_train)
