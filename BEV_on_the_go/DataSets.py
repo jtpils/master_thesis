@@ -103,7 +103,7 @@ class DataSetMapData(Dataset):
         sweep_and_cutout_image = np.concatenate((sweep_image, cutout_image))
         sweep_and_cutout_image = normalize_sample(sweep_and_cutout_image)
 
-        training_sample = {'sample': torch.from_numpy(sweep_and_cutout_image).float(), 'labels': rand_trans}
+        training_sample = {'sample': torch.from_numpy(sweep_and_cutout_image).float(), 'label': rand_trans}
         return training_sample
 
 
