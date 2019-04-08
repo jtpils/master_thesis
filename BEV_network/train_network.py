@@ -3,13 +3,13 @@ from torch.autograd import Variable
 from torch.optim.lr_scheduler import StepLR
 from early_stopping import EarlyStopping
 from cat_networks import *
-#from data_loader import *
+from data_loader import *
 from torch.utils.data.sampler import SubsetRandomSampler
 from DataSetsGenerateOnTheGo import DataSetFakeData
 import torch
 import numpy as np
 
-
+'''
 def get_loaders_new(batch_size, translation, rotation, use_cuda):
     # Training
     sample_path = '/home/annika_lundqvist144/ply_files/_out_Town01_190402_1/pc/'
@@ -34,7 +34,7 @@ def get_loaders_new(batch_size, translation, rotation, use_cuda):
     val_sampler = SubsetRandomSampler(np.arange(n_val_samples, dtype=np.int64))
     val_loader = torch.utils.data.DataLoader(val_data_set, batch_size=batch_size, sampler=val_sampler, num_workers=workers_train, **kwargs)
 
-    return train_loader, val_loader
+    return train_loader, val_loader'''
 
 def create_loss_and_optimizer(net, learning_rate=0.001):
     # Loss function
@@ -54,10 +54,10 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
 
     #path_training_data = '/home/annika_lundqvist144/BEV_samples/res_01/trans1_rot1/fake_training_set' #input('Path to training data set folder: ')
     #path_validation_data = '/home/annika_lundqvist144/BEV_samples/res_01/trans1_rot1/fake_validation_set'
-    #path_training_data = '/home/master04/Desktop/Dataset/BEV_samples/res_01/trans1_rot1/fake_training_set'  # '/home/master04/Desktop/Dataset/fake_training_data_torch'#
-    #path_validation_data = '/home/master04/Desktop/Dataset/BEV_samples/res_01/trans1_rot1/fake_validation_set'
-    path_training_data = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/fake_training_set'
-    path_validation_data = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/fake_validation_set'
+    path_training_data = '/home/master04/Desktop/Dataset/BEV_samples/res_01/fake_training_set'  # '/home/master04/Desktop/Dataset/fake_training_data_torch'#
+    path_validation_data = '/home/master04/Desktop/Dataset/BEV_samples/res_01/fake_validation_set'
+    #path_training_data = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/fake_training_set'
+    #path_validation_data = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/fake_validation_set'
 
     CNN = Duchess()
     print('=======> NETWORK NAME: =======> ', CNN.name())
@@ -66,9 +66,9 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
     print('Are model parameters on CUDA? ', next(CNN.parameters()).is_cuda)
     print(' ')
 
-    translation, rotation = 1, 0
-    train_loader, val_loader = get_loaders_new(batch_size, translation, rotation, use_cuda)
-    #train_loader, val_loader = get_loaders(path_training_data, path_validation_data, batch_size, use_cuda)
+    #translation, rotation = 1, 0
+    #train_loader, val_loader = get_loaders_new(batch_size, translation, rotation, use_cuda)
+    train_loader, val_loader = get_loaders(path_training_data, path_validation_data, batch_size, use_cuda)
 
     # Load weights
     if load_weights:
