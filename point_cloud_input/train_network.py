@@ -32,7 +32,7 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
     #print('Are model parameters on CUDA? ', next(net.parameters()).is_cuda)
     print(' ')
 
-    train_loader, val_loader = get_train_loader_pointpillars(batch_size, data_set_path_train, csv_path_train, data_set_path_val, csv_path_val, rotation, translation, {'num_workers': 4})
+    train_loader, val_loader = get_train_loader_pointpillars(batch_size, data_set_path_train, csv_path_train, data_set_path_val, csv_path_val, rotation, translation, {'num_workers': 16})
 
     '''# Load weights
     if load_weights:
