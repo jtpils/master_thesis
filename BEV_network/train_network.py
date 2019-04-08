@@ -3,9 +3,38 @@ from torch.autograd import Variable
 from torch.optim.lr_scheduler import StepLR
 from early_stopping import EarlyStopping
 from cat_networks import *
-from data_loader import *
+#from data_loader import *
+from torch.utils.data.sampler import SubsetRandomSampler
+from DataSetsGenerateOnTheGo import DataSetFakeData
 import torch
 import numpy as np
+
+
+def get_loaders_new(batch_size, translation, rotation, use_cuda):
+    # Training
+    sample_path = '/home/annika_lundqvist144/ply_files/_out_Town01_190402_1/pc/'
+    csv_path = '/home/annika_lundqvist144/ply_files/_out_Town01_190402_1/Town01_190402_1.csv'
+    training_data_set = DataSetFakeData(sample_path, csv_path, translation, rotation)
+
+    kwargs = {'pin_memory': True} if use_cuda else {}
+    workers_train = 0 #16
+    print('Number of workers: ', workers_train)
+    n_training_samples = 100 #len(training_data_set)
+    print('Number of training samples: ', n_training_samples)
+    train_sampler = SubsetRandomSampler(np.arange(n_training_samples, dtype=np.int64))
+    train_loader = torch.utils.data.DataLoader(training_data_set, batch_size=batch_size, sampler=train_sampler, num_workers=workers_train, **kwargs)
+
+    # validation
+    sample_path = '/home/annika_lundqvist144/ply_files/validation_set/pc/'
+    csv_path = '/home/annika_lundqvist144/ply_files/validation_set/validation_set.csv'
+    val_data_set = DataSetFakeData(sample_path, csv_path, translation, rotation)
+    kwargs = {'pin_memory': True} if use_cuda else {}
+    n_val_samples = 100 #len(val_data_set)  # change so that this is 20% of all samples
+    print('Number of validation samples: ', n_val_samples)
+    val_sampler = SubsetRandomSampler(np.arange(n_val_samples, dtype=np.int64))
+    val_loader = torch.utils.data.DataLoader(val_data_set, batch_size=batch_size, sampler=val_sampler, num_workers=workers_train, **kwargs)
+
+    return train_loader, val_loader
 
 def create_loss_and_optimizer(net, learning_rate=0.001):
     # Loss function
@@ -37,7 +66,9 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
     print('Are model parameters on CUDA? ', next(CNN.parameters()).is_cuda)
     print(' ')
 
-    train_loader, val_loader = get_loaders(path_training_data, path_validation_data, batch_size, use_cuda)
+    translation, rotation = 1, 0
+    train_loader, val_loader = get_loaders_new(batch_size, translation, rotation, use_cuda)
+    #train_loader, val_loader = get_loaders(path_training_data, path_validation_data, batch_size, use_cuda)
 
     # Load weights
     if load_weights:
