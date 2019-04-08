@@ -10,7 +10,7 @@ def main():
     n_epochs = 50 #int(input('Number of epochs: '))
     learning_rate = 0.01 #float(input('Learning rate: '))
     patience = 50 #int(input('Input patience for EarlyStopping: ')) # Threshold for early stopping. Number of epochs that we will wait until brake
-    batch_size = 32 #45  #32 #int(input('Input batch size: '))
+    batch_size = 45  #32 #int(input('Input batch size: '))
 
     use_cuda = torch.cuda.is_available()
     print('CUDA available: ', use_cuda)
