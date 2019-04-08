@@ -53,8 +53,8 @@ class Duchess(torch.nn.Module):
     def forward(self, x):
         # ENCODER INPUT: 32,300,300
         x = F.relu(self.conv1_bn(self.conv1(x)))  # 32,300,300
-        x = F.relu(self.conv2_bn(self.conv2(x)))  # 128,300,300
-        x = self.pool(x)  # 128,150,150
+        x = F.relu(self.conv2_bn(self.conv2(x)))  # 32,300,300
+        x = self.pool(x)  # 32,150,150
 
         # CONTEXT
         x = F.relu(self.conv3_bn(self.conv3(x)))  # 128,150,150

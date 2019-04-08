@@ -22,24 +22,24 @@ def create_loss_and_optimizer(net, learning_rate=0.01):
     return loss, optimizer
 
 
-def get_loaders(batch_size, translation, rotation, use_cuda):
+def get_loaders_new(batch_size, translation, rotation, use_cuda):
     # Training
-    #sample_path = '/home/master04/Desktop/Ply_files/_out_Town01_190402_1/pc/'
-    #csv_path = '/home/master04/Desktop/Ply_files/_out_Town01_190402_1/Town01_190402_1.csv'
+    sample_path = '/home/master04/Desktop/Ply_files/_out_Town01_190402_1/pc/'
+    csv_path = '/home/master04/Desktop/Ply_files/_out_Town01_190402_1/Town01_190402_1.csv'
     #map_path = '/home/annika_lundqvist144/maps/map_Town1_night_run/map.npy'
     #minmax_path = '/home/annika_lundqvist144/maps/map_Town1_night_run/max_min.npy'
     #grid_csv_path = '/home/annika_lundqvist144/pc_samples/csv_grids/Town01'
     #sample_path = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/_out_Town02_190306_1/pc/'
     #csv_path = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/_out_Town02_190306_1/Town02_190306_1.csv'
-    sample_path = '/home/annika_lundqvist144/ply_files/_out_Town01_190402_1/pc/'
-    csv_path = '/home/annika_lundqvist144/ply_files/_out_Town01_190402_1/Town01_190402_1.csv'
+
+    #sample_path = '/home/annika_lundqvist144/ply_files/_out_Town01_190402_1/pc/'
+    #csv_path = '/home/annika_lundqvist144/ply_files/_out_Town01_190402_1/Town01_190402_1.csv'
 
     #training_data_set = DataSetMapData(sample_path, csv_path, map_path, minmax_path, translation, rotation)
     training_data_set = DataSetFakeData(sample_path, csv_path, translation, rotation)
 
-
     kwargs = {'pin_memory': True} if use_cuda else {}
-    workers_train = 16
+    workers_train = 0 #16
     print('Number of workers: ', workers_train)
     n_training_samples = 100 #len(training_data_set)
     print('Number of training samples: ', n_training_samples)
@@ -47,14 +47,15 @@ def get_loaders(batch_size, translation, rotation, use_cuda):
     train_loader = torch.utils.data.DataLoader(training_data_set, batch_size=batch_size, sampler=train_sampler, num_workers=workers_train, **kwargs)
 
     # validation
-    #sample_path = '/home/master04/Desktop/Ply_files/validation_and_test/validation_set/pc/'
-    #csv_path = '/home/master04/Desktop/Ply_files/validation_and_test/validation_set/validation_set.csv'
+    sample_path = '/home/master04/Desktop/Ply_files/validation_and_test/validation_set/pc/'
+    csv_path = '/home/master04/Desktop/Ply_files/validation_and_test/validation_set/validation_set.csv'
     #map_path = '/home/annika_lundqvist144/maps/map_Town2_night_run/map.npy'
     #minmax_path = '/home/annika_lundqvist144/maps/map_Town2_night_run/max_min.npy'
     #sample_path = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/_out_Town02_190306_1/pc/'
     #csv_path = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/_out_Town02_190306_1/Town02_190306_1.csv'
-    sample_path = '/home/annika_lundqvist144/ply_files/validation_set/pc/'
-    csv_path = '/home/annika_lundqvist144/ply_files/validation_set/validation_set.csv'
+
+    #sample_path = '/home/annika_lundqvist144/ply_files/validation_set/pc/'
+    #csv_path = '/home/annika_lundqvist144/ply_files/validation_set/validation_set.csv'
     #grid_csv_path = '/home/annika_lundqvist144/pc_samples/csv_grids/validation/'
     #val_data_set = DataSetMapData(sample_path, csv_path, map_path, minmax_path, translation, rotation)
     val_data_set = DataSetFakeData(sample_path, csv_path, translation, rotation)
@@ -77,7 +78,7 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
     print('Are model parameters on CUDA? ', next(CNN.parameters()).is_cuda)
     print(' ')
 
-    train_loader, val_loader = get_loaders(batch_size, translation, rotation, use_cuda)
+    train_loader, val_loader = get_loaders_new(batch_size, translation, rotation, use_cuda)
 
     # Load weights
     if load_weights:
@@ -228,7 +229,7 @@ def main():
     n_epochs = 50
     learning_rate = 0.01
     patience = 50
-    batch_size = 45
+    batch_size = 2  #45
     translation, rotation = 1, 0
 
     print(' ')

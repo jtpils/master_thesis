@@ -3,6 +3,7 @@ from torch.utils.data import Dataset
 from functions_for_smaller_data import *
 from tqdm import tqdm
 import time
+import matplotlib.pyplot as plt
 
 
 class DataSetFakeData(Dataset):

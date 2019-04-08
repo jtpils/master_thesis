@@ -4,7 +4,7 @@ import os
 import sys
 import pandas as pd
 import math
-#from matplotlib import pyplot as plt
+from matplotlib import pyplot as plt
 from tqdm import tqdm
 
 
@@ -259,8 +259,8 @@ def visualize_detections(discretized_point_cloud, layer=0, fig_num=1):
     detection_layer = discretized_point_cloud[layer, :, :]
     detection_layer[detection_layer > 0] = 255
 
-    #plt.figure(fig_num)
-    #plt.imshow(detection_layer, cmap='gray')
+    plt.figure(fig_num)
+    plt.imshow(detection_layer, cmap='gray')
 
 
 def discretize_pc_fast(pc, trim_range=15, spatial_resolution=0.1, array_size=300):
