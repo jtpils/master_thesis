@@ -2,6 +2,7 @@ import torch
 from torch.utils.data import Dataset
 from functions_for_smaller_data import *
 from tqdm import tqdm
+import time
 
 
 class DataSetFakeData(Dataset):
@@ -147,10 +148,15 @@ class DataSetCreateMapData(Dataset):
         rand_trans = self.labels[idx]
 
         # sweep
+        t1 = time.time()
         sweep = rotate_pointcloud_to_global(pc, global_coords)  # rotate to align with map
         sweep = training_sample_rotation(sweep, rand_trans[2])  # rotate a bit more to create training sample
         sweep = trim_pointcloud(sweep)
+        t2 = time.time()
         sweep_image = discretize_pc_fast(sweep)
+        t3 = time.time()
+        print('sweep ', t3-t1)
+        print('discretize sweep ', t3-t2)
 
         # map cut-out
         cut_out_coordinates = global_coords[0][:2] + rand_trans[:2]  # translation x, y
@@ -159,6 +165,7 @@ class DataSetCreateMapData(Dataset):
         trim_range = 15
 
         # get all points around the sweep
+        t1 = time.time()
         cutout = self.lidar_points[self.lidar_points['x'] <= cut_out_coordinates[0]+trim_range]
         cutout = cutout[cutout['x'] >= cut_out_coordinates[0]-trim_range]
         cutout = cutout[cutout['y'] <= cut_out_coordinates[1]+trim_range]
@@ -166,7 +173,11 @@ class DataSetCreateMapData(Dataset):
         # if we want to use occupancy grid, sample points first
         # move all points such that the cut-out-coordinates becomes the origin
         cutout = cutout.values - np.array((cut_out_coordinates[0], cut_out_coordinates[1], 0))
+        t2 = time.time()
         cutout_image = discretize_pc_fast(cutout)
+        t3 = time.time()
+        print('cutout ', t3-t1)
+        print('discretize cutout ', t3-t2)
 
         # concatenate the sweep and the cutout image into one image and save.
         sweep_and_cutout_image = np.concatenate((sweep_image, cutout_image))
