@@ -1,7 +1,7 @@
 from train_network import *
 from point_cloud_net import *
 
-#model_name = input('Type name of new folder: ')
+model_name = input('Type name of new folder: ')
 n_epochs = 20 #int(input('Number of epochs: '))
 learning_rate = 0.01 #float(input('Learning rate: '))
 patience = 10 #int(input('Input patience for EarlyStopping: ')) # Threshold for early stopping. Number of epochs that we will wait until brake
@@ -23,5 +23,5 @@ os.mkdir(model_path)
 parameter_path = os.path.join(model_path, 'parameters')
 os.mkdir(parameter_path)'''
 
-train_loss, val_loss = train_network(n_epochs, learning_rate, patience, 'a', use_cuda, batch_size)
+train_loss, val_loss = train_network(n_epochs, learning_rate, patience, model_name, use_cuda, batch_size)
 
