@@ -109,22 +109,38 @@ class DataSetMapData(Dataset):
 
 def get_loaders(path_training, path_training_csv, path_validation, path_validation_csv, batch_size, use_cuda):
     kwargs = {'pin_memory': True, 'num_workers': 16} if use_cuda else {'num_workers': 4}
+
+    # USE MAP-CUTOUTS
+    '''
     map_train_path = '/home/annika_lundqvist144/maps/map_Town01/map.npy'
     map_minmax_train_path = '/home/annika_lundqvist144/maps/map_Town01/max_min.npy'
-    #train_set = DataSetFakeData(path_training, path_training_csv)
+    '''
+    map_train_path = '/home/master04/Desktop/Maps/map_Town01/map.npy'
+    map_minmax_train_path = '/home/master04/Desktop/Maps/map_Town01/max_min.npy'
     train_set = DataSetMapData(path_training, path_training_csv, map_train_path, map_minmax_train_path)
-    n_training_samples = 400#len(train_set)
+
+    # USE FAKA DATA
+    #train_set = DataSetFakeData(path_training, path_training_csv)
+
+    n_training_samples = 40#len(train_set)
     print('Number of training samples: ', n_training_samples)
     train_sampler = SubsetRandomSampler(np.arange(n_training_samples, dtype=np.int64))
     train_loader = torch.utils.data.DataLoader(train_set, batch_size=batch_size, sampler=train_sampler, **kwargs)
 
-
+    # USE MAP-CUTOUTS
+    '''
     map_val_path = '/home/annika_lundqvist144/maps/map_Town02_validation/map.npy'
     map_minmax_val_path = '/home/annika_lundqvist144/maps/map_Town02_validation/max_min.npy'
-    #val_set = DataSetFakeData(path_validation, path_validation_csv)
+    '''
+    map_val_path = '/home/master04/Desktop/Maps/map_Town02_validation/map.npy'
+    map_minmax_val_path = '//home/master04/Desktop/Maps/map_Town02_validation/max_min.npy'
     val_set = DataSetMapData(path_validation, path_validation_csv, map_val_path, map_minmax_val_path)
+
+    # USE FAKA DATA
+    #val_set = DataSetFakeData(path_validation, path_validation_csv)
+
     n_val_samples = 20#len(val_set)
-    print('Number of training samples: ', n_val_samples)
+    print('Number of validation samples: ', n_val_samples)
     val_sampler = SubsetRandomSampler(np.arange(n_val_samples, dtype=np.int64))
     val_loader = torch.utils.data.DataLoader(val_set, batch_size=batch_size, sampler=val_sampler, **kwargs)
 
