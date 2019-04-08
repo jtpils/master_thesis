@@ -28,14 +28,14 @@ def get_loaders(batch_size, translation, rotation, use_cuda):
     #csv_path = '/home/master04/Desktop/Ply_files/_out_Town01_190402_1/Town01_190402_1.csv'
     #map_path = '/home/annika_lundqvist144/maps/map_Town1_night_run/map.npy'
     #minmax_path = '/home/annika_lundqvist144/maps/map_Town1_night_run/max_min.npy'
-    grid_csv_path = '/home/annika_lundqvist144/pc_samples/csv_grids/Town01'
+    #grid_csv_path = '/home/annika_lundqvist144/pc_samples/csv_grids/Town01'
     #sample_path = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/_out_Town02_190306_1/pc/'
     #csv_path = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/_out_Town02_190306_1/Town02_190306_1.csv'
     sample_path = '/home/annika_lundqvist144/ply_files/_out_Town01_190402_1/pc/'
     csv_path = '/home/annika_lundqvist144/ply_files/_out_Town01_190402_1/Town01_190402_1.csv'
 
     #training_data_set = DataSetMapData(sample_path, csv_path, map_path, minmax_path, translation, rotation)
-    training_data_set = DataSetCreateMapData(sample_path, csv_path, grid_csv_path, translation, rotation)
+    training_data_set = DataSetFakeData(sample_path, csv_path, translation, rotation)
 
 
     kwargs = {'pin_memory': True} if use_cuda else {}
@@ -55,9 +55,9 @@ def get_loaders(batch_size, translation, rotation, use_cuda):
     #csv_path = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/_out_Town02_190306_1/Town02_190306_1.csv'
     sample_path = '/home/annika_lundqvist144/ply_files/validation_set/pc/'
     csv_path = '/home/annika_lundqvist144/ply_files/validation_set/validation_set.csv'
-    grid_csv_path = '/home/annika_lundqvist144/pc_samples/csv_grids/validation/'
+    #grid_csv_path = '/home/annika_lundqvist144/pc_samples/csv_grids/validation/'
     #val_data_set = DataSetMapData(sample_path, csv_path, map_path, minmax_path, translation, rotation)
-    val_data_set = DataSetCreateMapData(sample_path, csv_path, grid_csv_path, translation, rotation)
+    val_data_set = DataSetFakeData(sample_path, csv_path, translation, rotation)
 
     kwargs = {'pin_memory': True} if use_cuda else {}
     n_val_samples = len(val_data_set)  # change so that this is 20% of all samples

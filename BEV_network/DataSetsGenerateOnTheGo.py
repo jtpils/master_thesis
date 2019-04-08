@@ -73,6 +73,7 @@ class DataSetMapData(Dataset):
         self.map = np.load(map_path)
         self.map_minmax = np.load(minmax_path)
         self.labels = [random_rigid_transformation(translation, rotation) for x in np.arange(self.length)]
+        print('Done initializing data set.')
 
     def __len__(self):
         return self.length
@@ -106,7 +107,7 @@ class DataSetMapData(Dataset):
         return training_sample
 
 
-
+'''
 class DataSetCreateMapData(Dataset):
     """Generate "real" data on the go, eg sweep+map-cut-out, using the map.npy file"""
 
@@ -185,3 +186,4 @@ class DataSetCreateMapData(Dataset):
 
         training_sample = {'sample': torch.from_numpy(sweep_and_cutout_image).float(), 'labels': rand_trans}
         return training_sample
+'''
