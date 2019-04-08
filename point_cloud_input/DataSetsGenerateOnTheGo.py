@@ -126,7 +126,8 @@ def get_train_loader_pointpillars(batch_size, data_set_path, csv_path, rotation,
     :return: train_loader: data loader
     '''
     grid_csv_path = '/home/master04/Desktop/Dataset/ply_grids/in_global_coords/Town01'
-    training_data_set = LiDARDataSet_PC(data_set_path, csv_path, grid_csv_path, translation, rotation)
+    #training_data_set = LiDARDataSet_PC(data_set_path, csv_path, grid_csv_path, translation, rotation)
+    training_data_set = LiDARDataSet_PC_fake_data(data_set_path, csv_path, translation, rotation)
     print('Number of training samples: ', len(training_data_set))
     train_sampler = SubsetRandomSampler(np.arange(len(training_data_set), dtype=np.int64))
     train_loader = torch.utils.data.DataLoader(training_data_set, batch_size=batch_size, sampler=train_sampler, drop_last = True, **kwargs)

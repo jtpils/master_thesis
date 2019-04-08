@@ -17,8 +17,10 @@ def create_loss_and_optimizer(net, learning_rate=0.001):
 # def train_network(net, train_loader, val_loader, n_epochs, learning_rate, patience, folder_path, device, use_cuda):
 def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batch_size):
 
-    data_set_path = '/home/master04/Desktop/Ply_files/_out_Town01_190402_1/pc'
-    csv_path = '/home/master04/Desktop/Ply_files/_out_Town01_190402_1/Town01_190402_1.csv'
+    #data_set_path = '/home/master04/Desktop/Ply_files/_out_Town01_190402_1/pc'
+    #csv_path = '/home/master04/Desktop/Ply_files/_out_Town01_190402_1/Town01_190402_1.csv'
+    data_set_path = '/home/annika_lundqvist144/ply_files/_out_Town01_190402_1/pc'
+    csv_path = '/home/annika_lundqvist144/ply_files/_out_Town01_190402_1/Town01_190402_1.csv'
     translation, rotation = 0,0
 
 
@@ -29,7 +31,14 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
     #print('Are model parameters on CUDA? ', next(net.parameters()).is_cuda)
     print(' ')
 
-    train_loader = get_train_loader_pointpillars(batch_size, data_set_path, csv_path, rotation, translation, {'num_workers': 8})
+    train_loader = get_train_loader_pointpillars(batch_size, data_set_path, csv_path, rotation, translation, {'num_workers': 16})
+
+    #data_set_path = '/home/master04/Desktop/Ply_files/_out_Town01_190402_1/pc'
+    #csv_path = '/home/master04/Desktop/Ply_files/_out_Town01_190402_1/Town01_190402_1.csv'
+    data_set_path = '/home/annika_lundqvist144/ply_files/validation_set/pc'
+    csv_path = '/home/annika_lundqvist144/ply_files/validation_set/validation_set.csv'
+    translation, rotation = 0,0
+    val_loader = get_train_loader_pointpillars(batch_size, data_set_path, csv_path, rotation, translation, {'num_workers': 16})
 
     '''# Load weights
     if load_weights:
@@ -141,7 +150,7 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
             del data, sweep, cutout, labels, outputs, loss_size
             t1_get_data = time.time()
         # At the end of the epoch, do a pass on the validation set
-        '''
+
         total_val_loss = 0
         net = net.eval()
         with torch.no_grad():
@@ -178,7 +187,7 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
         # If the validation has not improved in patience # of epochs the training loop will break.
         if early_stopping.early_stop:
             print("Early stopping")
-            break'''
+            break
 
     print("Training finished, took {:.2f}s".format(time.time() - training_start_time))
     return train_loss, val_loss

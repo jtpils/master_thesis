@@ -2,10 +2,10 @@ from train_network import *
 from point_cloud_net import *
 
 #model_name = input('Type name of new folder: ')
-n_epochs = 1 #int(input('Number of epochs: '))
+n_epochs = 20 #int(input('Number of epochs: '))
 learning_rate = 0.01 #float(input('Learning rate: '))
 patience = 10 #int(input('Input patience for EarlyStopping: ')) # Threshold for early stopping. Number of epochs that we will wait until brake
-batch_size = 2 #int(input('Input batch size: '))
+batch_size = 32 #int(input('Input batch size: '))
 plot_flag = 'n' #input('Plot results? y / n: ')
 
 print(' ')
