@@ -6,6 +6,9 @@ from torch.utils.data import Dataset
 from torch.utils.data.sampler import SubsetRandomSampler
 #from generate_on_the_go.DataSetsGenerateOnTheGo import *
 from DataSetsGenerateOnTheGo import *
+from early_stopping import *
+from tqdm import tqdm
+
 
 def create_loss_and_optimizer(net, learning_rate=0.01):
     # Loss function
@@ -61,7 +64,7 @@ def get_loaders(batch_size, translation, rotation, use_cuda):
     return train_loader, val_loader
 
 
-def train_network(n_epochs, learning_rate, patience, use_cuda, batch_size, load_weights, load_weights_path, translation, rotation):
+def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batch_size, load_weights, load_weights_path, translation, rotation):
 
     CNN = Duchess()
     print('=======> NETWORK NAME: =======> ', CNN.name())
@@ -91,7 +94,7 @@ def train_network(n_epochs, learning_rate, patience, use_cuda, batch_size, load_
     train_loss = []
 
     # initialize the early_stopping object
-    #early_stopping = EarlyStopping(folder_path, patience, verbose=True)
+    early_stopping = EarlyStopping(folder_path, patience, verbose=True)
 
     # Get training data
     n_batches = len(train_loader)
@@ -165,7 +168,7 @@ def train_network(n_epochs, learning_rate, patience, use_cuda, batch_size, load_
         CNN = CNN.eval()
         val_time = time.time()
         with torch.no_grad():
-            for i, data in enumerate(val_loader, 1):
+            for i, data in tqdm(enumerate(val_loader, 1)):
                 sample = data['sample']
                 labels = data['labels']
 
@@ -182,7 +185,7 @@ def train_network(n_epochs, learning_rate, patience, use_cuda, batch_size, load_
 
                 val_loss_save.append(val_loss_size.item())
 
-                if (i+1) % 5 == 0:
+                if False: #(i+1) % 10 == 0:
                     print('Validation: Batch [{}/{}], Time: '.format(i, val_batches), time.time()-val_time)
                     val_time = time.time()
 
@@ -193,7 +196,7 @@ def train_network(n_epochs, learning_rate, patience, use_cuda, batch_size, load_
               ", Validation loss: {:.4f}".format(total_val_loss / len(val_loader)),
               ", Time: {:.2f}s".format(time.time() - start_time))
         print(' ')
-        '''
+
         # save the loss for each epoch
         train_loss.append(total_train_loss / len(train_loader))
         val_loss.append(total_val_loss / len(val_loader))
@@ -210,7 +213,7 @@ def train_network(n_epochs, learning_rate, patience, use_cuda, batch_size, load_
         if early_stopping.early_stop:
             print("Early stopping")
             break
-            '''
+
 
     print("Training finished, took {:.2f}s".format(time.time() - training_start_time))
 
@@ -220,7 +223,7 @@ def main():
     load_weights = False
     load_weights_path = '/home/annika_lundqvist144/master_thesis/BEV_network/Duchess_190402_1/parameters/epoch_11_checkpoint.pt'
 
-    #save_parameters_folder = input('Type name of new folder: ')
+    save_parameters_folder = input('Type name of new folder: ')
     n_epochs = 50
     learning_rate = 0.01
     patience = 50
@@ -234,15 +237,16 @@ def main():
 
 
     # create directory for model weights
-    #current_path = os.getcwd()
-    #save_parameters_path = os.path.join(current_path, save_parameters_folder)
-    #os.mkdir(save_parameters_path)
-    #parameter_path = os.path.join(save_parameters_path, 'parameters')
-    #os.mkdir(parameter_path)
+    current_path = os.getcwd()
+    save_parameters_path = os.path.join(current_path, save_parameters_folder)
+    os.mkdir(save_parameters_path)
+    parameter_path = os.path.join(save_parameters_path, 'parameters')
+    os.mkdir(parameter_path)
 
     # train!
-    train_network(n_epochs, learning_rate, patience, use_cuda, batch_size, load_weights, load_weights_path,
+    train_network(n_epochs, learning_rate, patience, parameter_path, use_cuda, batch_size, load_weights, load_weights_path,
                   translation, rotation)
+
 
 if __name__ == '__main__':
     main()

@@ -1,7 +1,4 @@
-
-from preprocessing_data_functions import *
 from train_network import *
-from data_set_pc_samples import *
 from point_cloud_net import *
 
 #model_name = input('Type name of new folder: ')

@@ -38,6 +38,10 @@ def create_pillars(point_cloud, pillar_size=0.5):
     for row in range(len(point_cloud[:,0])): # TODO: maybe we should sort for x and y as we did before? /A
         # Get which grid the current point belongs to. The key in the dict has the name of the grid. ex 0,0
         x_grid, y_grid = get_grid(point_cloud[row,0], point_cloud[row,1], x_edges, y_edges)
+        #trim_range = 15
+        #x_grid = np.floor((point_cloud[:,0] + trim_range)/pillar_size).astype(int)
+        #y_grid = np.floor((point_cloud[:,1] + trim_range)/pillar_size).astype(int)
+
         cell_name = str(x_grid) + ',' + str(y_grid)
 
         # If the cell name has been used before concatenate the points and update the value of the key. Else create

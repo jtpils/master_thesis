@@ -1,12 +1,7 @@
-import time
-from torch.autograd import Variable
 from torch.optim.lr_scheduler import StepLR
-import numpy as np
-import os
 from early_stopping import EarlyStopping
-import torch
 from point_cloud_net import *
-from data_set_pc_samples import *
+from DataSetsGenerateOnTheGo import *
 
 
 def create_loss_and_optimizer(net, learning_rate=0.001):
@@ -22,17 +17,19 @@ def create_loss_and_optimizer(net, learning_rate=0.001):
 # def train_network(net, train_loader, val_loader, n_epochs, learning_rate, patience, folder_path, device, use_cuda):
 def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batch_size):
 
-    data_set_path = '/home/annika_lundqvist144/pc_samples/training_samples_190403'
+    data_set_path = '/home/master04/Desktop/Ply_files/_out_Town01_190402_1/pc'
+    csv_path = '/home/master04/Desktop/Ply_files/_out_Town01_190402_1/Town01_190402_1.csv'
+    translation, rotation = 0,0
 
 
-    net = PointPillars(batch_size)
+    net = PointPillars(batch_size, use_cuda)
     print('=======> NETWORK NAME: =======> ', net.name())
     if use_cuda:
         net.cuda()
     #print('Are model parameters on CUDA? ', next(net.parameters()).is_cuda)
     print(' ')
 
-    train_loader = get_train_loader_pc(batch_size, data_set_path, {'num_workers': 8})
+    train_loader = get_train_loader_pointpillars(batch_size, data_set_path, csv_path, rotation, translation, {'num_workers': 8})
 
     '''# Load weights
     if load_weights:

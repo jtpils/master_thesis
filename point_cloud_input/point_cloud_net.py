@@ -44,7 +44,7 @@ def PointPillarsScatter(PFN_input, PFN_output, batch_size):
     return batch_canvas'''
 
 
-def fasterScatter(PFN_input, coordinates, PFN_output,  batch_size):
+def fasterScatter(PFN_input, coordinates, PFN_output,  batch_size, use_cuda):
 
     num_channels = 64
     height = 282
@@ -68,7 +68,10 @@ def fasterScatter(PFN_input, coordinates, PFN_output,  batch_size):
         ygrids = torch.floor((y_coords + range) / pillar_size)
 
         #convert these 2D-indices to 1D indices by declaring canvas as:
-        canvas = torch.zeros((num_channels, height*width)).cuda()  ######### CHANGED HERE FOR GOOGLE CLOUD, fix this with some flag use_cuda or something /A
+        if use_cuda:
+            canvas = torch.zeros((num_channels, height*width)).cuda()  ######### CHANGED HERE FOR GOOGLE CLOUD, fix this with some flag use_cuda or something /A
+        else:
+            canvas = torch.zeros((num_channels, height*width))
         indices = xgrids*width + ygrids  # new indices along 1D-canvas. or maybe swap x and y here?
         #indices = (height-xgrids)*height -ygrids-1
         indices = torch.squeeze(indices).long()
@@ -223,21 +226,22 @@ class PointPillars(torch.nn.Module):
     The whole damn net.
     """
 
-    def __init__(self, batch_size):
+    def __init__(self, batch_size, use_cuda):
         super(PointPillars, self).__init__()
         self.batch_size = batch_size
         self.PFNlayer_sweep = PFNLayer()
         self.PFNlayer_map = PFNLayer()
         self.Backbone = Backbone()
+        self.use_cuda = use_cuda
 
     def forward(self, sweep, map, sweep_coordinates, map_coordinates):
 
         sweep_outputs = self.PFNlayer_sweep.forward(sweep)
         map_outputs = self.PFNlayer_map.forward(map)
         #sweep_canvas = fasterScatter(sweep, sweep_outputs, self.batch_size)
-        sweep_canvas = fasterScatter(sweep, sweep_coordinates, sweep_outputs, self.batch_size)
+        sweep_canvas = fasterScatter(sweep, sweep_coordinates, sweep_outputs, self.batch_size, self.use_cuda)
         #map_canvas = fasterScatter(map, map_outputs, self.batch_size)
-        map_canvas = fasterScatter(map, map_coordinates, map_outputs, self.batch_size)
+        map_canvas = fasterScatter(map, map_coordinates, map_outputs, self.batch_size, self.use_cuda)
         zipped_canvas = list(zip(sweep_canvas,map_canvas))
         concatenated_canvas = torch.zeros(self.batch_size, 128, 282, 282)
 
@@ -247,8 +251,10 @@ class PointPillars(torch.nn.Module):
             concatenated_layers = torch.cat((sweep_layers , map_layers ), 0)
 
             concatenated_canvas[i, :, :, :] = concatenated_layers
-
-        output = self.Backbone.forward(concatenated_canvas.cuda())
+        if self.use_cuda:
+            output = self.Backbone.forward(concatenated_canvas.cuda())
+        else:
+            output = self.Backbone.forward(concatenated_canvas)
 
         del sweep_canvas, map_canvas, zipped_canvas, concatenated_layers, sweep_outputs, map_outputs, sweep, map
         return output

@@ -1,25 +1,30 @@
-from data_set_point_cloud import PointCloudDataSet
-import time
 import numpy as np
-import os
-import time
-from plyfile import PlyData, PlyElement
-from tqdm import tqdm
+import csv
 import pandas as pd
 
 
 #data_path = '/home/master04/Desktop/Ply_files/validation_and_test/test_set/pc/'
 #ply_files = os.listdir(data_path)
-plydata = PlyData.read('001619.ply')
+#plydata = PlyData.read('001619.ply')
 #pc = plydata.elements[0].data
 
+pc = pd.read_csv('001619.ply', delimiter=' ', skiprows=7, header=None, names=('x','y','z'))
+pc = pc.values
+
+# Creates the csv file
+csv_path = 'test.csv'
+with open(csv_path, mode='w') as csv_file:
+    fieldnames = ['x', 'y', 'z']
+    csv_writer = csv.writer(csv_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+    csv_writer.writerow(fieldnames)
+
+with open(csv_path, mode ='a') as csv_file:
+     csv_writer = csv.writer(csv_file, delimiter = ',' , quotechar='"', quoting=csv.QUOTE_MINIMAL)
+     for row in np.arange(len(pc)):
+        csv_writer.writerow([pc[row,0],pc[row,1],pc[row,2]])
 
 
-
-el = PlyElement.describe(pc, 'vertex')
-PlyData([el], text=True).write('test_file.ply')
-
-print('Done')
+print(' ')
 
 '''
 data_set_path = '/home/master04/Desktop/Dataset/ply_grids/Town02_sorted_grid_ply'
