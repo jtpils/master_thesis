@@ -30,6 +30,7 @@ def load_data(path_to_ply, path_to_csv):
     global_lidar_coordinates[0][3] = global_lidar_coordinates[0][3] + 90  # add 90 to get the correct coordinate system
 
     global_lidar_coordinates[0][1] = -global_lidar_coordinates[0][1]  # y = -y, get the correct coordinate system
+    global_lidar_coordinates = global_lidar_coordinates[0]
 
     return point_cloud, global_lidar_coordinates
 
@@ -82,7 +83,7 @@ def random_rigid_transformation(bound_translation_meter, bound_rotation_degrees)
     return rigid_transformation
 
 
-def rotate_point_cloud(point_cloud, rotation_angle):
+def rotate_point_cloud(point_cloud, rotation_angle, to_global):
     rotation = np.deg2rad(rotation_angle)
 
     # rotate:
@@ -92,7 +93,11 @@ def rotate_point_cloud(point_cloud, rotation_angle):
     rotated_point_cloud = Rz @ np.transpose(point_cloud) # rotate each vector with coordinates, transpose to get dimensions correctly
     rotated_point_cloud = np.transpose(rotated_point_cloud)
 
+    if to_global:
+        rotated_point_cloud[:, 1] = -rotated_point_cloud[:,1]
+
     return rotated_point_cloud
+
 
 def translate_point_cloud(point_cloud, translation):
     translation = np.array((translation[0], translation[1], 0))
@@ -124,3 +129,21 @@ def visualize_detections(discretized_point_cloud, fig_num=1):
     #plt.show()
 
 
+def discretize_map(point_cloud, spatial_resolution=0.1):
+    x_min, x_max = np.min(point_cloud[:,0]), np.max(point_cloud[:,0])
+    y_min, y_max = np.min(point_cloud[:,1]), np.max(point_cloud[:,1])
+
+    x_distance, y_distance = x_max - x_min, y_max - y_min
+
+    num_x_grids = np.ceil(x_distance/spatial_resolution).astype(int)
+    num_y_grids = np.ceil(y_distance/spatial_resolution).astype(int)
+
+    discretized_map = np.zeros((1,num_x_grids,num_y_grids))
+
+    x_grids = np.floor((point_cloud[:,0] - x_min)/spatial_resolution).astype(int)
+    y_grids = np.floor((point_cloud[:,1] - y_min)/spatial_resolution).astype(int)
+
+    for i in np.arange(len(point_cloud)):
+        discretized_map[:,x_grids[i],y_grids[i]] = discretized_map[:,x_grids[i],y_grids[i]] + 1
+
+    return discretized_map
