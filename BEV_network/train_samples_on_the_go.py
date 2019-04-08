@@ -4,7 +4,6 @@ from torch.optim.lr_scheduler import StepLR
 from cat_networks import *
 from torch.utils.data import Dataset
 from torch.utils.data.sampler import SubsetRandomSampler
-#from generate_on_the_go.DataSetsGenerateOnTheGo import *
 from DataSetsGenerateOnTheGo import *
 from early_stopping import *
 from tqdm import tqdm
@@ -27,14 +26,14 @@ def get_loaders(batch_size, translation, rotation, use_cuda):
     # Training
     #sample_path = '/home/master04/Desktop/Ply_files/_out_Town01_190402_1/pc/'
     #csv_path = '/home/master04/Desktop/Ply_files/_out_Town01_190402_1/Town01_190402_1.csv'
-    #map_path = '/home/master04/Desktop/Maps/map_Town1_night_run/map.npy'
-    #minmax_path = '/home/master04/Desktop/Maps/map_Town1_night_run/max_min.npy'
+    map_path = '/home/annika_lundqvist144/maps/map_Town1_night_run/map.npy'
+    minmax_path = '/home/annika_lundqvist144/maps/map_Town1_night_run/max_min.npy'
     #grid_csv_path = '/home/master04/Desktop/Dataset/ply_grids/in_global_coords/Town01'
     #sample_path = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/_out_Town02_190306_1/pc/'
     #csv_path = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/_out_Town02_190306_1/Town02_190306_1.csv'
     sample_path = '/home/annika_lundqvist144/ply_files/_out_Town01_190402_1/pc/'
     csv_path = '/home/annika_lundqvist144/ply_files/_out_Town01_190402_1/Town01_190402_1.csv'
-    training_data_set = DataSetFakeData(sample_path, csv_path, translation, rotation)
+    training_data_set = DataSetMapData(sample_path, csv_path, translation, rotation)
     kwargs = {'pin_memory': True} if use_cuda else {}
     workers_train = 16
     print('Number of workers: ', workers_train)
@@ -43,23 +42,21 @@ def get_loaders(batch_size, translation, rotation, use_cuda):
     train_sampler = SubsetRandomSampler(np.arange(n_training_samples, dtype=np.int64))
     train_loader = torch.utils.data.DataLoader(training_data_set, batch_size=batch_size, sampler=train_sampler, num_workers=workers_train, **kwargs)
 
-
     # validation
     #sample_path = '/home/master04/Desktop/Ply_files/validation_and_test/validation_set/pc/'
     #csv_path = '/home/master04/Desktop/Ply_files/validation_and_test/validation_set/validation_set.csv'
-    #map_path = '/home/master04/Desktop/Maps/map_Town2_night_run/map.npy'
-    #minmax_path = '/home/master04/Desktop/Maps/map_Town2_night_run/max_min.npy'
+    map_path = '/home/annika_lundqvist144/maps/map_Town2_night_run/map.npy'
+    minmax_path = '/home/annika_lundqvist144/maps/map_Town2_night_run/max_min.npy'
     #sample_path = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/_out_Town02_190306_1/pc/'
     #csv_path = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/_out_Town02_190306_1/Town02_190306_1.csv'
     sample_path = '/home/annika_lundqvist144/ply_files/validation_set/pc/'
     csv_path = '/home/annika_lundqvist144/ply_files/validation_set/validation_set.csv'
-    val_data_set = DataSetFakeData(sample_path, csv_path, translation, rotation)
+    val_data_set = DataSetMapData(sample_path, csv_path, map_path, minmax_path, translation, rotation)
     kwargs = {'pin_memory': True} if use_cuda else {}
     n_val_samples = len(val_data_set)  # change so that this is 20% of all samples
     print('Number of validation samples: ', n_val_samples)
     val_sampler = SubsetRandomSampler(np.arange(n_val_samples, dtype=np.int64))
     val_loader = torch.utils.data.DataLoader(val_data_set, batch_size=batch_size, sampler=val_sampler, num_workers=workers_train, **kwargs)
-
 
     return train_loader, val_loader
 
@@ -161,7 +158,6 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
             del data, sample, labels, outputs, loss_size
             t1_get_data = time.time()
 
-
         print('===== Validation =====')
         # At the end of the epoch, do a pass on the validation set
         total_val_loss = 0
@@ -214,9 +210,7 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
             print("Early stopping")
             break
 
-
     print("Training finished, took {:.2f}s".format(time.time() - training_start_time))
-
 
 
 def main():
@@ -234,7 +228,6 @@ def main():
     print('Number of GPUs available: ', torch.cuda.device_count())
     use_cuda = torch.cuda.is_available()
     print('CUDA available: ', use_cuda)
-
 
     # create directory for model weights
     current_path = os.getcwd()

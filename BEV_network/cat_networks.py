@@ -99,8 +99,7 @@ class Gustav(torch.nn.Module):
     # Gustav was a sweet orange kitten from Foot Island that lived with Annika's family during some colorful weeks back
     # in the early 2000's. He found a new home, but will forever be in our hearts.
 
-    # Inspired by Caltagirone.
-            # ENCODER
+    # Use two inputs, eg sweep + cutout
 
     def __init__(self):
         super(Gustav, self).__init__()
@@ -112,6 +111,7 @@ class Gustav(torch.nn.Module):
         self.conv3_input1 = torch.nn.Conv2d(32, 64, kernel_size=3, stride=1, padding=1)
         self.conv3_bn_input1 = torch.nn.BatchNorm2d(64)
 
+        # OBS I FLOWNET HAR DE INTE OLIKA CONV-LAGER FOR 2 INPUTS
 
         self.conv1_input2 = torch.nn.Conv2d(1, 32, kernel_size=3, stride=1, padding=1)
         self.conv2_input2 = torch.nn.Conv2d(32, 32, kernel_size=3, stride=1, padding=1)
@@ -122,7 +122,6 @@ class Gustav(torch.nn.Module):
 
         self.dropout_2d = torch.nn.Dropout2d(p=0.2)
         self.pool = torch.nn.MaxPool2d(kernel_size=2, stride=2, padding=0)
-
 
         # CONTEXT
         self.conv4 = torch.nn.Conv2d(128, 128, kernel_size=3, stride=1, padding=1)

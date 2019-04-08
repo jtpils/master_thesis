@@ -17,8 +17,9 @@ class DataSetFakeData(Dataset):
         self.sweeps_file_names = os.listdir(sample_path)
         self.length = len(self.sweeps_file_names)
         self.csv_path = csv_path
-        self.translation = translation
-        self.rotation = rotation
+        #self.translation = translation
+        #self.rotation = rotation
+        self.labels = [random_rigid_transformation(translation, rotation) for x in np.arange(self.length)]
 
     def __len__(self):
         return self.length
@@ -26,7 +27,8 @@ class DataSetFakeData(Dataset):
     def __getitem__(self, idx):
         file_name = self.sweeps_file_names[idx]
         pc, global_coords = load_data(os.path.join(self.sample_dir,file_name), self.csv_path)
-        rand_trans = random_rigid_transformation(self.translation, self.rotation)
+        #rand_trans = random_rigid_transformation(self.translation, self.rotation)
+        rand_trans = self.labels[idx]
 
         # sweep
         sweep = training_sample_rotation(pc, rand_trans[-1])
@@ -65,10 +67,11 @@ class DataSetMapData(Dataset):
         self.sweeps_file_names = os.listdir(sample_path)
         self.length = len(self.sweeps_file_names)
         self.csv_path = csv_path
-        self.translation = translation
-        self.rotation = rotation
+        #self.translation = translation
+        #self.rotation = rotation
         self.map = np.load(map_path)
         self.map_minmax = np.load(minmax_path)
+        self.labels = [random_rigid_transformation(translation, rotation) for x in np.arange(self.length)]
 
     def __len__(self):
         return self.length
@@ -77,7 +80,8 @@ class DataSetMapData(Dataset):
         # Load one sweep and generate a random transformation
         file_name = self.sweeps_file_names[idx]
         pc, global_coords = load_data(os.path.join(self.sample_dir,file_name), self.csv_path)
-        rand_trans = random_rigid_transformation(self.translation, self.rotation)
+        #rand_trans = random_rigid_transformation(self.translation, self.rotation)
+        rand_trans = self.labels[idx]
 
         # sweep
         sweep = rotate_pointcloud_to_global(pc, global_coords)  # rotate to align with map
@@ -102,7 +106,7 @@ class DataSetMapData(Dataset):
 
 
 
-class DataSetMapData(Dataset):
+class DataSetCreateMapData(Dataset):
     """Generate "real" data on the go, eg sweep+map-cut-out, using the map.npy file"""
 
     def __init__(self, sample_path, csv_path, grid_csv_path, translation, rotation):
@@ -117,8 +121,9 @@ class DataSetMapData(Dataset):
         self.sweeps_file_names = os.listdir(sample_path)
         self.length = len(self.sweeps_file_names)
         self.csv_path = csv_path
-        self.translation = translation
-        self.rotation = rotation
+        #self.translation = translation
+        #self.rotation = rotation
+        self.labels = [random_rigid_transformation(translation, rotation) for x in np.arange(self.length)]
 
         list_of_files = os.listdir(grid_csv_path)
         sweeps = []
@@ -138,7 +143,8 @@ class DataSetMapData(Dataset):
         # Load one sweep and generate a random transformation
         file_name = self.sweeps_file_names[idx]
         pc, global_coords = load_data(os.path.join(self.sample_dir,file_name), self.csv_path)
-        rand_trans = random_rigid_transformation(self.translation, self.rotation)
+        #rand_trans = random_rigid_transformation(self.translation, self.rotation)
+        rand_trans = self.labels[idx]
 
         # sweep
         sweep = rotate_pointcloud_to_global(pc, global_coords)  # rotate to align with map
@@ -148,7 +154,6 @@ class DataSetMapData(Dataset):
 
         # map cut-out
         cut_out_coordinates = global_coords[0][:2] + rand_trans[:2]  # translation x, y
-        spatial_resolution = 0.1
 
         # we want all coordinates that in trim_range around cut_out_coordinates
         trim_range = 15
