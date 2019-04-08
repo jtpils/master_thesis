@@ -31,14 +31,14 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
     #print('Are model parameters on CUDA? ', next(net.parameters()).is_cuda)
     print(' ')
 
-    train_loader = get_train_loader_pointpillars(batch_size, data_set_path, csv_path, rotation, translation, {'num_workers': 16})
+    train_loader = get_train_loader_pointpillars(batch_size, data_set_path, csv_path, rotation, translation, {'num_workers': 8})
 
     #data_set_path = '/home/master04/Desktop/Ply_files/_out_Town01_190402_1/pc'
     #csv_path = '/home/master04/Desktop/Ply_files/_out_Town01_190402_1/Town01_190402_1.csv'
     data_set_path = '/home/annika_lundqvist144/ply_files/validation_set/pc'
     csv_path = '/home/annika_lundqvist144/ply_files/validation_set/validation_set.csv'
     translation, rotation = 0,0
-    val_loader = get_train_loader_pointpillars(batch_size, data_set_path, csv_path, rotation, translation, {'num_workers': 16})
+    val_loader = get_train_loader_pointpillars(batch_size, data_set_path, csv_path, rotation, translation, {'num_workers': 8})
 
     '''# Load weights
     if load_weights:
