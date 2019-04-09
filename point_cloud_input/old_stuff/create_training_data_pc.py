@@ -1,5 +1,4 @@
-import numpy as np
-from data_set_point_cloud import *
+from old_stuff.data_set_point_cloud import *
 from preprocessing_data_functions import *
 import os
 from tqdm import tqdm

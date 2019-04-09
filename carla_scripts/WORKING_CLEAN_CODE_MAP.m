@@ -3,11 +3,14 @@
 clear all;clc
 % CHANGE PATH HERE
 
-pc_path = '/Users/sabinalinderoth/Desktop/Town01_190308/pc/';
-csv_path = '/Users/sabinalinderoth/Desktop/Town01_190308/Town01_190308.csv';
+%pc_path = '/Users/sabinalinderoth/Desktop/Town01_190308/pc/';
+%csv_path = '/Users/sabinalinderoth/Desktop/Town01_190308/Town01_190308.csv';
 
-# pc_path = '/home/master04/Desktop/Ply_files/validation_and_test/test_set/pc/';
-# csv_path = '/home/master04/Desktop/Ply_files/validation_and_test/test_set/test_set.csv';
+pc_path = '/home/master04/Desktop/Ply_files/new_lidar_data/pc/';
+csv_path = '/home/master04/Desktop/Ply_files/new_lidar_data/lidar_scans.csv';
+
+%pc_path = '/home/master04/Desktop/Ply_files/_out_Town01_190308_1/pc';
+%csv_path = '/home/master04/Desktop/Ply_files/_out_Town01_190308_1/Town01_190308_1.csv';
 
 global_coordinates = importdata(csv_path);
 
@@ -63,15 +66,24 @@ for file_number=1:step:length(files)-3
         global_coordinates.data(row,3) = - global_coordinates.data(row,3); % y = -y
         pc = pc + global_coordinates.data(row,2:4)';
 
-        title('3D plot')
+%         title('3D plot')
+%         hold on
+%         plot3(global_coordinates.data(row,2), global_coordinates.data(row,3), global_coordinates.data(row,4),'rd','MarkerSize',10)
+%         plot3(pc(1,:), pc(2,:), pc(3,:),'b.')
+%         xlabel('x')
+%         ylabel('y')
+%         zlabel('z')
+%         axis('equal')
+        %clf
+        title('2D plot')
         hold on
-        plot3(global_coordinates.data(row,2), global_coordinates.data(row,3), global_coordinates.data(row,4),'rd','MarkerSize',10)
-        plot3(pc(1,:), pc(2,:), pc(3,:),'b.')
+        plot(global_coordinates.data(row,2), global_coordinates.data(row,3), 'rd','MarkerSize',10)
+        plot(pc(1,:), pc(2,:),'b.')
         xlabel('x')
         ylabel('y')
-        zlabel('z')
         axis('equal')
-  
+        
+
     end
     
     pause(0.01)

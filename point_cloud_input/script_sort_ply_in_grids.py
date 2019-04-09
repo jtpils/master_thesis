@@ -17,11 +17,11 @@ def get_file_name_from_frame_number(frame_number):
 
 # **********# change the rows marked with this # **********#
 
-path_to_ply = '/home/master04/Desktop/Ply_files/new_lidar_data'  # **********#
-path_to_csv = os.path.join(path_to_ply, 'lidar_scans.csv')  # **********#
+path_to_ply = '/home/master04/Desktop/Ply_files/validation_and_test/test_set'  # **********#
+path_to_csv = os.path.join(path_to_ply, 'test_set.csv')  # **********#
 path_to_pc = os.path.join(path_to_ply, 'pc')
 
-new_folder = '/home/master04/Desktop/Dataset/ply_grids/Town01_sorted_grid_ply'  # **********#
+new_folder = '/home/master04/Desktop/Dataset/ply_grids/test_sorted_grid_ply'  # **********#
 os.mkdir(new_folder)
 
 global_coordinates = pd.read_csv(path_to_csv)
