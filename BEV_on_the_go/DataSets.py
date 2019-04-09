@@ -210,6 +210,7 @@ class DataSetMapData_createMapOnTheGo(Dataset):
 
     def __getitem__(self, idx):
         # load ply-file
+        t1 = time.time()
         indices = [x-(self.num_sweeps //2) for x in np.arange(self.num_sweeps)]
 
         pc_multiple_sweeps = np.zeros((1,3))
@@ -233,6 +234,8 @@ class DataSetMapData_createMapOnTheGo(Dataset):
         #move our origin
         origin = global_coords[:2] + rand_trans[:2]
         sweep_image = discretize_point_cloud(sweep, origin=origin,trim_range=15, spatial_resolution=0.1, image_size=300)
+        t2 = time.time()
+        print('Time to create sweep image: ', t2-t1)
 
         # map cut-out
         cut_out_coordinates = global_coords[:2]
@@ -252,7 +255,8 @@ class DataSetMapData_createMapOnTheGo(Dataset):
         # if we want to use occupancy grid, sample points first
         # move all points such that the cut-out-coordinates become the origin
         cutout_image = discretize_point_cloud(cutout, origin=cut_out_coordinates[:2],trim_range=15, spatial_resolution=0.1, image_size=300)
-
+        t3 = time.time()
+        print('Time to create cutout image: ', t3-t2)
         # concatenate the sweep and the cutout image into one image and save.
         sweep_and_cutout_image = np.concatenate((sweep_image, cutout_image))
         sweep_and_cutout_image = normalize_sample(sweep_and_cutout_image)
