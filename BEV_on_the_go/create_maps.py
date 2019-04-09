@@ -6,13 +6,13 @@ import os
 
 
 t1 = time.time()
-path_pc = '/home/master04/Desktop/Ply_files/validation_and_test/test_set/pc/'
-path_csv = '/home/master04/Desktop/Ply_files/validation_and_test/test_set/test_set.csv'
+############################ Change stuff here ###########################################################
+path_pc = '/home/master04/Desktop/Ply_files/validation_and_test/test_set/pc/'  # path to pc folder with ply-files
+path_csv = '/home/master04/Desktop/Ply_files/validation_and_test/test_set/test_set.csv'  # path to csv with global coordinates
+folder_name = 'map_Town' # name of new directory to save stuff
+#########################################################################################################
+
 files_in_ply_folder = os.listdir(path_pc)
-
-
-# create a folder name to save new map
-folder_name = 'map_Town'
 
 # creates folder to store the png files
 current_path = os.getcwd()
