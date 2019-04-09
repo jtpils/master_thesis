@@ -4,6 +4,7 @@ from DataSets import *
 from torch.optim.lr_scheduler import StepLR
 import time
 from torch.autograd import Variable
+from early_stopping import EarlyStopping
 
 
 def main():
@@ -57,6 +58,9 @@ def main():
     train_loss_save = [len(train_loader)]  # append train loss for each mini batch later on, save this information to plot correctly
     val_loss_save = [len(val_loader)]
     print('Batch size: ', batch_size)
+
+    # initialize the early_stopping object
+    early_stopping = EarlyStopping(parameter_path, patience, verbose=True)
 
     loss = torch.nn.MSELoss()
     optimizer = torch.optim.Adam(CNN.parameters(), lr=learning_rate)
@@ -142,8 +146,13 @@ def main():
         print("Epoch time: {:.2f}s".format(time.time() - start_time))
         print(' ')
 
+        # see if validation loss has decreased, if it has a checkpoint will be saved of the current model.
+        early_stopping(epoch, total_train_loss, total_val_loss, CNN, optimizer)
 
-
+        # If the validation has not improved in patience # of epochs the training loop will break.
+        if early_stopping.early_stop:
+            print("Early stopping")
+            break
 
 
 if __name__ == '__main__':

@@ -108,7 +108,7 @@ class DataSetMapData(Dataset):
 
 
 def get_loaders(path_training, path_training_csv, path_validation, path_validation_csv, batch_size, use_cuda):
-    kwargs = {'pin_memory': True, 'num_workers': 16} if use_cuda else {'num_workers': 4}
+    kwargs = {'pin_memory': True, 'num_workers': 16} if use_cuda else {'num_workers': 0}
 
     # USE MAP-CUTOUTS
     '''
@@ -122,7 +122,7 @@ def get_loaders(path_training, path_training_csv, path_validation, path_validati
     # USE FAKA DATA
     #train_set = DataSetFakeData(path_training, path_training_csv)
 
-    n_training_samples = 40#len(train_set)
+    n_training_samples = 10#len(train_set)
     print('Number of training samples: ', n_training_samples)
     train_sampler = SubsetRandomSampler(np.arange(n_training_samples, dtype=np.int64))
     train_loader = torch.utils.data.DataLoader(train_set, batch_size=batch_size, sampler=train_sampler, **kwargs)
@@ -139,7 +139,7 @@ def get_loaders(path_training, path_training_csv, path_validation, path_validati
     # USE FAKA DATA
     #val_set = DataSetFakeData(path_validation, path_validation_csv)
 
-    n_val_samples = 20#len(val_set)
+    n_val_samples = 10#len(val_set)
     print('Number of validation samples: ', n_val_samples)
     val_sampler = SubsetRandomSampler(np.arange(n_val_samples, dtype=np.int64))
     val_loader = torch.utils.data.DataLoader(val_set, batch_size=batch_size, sampler=val_sampler, **kwargs)
