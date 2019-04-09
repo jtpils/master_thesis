@@ -310,7 +310,7 @@ def get_loaders(path_training, path_training_csv, path_validation, path_validati
         path_validation_grids = '/home/annika_lundqvist144/csv_grids_190409/csv_grids_validation/'
     else:
         path_validation_grids = '/home/master04/Desktop/Dataset/ply_grids/csv_grids_190409/csv_grids_validation/'
-    val_set = DataSetMapData_createMapOnTheGo(path_training, path_training_csv, path_validation_grids)
+    val_set = DataSetMapData_createMapOnTheGo(path_validation, path_validation_csv, path_validation_grids)
 
     n_val_samples = len(val_set)
     print('Number of validation samples: ', n_val_samples)
