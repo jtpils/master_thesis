@@ -136,39 +136,24 @@ class DataSetMapData_kSweeps(Dataset):
 
     def __getitem__(self, idx):
         # Load one sweep and generate a random transformation
-        #for i in [idx-1, idx, idx+1]:
 
-        #for k in [idx-2, idx-1, idx, idx+1, idx+2]:
+        indices = [x-(self.num_sweeps //2) for x in np.arange(self.num_sweeps)]
 
-
-        file_name1 = self.sweeps_file_names[idx-1]
-        pc1, global_coords1 = load_data(os.path.join(self.sample_dir,file_name1), self.csv_path)
-        pc1 = trim_point_cloud_vehicle_ground(pc1,  origin=global_coords1[:2], remove_vehicle=True, remove_ground=False)
-
-        file_name2 = self.sweeps_file_names[idx]
-        pc2, global_coords2 = load_data(os.path.join(self.sample_dir,file_name2), self.csv_path)
-        pc2 = trim_point_cloud_vehicle_ground(pc2,  origin=global_coords2[:2], remove_vehicle=True, remove_ground=False)
-
-        file_name3 = self.sweeps_file_names[idx+1]
-        pc3, global_coords3 = load_data(os.path.join(self.sample_dir,file_name3), self.csv_path)
-        pc3 = trim_point_cloud_vehicle_ground(pc3,  origin=global_coords3[:2], remove_vehicle=True, remove_ground=False)
-
-        file_name4 = self.sweeps_file_names[idx-2]
-        pc4, global_coords4 = load_data(os.path.join(self.sample_dir,file_name4), self.csv_path)
-        pc4 = trim_point_cloud_vehicle_ground(pc4,  origin=global_coords4[:2], remove_vehicle=True, remove_ground=False)
-
-        file_name5 = self.sweeps_file_names[idx+2]
-        pc5, global_coords5 = load_data(os.path.join(self.sample_dir,file_name5), self.csv_path)
-        pc5 = trim_point_cloud_vehicle_ground(pc5,  origin=global_coords5[:2], remove_vehicle=True, remove_ground=False)
-
-        rand_trans = random_rigid_transformation(self.translation, self.rotation)
-        global_coords = global_coords2
-        pc = np.concatenate((pc1, pc2, pc3, pc4, pc5), axis=0)
+        pc_multiple_sweeps = np.zeros((1,3))
+        for i in indices:
+            file_name = self.sweeps_file_names[idx + i]
+            pc, global_coords_temp = load_data(os.path.join(self.sample_dir,file_name), self.csv_path)
+            pc = trim_point_cloud_vehicle_ground(pc,  origin=global_coords_temp[:2], remove_vehicle=True, remove_ground=False)
+            pc_multiple_sweeps = np.concatenate((pc_multiple_sweeps, pc), axis=0)
+            if i==0:
+                global_coords = global_coords_temp
+        pc_multiple_sweeps = pc_multiple_sweeps[1:,:]
 
         # sweep
         # rotate and translate sweep
         rand_trans = random_rigid_transformation(self.translation, self.rotation)
-        sweep = trim_point_cloud_range(pc, origin=global_coords[:2], trim_range=20)
+        sweep = trim_point_cloud_range(pc_multiple_sweeps, origin=global_coords[:2], trim_range=20)
+        del pc_multiple_sweeps, pc
         #sweep = trim_point_cloud_vehicle_ground(sweep,  origin=global_coords[:2], remove_vehicle=True, remove_ground=False)
         sweep = rotate_point_cloud(sweep, rand_trans[-1], to_global=False)
         sweep = translate_point_cloud(sweep, rand_trans[:2])
@@ -183,13 +168,96 @@ class DataSetMapData_kSweeps(Dataset):
         x_min, x_max, y_min, y_max = self.map_minmax
         x_grid = np.floor((cut_out_coordinates[0]-x_min)/spatial_resolution).astype(int)
         y_grid = np.floor((cut_out_coordinates[1]-y_min)/spatial_resolution).astype(int)
-        cutout_image = self.map[:, x_grid-150:x_grid+150, y_grid-150:y_grid+150] ###### change x and y?
+        cutout_image = self.map[:, x_grid-150:x_grid+150, y_grid-150:y_grid+150]
 
         # concatenate the sweep and the cutout image into one image and save.
         sweep_and_cutout_image = np.concatenate((sweep_image, cutout_image))
         sweep_and_cutout_image = normalize_sample(sweep_and_cutout_image)
 
         training_sample = {'sample': torch.from_numpy(sweep_and_cutout_image).float(), 'label': rand_trans}
+        del sweep_image, sweep, cutout_image, sweep_and_cutout_image
+        return training_sample
+
+
+class DataSetMapData_createMapOnTheGo(Dataset):
+    """Lidar sample dataset."""
+
+    def __init__(self, sample_dir, csv_path, grid_csv_path, translation=1, rotation=0):
+        """
+        Args:
+            sample_dir <string>: Directory with all ply-files.
+        """
+        self.sample_dir = sample_dir
+        self.csv_path = csv_path
+        self.translation = translation
+        self.rotation = rotation
+        self.sweeps_file_names = sorted(os.listdir(sample_dir))
+        self.num_sweeps = 5
+
+        list_of_csv = os.listdir(grid_csv_path)
+        sweeps = []
+        print('loading all LiDAR detections...')
+        for file in tqdm(list_of_csv):
+            if 'grid' in file:
+                pc = pd.read_csv(os.path.join(grid_csv_path, file))
+                sweeps.append(pc)
+        self.lidar_points = pd.concat(sweeps)
+        print('Done loading detections.')
+        del sweeps, pc
+
+    def __len__(self):
+        return len(self.sweeps_file_names) - (self.num_sweeps - 1)
+
+    def __getitem__(self, idx):
+        # load ply-file
+        indices = [x-(self.num_sweeps //2) for x in np.arange(self.num_sweeps)]
+
+        pc_multiple_sweeps = np.zeros((1,3))
+        for i in indices:
+            file_name = self.sweeps_file_names[idx + i]
+            pc, global_coords_temp = load_data(os.path.join(self.sample_dir,file_name), self.csv_path)
+            pc = trim_point_cloud_vehicle_ground(pc,  origin=global_coords_temp[:2], remove_vehicle=True, remove_ground=False)
+            pc_multiple_sweeps = np.concatenate((pc_multiple_sweeps, pc), axis=0)
+            if i==0:
+                global_coords = global_coords_temp
+        pc_multiple_sweeps = pc_multiple_sweeps[1:,:]
+
+        # rotate and translate sweep
+        rand_trans = random_rigid_transformation(self.translation, self.rotation)
+        sweep = trim_point_cloud_range(pc_multiple_sweeps, origin=global_coords[:2], trim_range=20)
+        del pc_multiple_sweeps, pc
+        #sweep = trim_point_cloud_vehicle_ground(sweep,  origin=global_coords[:2], remove_vehicle=True, remove_ground=False)
+        sweep = rotate_point_cloud(sweep, rand_trans[-1], to_global=False)
+        sweep = translate_point_cloud(sweep, rand_trans[:2])
+        sweep = trim_point_cloud_range(sweep, origin=global_coords[:2],  trim_range=15)
+        #move our origin
+        origin = global_coords[:2] + rand_trans[:2]
+        sweep_image = discretize_point_cloud(sweep, origin=origin,trim_range=15, spatial_resolution=0.1, image_size=300)
+
+        # map cut-out
+        cut_out_coordinates = global_coords[:2]
+        # we want all coordinates that in trim_range around cut_out_coordinates
+        trim_range = 15
+        # get all points around the sweep
+        cutout = self.lidar_points[self.lidar_points['x'] <= cut_out_coordinates[0]+trim_range]
+        cutout = cutout[cutout['x'] >= cut_out_coordinates[0]-trim_range]
+        cutout = cutout[cutout['y'] <= cut_out_coordinates[1]+trim_range]
+        cutout = cutout[cutout['y'] >= cut_out_coordinates[1]-trim_range]
+
+        cutout = cutout.values
+        num_points_to_keep = len(sweep)
+        points_to_keep = np.random.choice(len(cutout), num_points_to_keep)
+        cutout = cutout[points_to_keep,:]
+
+        # if we want to use occupancy grid, sample points first
+        # move all points such that the cut-out-coordinates become the origin
+        cutout_image = discretize_point_cloud(cutout, origin=cut_out_coordinates[:2],trim_range=15, spatial_resolution=0.1, image_size=300)
+
+        # concatenate the sweep and the cutout image into one image and save.
+        sweep_and_cutout_image = np.concatenate((sweep_image, cutout_image))
+        sweep_and_cutout_image = normalize_sample(sweep_and_cutout_image)
+        training_sample = {'sample': torch.from_numpy(sweep_and_cutout_image).float(), 'label': rand_trans}
+
         return training_sample
 
 
@@ -199,6 +267,7 @@ def get_loaders(path_training, path_training_csv, path_validation, path_validati
     kwargs = {'pin_memory': True, 'num_workers': 16} if use_cuda else {'num_workers': 4}
 
     # USE MAP-CUTOUTS
+    '''
     if use_cuda:
         map_train_path = '/home/annika_lundqvist144/maps/map_Town_training/map.npy'
         map_minmax_train_path = '/home/annika_lundqvist144/maps/map_Town_training/max_min.npy'
@@ -207,9 +276,16 @@ def get_loaders(path_training, path_training_csv, path_validation, path_validati
         map_minmax_train_path = '/home/master04/Desktop/Maps/map_Town_training/max_min.npy'
 
     train_set = DataSetMapData_kSweeps(path_training, path_training_csv, map_train_path, map_minmax_train_path)
-
+    '''
     # USE FAKA DATA
     #train_set = DataSetFakeData(path_training, path_training_csv)
+
+    # CREATE MAP ON THE GO
+    if use_cuda:
+        path_training_grids = '/home/annika_lundqvist144/csv_grids_190409/csv_grids_training/'
+    else:
+        path_training_grids = '/home/master04/Desktop/Dataset/ply_grids/csv_grids_190409/csv_grids_training'
+    train_set = DataSetMapData_createMapOnTheGo(path_training, path_training_csv, path_training_grids)
 
     n_training_samples = len(train_set)
     print('Number of training samples: ', n_training_samples)
@@ -217,17 +293,24 @@ def get_loaders(path_training, path_training_csv, path_validation, path_validati
     train_loader = torch.utils.data.DataLoader(train_set, batch_size=batch_size, sampler=train_sampler, **kwargs)
 
     # USE MAP-CUTOUTS
-    if use_cuda:
+    '''if use_cuda:
         map_val_path = '/home/annika_lundqvist144/maps/map_Town_validation/map.npy'
         map_minmax_val_path = '/home/annika_lundqvist144/maps/map_Town_validation/max_min.npy'
     else:
         map_val_path = '/home/master04/Desktop/Maps/map_Town_validation/map.npy'
         map_minmax_val_path = '/home/master04/Desktop/Maps/map_Town_validation/max_min.npy'
-
-    val_set = DataSetMapData_kSweeps(path_validation, path_validation_csv, map_val_path, map_minmax_val_path)
+    '''
+    #val_set = DataSetMapData_kSweeps(path_validation, path_validation_csv, map_val_path, map_minmax_val_path)
 
     # USE FAKA DATA
     #val_set = DataSetFakeData(path_validation, path_validation_csv)
+
+    # CREATE MAP ON THE GO
+    if use_cuda:
+        path_validation_grids = '/home/annika_lundqvist144/csv_grids_190409/csv_grids_validation/'
+    else:
+        path_validation_grids = '/home/master04/Desktop/Dataset/ply_grids/csv_grids_190409/csv_grids_validation/'
+    val_set = DataSetMapData_createMapOnTheGo(path_training, path_training_csv, path_validation_grids)
 
     n_val_samples = len(val_set)
     print('Number of validation samples: ', n_val_samples)
