@@ -226,7 +226,7 @@ class DataSetMapData_createMapOnTheGo(Dataset):
         # rotate and translate sweep
         rand_trans = random_rigid_transformation(self.translation, self.rotation)
         sweep = trim_point_cloud_range(pc_multiple_sweeps, origin=global_coords[:2], trim_range=20)
-        del pc_multiple_sweeps, pc
+
         #sweep = trim_point_cloud_vehicle_ground(sweep,  origin=global_coords[:2], remove_vehicle=True, remove_ground=False)
         sweep = rotate_point_cloud(sweep, rand_trans[-1], to_global=False)
         sweep = translate_point_cloud(sweep, rand_trans[:2])
@@ -261,6 +261,8 @@ class DataSetMapData_createMapOnTheGo(Dataset):
         sweep_and_cutout_image = np.concatenate((sweep_image, cutout_image))
         sweep_and_cutout_image = normalize_sample(sweep_and_cutout_image)
         training_sample = {'sample': torch.from_numpy(sweep_and_cutout_image).float(), 'label': rand_trans}
+
+        del pc_multiple_sweeps, pc, cutout, sweep, sweep_image, cutout_image, sweep_and_cutout_image
 
         return training_sample
 
