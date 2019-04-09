@@ -32,18 +32,16 @@ def main():
         print('Failed to create new directories.')
 
     # path to ply-files for town01 and validation
-    '''
-    path_training = '/home/master04/Desktop/Ply_files/_out_Town01_190402_1/pc/'
-    path_training_csv = '/home/master04/Desktop/Ply_files/_out_Town01_190402_1/Town01_190402_1.csv'
-    path_validation = '/home/master04/Desktop/Ply_files/validation_and_test/validation_set/pc/'
-    path_validation_csv = '/home/master04/Desktop/Ply_files/validation_and_test/validation_set/validation_set.csv'
-    '''
-
-    path_training = '/home/annika_lundqvist144/ply_files/_out_Town01_190402_1/pc/'
-    path_training_csv = '/home/annika_lundqvist144/ply_files/_out_Town01_190402_1/Town01_190402_1.csv'
-    path_validation = '/home/annika_lundqvist144/ply_files//validation_set/pc/'
-    path_validation_csv = '/home/annika_lundqvist144/ply_files/validation_set/validation_set.csv'
-
+    if use_cuda:
+        path_training = '/home/annika_lundqvist144/ply_files/_out_Town01_190402_1/pc/'
+        path_training_csv = '/home/annika_lundqvist144/ply_files/_out_Town01_190402_1/Town01_190402_1.csv'
+        path_validation = '/home/annika_lundqvist144/ply_files//validation_set/pc/'
+        path_validation_csv = '/home/annika_lundqvist144/ply_files/validation_set/validation_set.csv'
+    else:
+        path_training = '/home/master04/Desktop/Ply_files/_out_Town01_190402_1/pc/'
+        path_training_csv = '/home/master04/Desktop/Ply_files/_out_Town01_190402_1/Town01_190402_1.csv'
+        path_validation = '/home/master04/Desktop/Ply_files/validation_and_test/validation_set/pc/'
+        path_validation_csv = '/home/master04/Desktop/Ply_files/validation_and_test/validation_set/validation_set.csv'
 
     CNN = Duchess()
     print('=======> NETWORK NAME: =======> ', CNN.name())

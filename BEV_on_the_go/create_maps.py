@@ -9,7 +9,7 @@ t1 = time.time()
 ############################ Change stuff here ###########################################################
 path_pc = '/home/master04/Desktop/Ply_files/validation_and_test/test_set/pc/'  # path to pc folder with ply-files
 path_csv = '/home/master04/Desktop/Ply_files/validation_and_test/test_set/test_set.csv'  # path to csv with global coordinates
-folder_name = 'map_Town' # name of new directory to save stuff
+folder_name = 'map_Town_test' # name of new directory to save stuff
 #########################################################################################################
 
 files_in_ply_folder = os.listdir(path_pc)
@@ -38,10 +38,10 @@ for file in tqdm(files_in_ply_folder):  # the last number is how large steps to 
         print('Failed to load file ', file, '. Moving on to next file.')
         continue
 
-    pc = trim_point_cloud_range(pc, trim_range=30)
-    pc = trim_point_cloud_vehicle_ground(pc, remove_vehicle=True, remove_ground=False)
-    pc = rotate_point_cloud(pc, global_coordinates[-1], to_global=True)  # rotate to global
-    pc = translate_point_cloud(pc, global_coordinates[0:2])  # translate to global
+    pc = trim_point_cloud_range(pc, origin=global_coordinates[:2], trim_range=30)
+    pc = trim_point_cloud_vehicle_ground(pc, origin=global_coordinates[:2], remove_vehicle=True, remove_ground=False)
+    #pc = rotate_point_cloud(pc, global_coordinates[-1], to_global=True)  # rotate to global
+    #pc = translate_point_cloud(pc, global_coordinates[0:2])  # translate to global
 
     pc_super_array = np.concatenate((pc_super_array, pc))
 

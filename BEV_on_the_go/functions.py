@@ -23,28 +23,58 @@ def load_data(path_to_ply, path_to_csv):
     # extract information from csv at given frame_number
     row = np.where(global_coordinates == frame_number)[0]  # returns which row the frame number is located on
     global_lidar_coordinates = global_coordinates[row, 1:5]  # save that row, columns [x y z yaw]
+    global_lidar_coordinates = global_lidar_coordinates[0]
 
     # Fix yaw angle:
-    if global_lidar_coordinates[0][3] < 0:
-        global_lidar_coordinates[0][3] = global_lidar_coordinates[0][3] + 360  # change angles to interval [0,360]
-    global_lidar_coordinates[0][3] = global_lidar_coordinates[0][3] + 90  # add 90 to get the correct coordinate system
+    if global_lidar_coordinates[3] < 0:
+        global_lidar_coordinates[3] = global_lidar_coordinates[3] + 360  # change angles to interval [0,360]
+    global_lidar_coordinates[3] = global_lidar_coordinates[3] + 90  # add 90 to get the correct coordinate system
 
-    global_lidar_coordinates[0][1] = -global_lidar_coordinates[0][1]  # y = -y, get the correct coordinate system
-    global_lidar_coordinates = global_lidar_coordinates[0]
+    # rotate:
+    rotation = np.deg2rad(global_lidar_coordinates[3])
+    c, s = np.cos(rotation), np.sin(rotation)
+    Rz = np.array(((c, -s, 0), (s, c, 0), (0, 0, 1))) # Rotation matrix
+    point_cloud = Rz @ np.transpose(point_cloud) # rotate each vector with coordinates, transpose to get dimensions correctly
+    point_cloud = np.transpose(point_cloud)
+
+    point_cloud[:, 1] = -point_cloud[:,1]  # y = -y
+
+    global_lidar_coordinates[1] = -global_lidar_coordinates[1]  # y = -y, get the correct coordinate system
+
+    #translate
+    point_cloud = point_cloud + global_lidar_coordinates[0:3]
 
     return point_cloud, global_lidar_coordinates
 
 
-def trim_point_cloud_range(point_cloud, trim_range=15):
+def trim_point_cloud_range(point_cloud, origin, trim_range=15):
+    """
+
+    :param point_cloud:
+    :param origin: list with x,y from global coordinates
+    :param trim_range:
+    :return:
+    """
+    # translate all points to our origin
+    translation = np.array((origin[0], origin[1], 0))
+    point_cloud = point_cloud - translation
+
     # keep points inside the range of interest
     points_in_range = np.max(np.absolute(point_cloud), axis=1) <= trim_range  # this takes care of both x, y and z
     point_cloud = point_cloud[points_in_range]
 
+    # translate back to global coordinates
+    point_cloud = point_cloud + translation
+
     return point_cloud
 
 
-def trim_point_cloud_vehicle_ground(point_cloud, remove_vehicle=True, remove_ground=True):
+def trim_point_cloud_vehicle_ground(point_cloud, origin, remove_vehicle=True, remove_ground=True):
     # keep points inside the range of interest
+
+    # translate all points to our origin
+    translation = np.array((origin[0], origin[1], 0))
+    point_cloud = point_cloud - translation
 
     if remove_ground:
         z_coordinates = point_cloud[:, -1]
@@ -57,16 +87,21 @@ def trim_point_cloud_vehicle_ground(point_cloud, remove_vehicle=True, remove_gro
         points_in_range = np.max(np.absolute(point_cloud), axis=1) >= 2.3  # this takes care of both x, y and z
         point_cloud = point_cloud[points_in_range]
 
+    # translate back to global coordinates
+    point_cloud = point_cloud + translation
+
     return point_cloud
 
 
-def discretize_point_cloud(point_cloud, trim_range=15, spatial_resolution=0.1, image_size=300):
-    # obs, the point cloud has lidar in origin
+def discretize_point_cloud(point_cloud, origin, trim_range=15, spatial_resolution=0.1, image_size=300):
+    # translate all points to our origin
+    translation = np.array((origin[0], origin[1], 0))
+    point_cloud = point_cloud - translation
 
     x_grids = np.floor((point_cloud[:,0] + trim_range)/spatial_resolution).astype(int)
     y_grids = np.floor((point_cloud[:,1] + trim_range)/spatial_resolution).astype(int)
 
-    image = np.zeros((1,image_size+1, image_size+1))
+    image = np.zeros((1,image_size+10, image_size+10))
     for i in np.arange(len(point_cloud)):
         image[:,x_grids[i],y_grids[i]] = image[:,x_grids[i],y_grids[i]] + 1
 
@@ -125,8 +160,14 @@ def visualize_detections(discretized_point_cloud, fig_num=1):
     detection_layer[detection_layer > 0] = 255
 
     plt.figure(fig_num)
-    plt.imshow(detection_layer, cmap='gray')
+    plt.imshow(detection_layer, cmap='gray',)
     #plt.show()
+
+    #img = Image.fromarray(detection_layer)
+    #new_img = img.convert("L")
+    #new_img.rotate(180)
+    #new_img.show()
+
 
 
 def discretize_map(point_cloud, spatial_resolution=0.1):
@@ -143,7 +184,7 @@ def discretize_map(point_cloud, spatial_resolution=0.1):
     x_grids = np.floor((point_cloud[:,0] - x_min)/spatial_resolution).astype(int)
     y_grids = np.floor((point_cloud[:,1] - y_min)/spatial_resolution).astype(int)
 
-    for i in np.arange(len(point_cloud)):
-        discretized_map[:,x_grids[i],y_grids[i]] = discretized_map[:,x_grids[i],y_grids[i]] + 1
+    for i in tqdm(np.arange(len(point_cloud))):
+        discretized_map[:,x_grids[i],y_grids[i]] = discretized_map[:,x_grids[i],y_grids[i]] + 1 ###### maybe change here?
 
     return discretized_map

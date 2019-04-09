@@ -84,12 +84,14 @@ class DataSetMapData(Dataset):
         # sweep
         # rotate and translate sweep
         rand_trans = random_rigid_transformation(self.translation, self.rotation)
-        sweep = trim_point_cloud_range(pc, trim_range=20)
-        sweep = trim_point_cloud_vehicle_ground(sweep, remove_vehicle=True, remove_ground=False)
+        sweep = trim_point_cloud_range(pc, origin=global_coords[:2], trim_range=20)
+        sweep = trim_point_cloud_vehicle_ground(sweep,  origin=global_coords[:2], remove_vehicle=True, remove_ground=False)
         sweep = rotate_point_cloud(sweep, rand_trans[-1], to_global=False)
         sweep = translate_point_cloud(sweep, rand_trans[:2])
-        sweep = trim_point_cloud_range(sweep, trim_range=15)
-        sweep_image = discretize_point_cloud(sweep, trim_range=15, spatial_resolution=0.1, image_size=300)
+        sweep = trim_point_cloud_range(sweep, origin=global_coords[:2],  trim_range=15)
+        #move our origin
+        origin = global_coords[:2] + rand_trans[:2]
+        sweep_image = discretize_point_cloud(sweep, origin=origin,trim_range=15, spatial_resolution=0.1, image_size=300)
 
         # map cut-out
         cut_out_coordinates = global_coords[:2]
@@ -97,7 +99,7 @@ class DataSetMapData(Dataset):
         x_min, x_max, y_min, y_max = self.map_minmax
         x_grid = np.floor((cut_out_coordinates[0]-x_min)/spatial_resolution).astype(int)
         y_grid = np.floor((cut_out_coordinates[1]-y_min)/spatial_resolution).astype(int)
-        cutout_image = self.map[:, x_grid-150:x_grid+150, y_grid-150:y_grid+150]
+        cutout_image = self.map[:, x_grid-150:x_grid+150, y_grid-150:y_grid+150] ###### change x and y?
 
         # concatenate the sweep and the cutout image into one image and save.
         sweep_and_cutout_image = np.concatenate((sweep_image, cutout_image))
@@ -108,16 +110,16 @@ class DataSetMapData(Dataset):
 
 
 def get_loaders(path_training, path_training_csv, path_validation, path_validation_csv, batch_size, use_cuda):
-    kwargs = {'pin_memory': True, 'num_workers': 16} if use_cuda else {'num_workers': 0}
+    kwargs = {'pin_memory': True, 'num_workers': 16} if use_cuda else {'num_workers': 4}
 
     # USE MAP-CUTOUTS
+    if use_cuda:
+        map_train_path = '/home/annika_lundqvist144/maps/map_Town_training/map.npy'
+        map_minmax_train_path = '/home/annika_lundqvist144/maps/map_Town_training/max_min.npy'
+    else:
+        map_train_path = '/home/master04/Desktop/Maps/map_Town_training/map.npy'
+        map_minmax_train_path = '/home/master04/Desktop/Maps/map_Town_training/max_min.npy'
 
-    map_train_path = '/home/annika_lundqvist144/maps/map_Town01/map.npy'
-    map_minmax_train_path = '/home/annika_lundqvist144/maps/map_Town01/max_min.npy'
-    '''
-    map_train_path = '/home/master04/Desktop/Maps/map_Town01/map.npy'
-    map_minmax_train_path = '/home/master04/Desktop/Maps/map_Town01/max_min.npy'
-    '''
     train_set = DataSetMapData(path_training, path_training_csv, map_train_path, map_minmax_train_path)
 
     # USE FAKA DATA
@@ -129,13 +131,13 @@ def get_loaders(path_training, path_training_csv, path_validation, path_validati
     train_loader = torch.utils.data.DataLoader(train_set, batch_size=batch_size, sampler=train_sampler, **kwargs)
 
     # USE MAP-CUTOUTS
+    if use_cuda:
+        map_val_path = '/home/annika_lundqvist144/maps/map_Town_validation/map.npy'
+        map_minmax_val_path = '/home/annika_lundqvist144/maps/map_Town_validation/max_min.npy'
+    else:
+        map_val_path = '/home/master04/Desktop/Maps/map_Town_validation/map.npy'
+        map_minmax_val_path = '/home/master04/Desktop/Maps/map_Town_validation/max_min.npy'
 
-    map_val_path = '/home/annika_lundqvist144/maps/map_Town02_validation/map.npy'
-    map_minmax_val_path = '/home/annika_lundqvist144/maps/map_Town02_validation/max_min.npy'
-    '''
-    map_val_path = '/home/master04/Desktop/Maps/map_Town02_validation/map.npy'
-    map_minmax_val_path = '//home/master04/Desktop/Maps/map_Town02_validation/max_min.npy'
-    '''
     val_set = DataSetMapData(path_validation, path_validation_csv, map_val_path, map_minmax_val_path)
 
     # USE FAKA DATA
@@ -147,3 +149,4 @@ def get_loaders(path_training, path_training_csv, path_validation, path_validati
     val_loader = torch.utils.data.DataLoader(val_set, batch_size=batch_size, sampler=val_sampler, **kwargs)
 
     return train_loader, val_loader
+
