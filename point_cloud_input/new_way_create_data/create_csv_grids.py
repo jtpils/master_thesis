@@ -4,30 +4,35 @@ import pandas as pd
 import os
 import shutil
 from lidar_processing_functions import *
+from tqdm import tqdm
 
 
 # This script creates one csv-file per grid, with all the detections in the grid stored in csv-file. The detections are
 # rotated and translated to global coordinates.
 
 
-save_data_path = '/home/master04/Desktop/Dataset/ply_grids/in_global_coords/Town01/' # save new data to this path
-path = '/home/master04/Desktop/Dataset/ply_grids/Town01_sorted_grid_ply/' # path to your ply-grids
-
+#save_data_path = '/home/master04/Desktop/Dataset/ply_grids/in_global_coords/Town01/' # save new data to this path
+#path = '/home/master04/Desktop/Dataset/ply_grids/Town01_sorted_grid_ply/' # path to your ply-grids
+save_data_path = '/home/master04/Desktop/Dataset/ply_grids/in_global_coords/test/' # save new data to this path
+path = '/home/master04/Desktop/Dataset/ply_grids/test_sorted_grid_ply/' # path to your ply-grids
 
 
 #save_data_path = '/Users/sabinalinderoth/Documents/CSV_grids/'
 #path = '/Users/sabinalinderoth/Documents/Ply_files/TEST_sorted_grid_ply/'
 
-#edges = np.load(path + 'edges.npy')
+edges = np.load(path + 'edges.npy')
 shutil.copyfile(path+'edges.npy', save_data_path+'edges.npy')
-path_global_csv = save_data_path+'global_coordinates.csv'
-shutil.copyfile(path+'global_coordinates.csv', path_global_csv)
+path_global_csv = path+'global_coordinates.csv'
+#path_global_csv = '/home/master04/Desktop/Dataset/ply_grids/in_global_coords/validation/validation_set.csv'
+#shutil.copyfile(path+'global_coordinates.csv', path_global_csv)
+shutil.copyfile(path_global_csv, save_data_path+'global_coordinates.csv')
+
 
 # go through all directories, and for each directory, create a super-csv with all the detections from that directory (translated and rotated to global coordinates.)
 directory_path_list = [f.path for f in os.scandir(path) if f.is_dir()]
 directory_name_list = [f.name for f in os.scandir(path) if f.is_dir()]
 i = 0
-for i in np.arange(len(directory_path_list)):
+for i in tqdm(np.arange(len(directory_path_list))):
     file_list = os.listdir(directory_path_list[i])
     if len(file_list) is not 0: #if there are files, do some stuff!
         # Create a csv file
