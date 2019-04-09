@@ -97,11 +97,6 @@ for file_name in ply_files[:number_of_files_to_load]:
     path = path_samples + '/' + str(i)
     np.save(path, sweep_and_cutout_image)
 
-    #import torch
-    #sweep_and_cutout_image = torch.from_numpy(sweep_and_cutout_image)
-    #path = path + '.pt'
-    #torch.save(sweep_and_cutout_image, path)
-
 
     # write frame_number in column 1, and the transformation in the next columns
     with open(csv_labels_path , mode ='a') as csv_file:

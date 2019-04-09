@@ -1,63 +1,19 @@
+import os
 import time
 from torch.autograd import Variable
 from torch.optim.lr_scheduler import StepLR
 from early_stopping import EarlyStopping
 from cat_networks import *
 from data_loader import *
-from torch.utils.data.sampler import SubsetRandomSampler
-from DataSetsGenerateOnTheGo import DataSetFakeData
 import torch
 import numpy as np
 
-'''
-def get_loaders_new(batch_size, translation, rotation, use_cuda):
-    # Training
-    sample_path = '/home/annika_lundqvist144/ply_files/_out_Town01_190402_1/pc/'
-    csv_path = '/home/annika_lundqvist144/ply_files/_out_Town01_190402_1/Town01_190402_1.csv'
-    training_data_set = DataSetFakeData(sample_path, csv_path, translation, rotation)
+def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batch_size, load_weights, load_weights_path, optimizer_selection, loss_selection):
 
-    kwargs = {'pin_memory': True} if use_cuda else {}
-    workers_train = 0 #16
-    print('Number of workers: ', workers_train)
-    n_training_samples = 100 #len(training_data_set)
-    print('Number of training samples: ', n_training_samples)
-    train_sampler = SubsetRandomSampler(np.arange(n_training_samples, dtype=np.int64))
-    train_loader = torch.utils.data.DataLoader(training_data_set, batch_size=batch_size, sampler=train_sampler, num_workers=workers_train, **kwargs)
-
-    # validation
-    sample_path = '/home/annika_lundqvist144/ply_files/validation_set/pc/'
-    csv_path = '/home/annika_lundqvist144/ply_files/validation_set/validation_set.csv'
-    val_data_set = DataSetFakeData(sample_path, csv_path, translation, rotation)
-    kwargs = {'pin_memory': True} if use_cuda else {}
-    n_val_samples = 100 #len(val_data_set)  # change so that this is 20% of all samples
-    print('Number of validation samples: ', n_val_samples)
-    val_sampler = SubsetRandomSampler(np.arange(n_val_samples, dtype=np.int64))
-    val_loader = torch.utils.data.DataLoader(val_data_set, batch_size=batch_size, sampler=val_sampler, num_workers=workers_train, **kwargs)
-
-    return train_loader, val_loader'''
-
-def create_loss_and_optimizer(net, learning_rate=0.001):
-    # Loss function
-    # loss = torch.nn.CrossEntropyLoss()
-    loss = torch.nn.MSELoss()
-    #loss = torch.nn.SmoothL1Loss()
-
-    # Optimizer
-    optimizer = torch.optim.Adam(net.parameters(), lr=learning_rate)#, weight_decay=1e-5)
-    # optimizer = optim.Adagrad(net.parameters(), lr=learning_rate, lr_decay=1e-3)
-    # optimizer = torch.optim.SGD(net.parameters(), lr=learning_rate)
-    return loss, optimizer
-
-
-# def train_network(net, train_loader, val_loader, n_epochs, learning_rate, patience, folder_path, device, use_cuda):
-def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batch_size, load_weights, load_weights_path):
-
-    path_training_data = '/home/annika_lundqvist144/BEV_samples/res_01/fake_training_set' #input('Path to training data set folder: ')
-    path_validation_data = '/home/annika_lundqvist144/BEV_samples/res_01/fake_validation_set'
-    #path_training_data = '/home/master04/Desktop/Dataset/BEV_samples/res_01/fake_training_set'  # '/home/master04/Desktop/Dataset/fake_training_data_torch'#
-    #path_validation_data = '/home/master04/Desktop/Dataset/BEV_samples/res_01/fake_validation_set'
-    #path_training_data = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/fake_training_set'
-    #path_validation_data = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/fake_validation_set'
+    path_training_data = '/home/annika_lundqvist144/BEV_samples/fake_training_set' #input('Path to training data set folder: ')
+    path_validation_data = '/home/annika_lundqvist144/BEV_samples/fake_validation_set'
+    #path_training_data = '/home/master04/Desktop/Dataset/BEV_samples/fake_training_set'  # '/home/master04/Desktop/Dataset/fake_training_data_torch'#
+    #path_validation_data = '/home/master04/Desktop/Dataset/BEV_samples/fake_validation_set'
 
     CNN = Duchess()
     print('=======> NETWORK NAME: =======> ', CNN.name())
@@ -66,8 +22,6 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
     print('Are model parameters on CUDA? ', next(CNN.parameters()).is_cuda)
     print(' ')
 
-    #translation, rotation = 1, 0
-    #train_loader, val_loader = get_loaders_new(batch_size, translation, rotation, use_cuda)
     train_loader, val_loader = get_loaders(path_training_data, path_validation_data, batch_size, use_cuda)
 
     # Load weights
@@ -96,14 +50,25 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
     val_batches = len(val_loader)
 
     # Create our loss and optimizer functions
-    loss, optimizer = create_loss_and_optimizer(CNN, learning_rate)
+    #loss, optimizer = create_loss_and_optimizer(CNN, learning_rate)
+    if loss_selection == 1:
+        loss = torch.nn.SmoothL1Loss()
+        print('SmoothL1Loss')
+    else:
+        loss = torch.nn.MSELoss()
+        print('MSELoss')
+
+    if optimizer_selection == 1:
+        optimizer = torch.optim.Adam(CNN.parameters(), lr=learning_rate)
+        print('Adam')
+    else:
+        optimizer = torch.optim.SGD(CNN.parameters(), lr=learning_rate)
+        print('SGD')
 
     scheduler = StepLR(optimizer, step_size=10, gamma=0.1)
 
     # Time for printing
     training_start_time = time.time()
-    train_loss_save = [len(train_loader)]  # append train loss for each mini batch later on, save this information to plot correctly
-    val_loss_save = [len(val_loader)]
 
     # Loop for n_epochs
     for epoch in range(n_epochs):
@@ -113,7 +78,7 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
         print('learning rate: ', params[0]['lr'])
 
         running_loss = 0.0
-        print_every = 1 #n_batches // 5  # how many mini-batches if we want to print stats x times per epoch
+        print_every = n_batches // 5  # how many mini-batches if we want to print stats x times per epoch
         start_time = time.time()
         total_train_loss = 0
 
@@ -145,8 +110,6 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
             running_loss += loss_size.item()
             total_train_loss += loss_size.item()
 
-            train_loss_save.append(loss_size.item())
-
             if (i+1) % print_every == 0:
                 print('Epoch [{}/{}], Batch [{}/{}], Loss: {:.4f}, Time: '
                        .format(epoch+1, n_epochs, i, n_batches, running_loss/print_every), time.time()-time_epoch)
@@ -177,8 +140,6 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
                 val_loss_size = loss(val_outputs, labels.float())
                 total_val_loss += val_loss_size.item()
 
-                val_loss_save.append(val_loss_size.item())
-
                 if (i+1) % 5 == 0:
                     print('Validation: Batch [{}/{}], Time: '.format(i, val_batches), time.time()-val_time)
                     val_time = time.time()
@@ -193,11 +154,6 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
         train_loss.append(total_train_loss / len(train_loader))
         val_loss.append(total_val_loss / len(val_loader))
 
-        train_path = folder_path + '/train_loss.npy'
-        val_path = folder_path + '/val_loss.npy'
-        np.save(train_path, train_loss_save)
-        np.save(val_path, val_loss_save)
-
         # see if validation loss has decreased, if it has a checkpoint will be saved of the current model.
         early_stopping(epoch, total_train_loss, total_val_loss, CNN, optimizer)
 
@@ -207,4 +163,45 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
             break
 
     print("Training finished, took {:.2f}s".format(time.time() - training_start_time))
+    del CNN, optimizer, loss, early_stopping
     return train_loss, val_loss
+
+
+def main():
+    # load old weights! change here manually
+    load_weights = False
+    load_weights_path = '/home/annika_lundqvist144/master_thesis/BEV_network/Gustav_190328_1/parameters/epoch_9_checkpoint.pt'
+
+    loss_list = [1,2] #1 is smoothl1, 2 is MSE
+    optimizer_list = [2,2] #1 is Adam, 2 is SGD
+    model_names = ['Duchess_12', 'Duchess_22'] #combine all optimizers with all losses
+
+    for i in np.arange(len(model_names)):
+        save_parameters_folder = model_names[i]
+        n_epochs = 50
+        learning_rate = 0.01
+        patience = 15
+        batch_size = 45
+
+        print(' ')
+        print(' ===== NEW MODEL ===== ')
+        print(' ')
+        print('Number of GPUs available: ', torch.cuda.device_count())
+        use_cuda = torch.cuda.is_available()
+        print('CUDA available: ', use_cuda)
+
+
+        # create directory for model weights
+        current_path = os.getcwd()
+        save_parameters_path = os.path.join(current_path, save_parameters_folder)
+        os.mkdir(save_parameters_path)
+        parameter_path = os.path.join(save_parameters_path, 'parameters')
+        os.mkdir(parameter_path)
+
+        # train!
+        train_loss, val_loss = train_network(n_epochs, learning_rate, patience, parameter_path, use_cuda, batch_size,load_weights, load_weights_path, optimizer_list[i], loss_list[i])
+
+
+
+if __name__ == '__main__':
+    main()

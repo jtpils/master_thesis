@@ -1,42 +1,15 @@
 import time
 from torch.autograd import Variable
 from torch.optim.lr_scheduler import StepLR
-from early_stopping import EarlyStopping
 from cat_networks import *
-from data_loader import *
+from torch.utils.data import Dataset
 from torch.utils.data.sampler import SubsetRandomSampler
-from DataSetsGenerateOnTheGo import DataSetFakeData
-import torch
-import numpy as np
+from DataSetsGenerateOnTheGo import *
+from early_stopping import *
+from tqdm import tqdm
 
-'''
-def get_loaders_new(batch_size, translation, rotation, use_cuda):
-    # Training
-    sample_path = '/home/annika_lundqvist144/ply_files/_out_Town01_190402_1/pc/'
-    csv_path = '/home/annika_lundqvist144/ply_files/_out_Town01_190402_1/Town01_190402_1.csv'
-    training_data_set = DataSetFakeData(sample_path, csv_path, translation, rotation)
 
-    kwargs = {'pin_memory': True} if use_cuda else {}
-    workers_train = 0 #16
-    print('Number of workers: ', workers_train)
-    n_training_samples = 100 #len(training_data_set)
-    print('Number of training samples: ', n_training_samples)
-    train_sampler = SubsetRandomSampler(np.arange(n_training_samples, dtype=np.int64))
-    train_loader = torch.utils.data.DataLoader(training_data_set, batch_size=batch_size, sampler=train_sampler, num_workers=workers_train, **kwargs)
-
-    # validation
-    sample_path = '/home/annika_lundqvist144/ply_files/validation_set/pc/'
-    csv_path = '/home/annika_lundqvist144/ply_files/validation_set/validation_set.csv'
-    val_data_set = DataSetFakeData(sample_path, csv_path, translation, rotation)
-    kwargs = {'pin_memory': True} if use_cuda else {}
-    n_val_samples = 100 #len(val_data_set)  # change so that this is 20% of all samples
-    print('Number of validation samples: ', n_val_samples)
-    val_sampler = SubsetRandomSampler(np.arange(n_val_samples, dtype=np.int64))
-    val_loader = torch.utils.data.DataLoader(val_data_set, batch_size=batch_size, sampler=val_sampler, num_workers=workers_train, **kwargs)
-
-    return train_loader, val_loader'''
-
-def create_loss_and_optimizer(net, learning_rate=0.001):
+def create_loss_and_optimizer(net, learning_rate=0.01):
     # Loss function
     # loss = torch.nn.CrossEntropyLoss()
     loss = torch.nn.MSELoss()
@@ -49,15 +22,54 @@ def create_loss_and_optimizer(net, learning_rate=0.001):
     return loss, optimizer
 
 
-# def train_network(net, train_loader, val_loader, n_epochs, learning_rate, patience, folder_path, device, use_cuda):
-def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batch_size, load_weights, load_weights_path):
+def get_loaders_new(batch_size, translation, rotation, use_cuda):
+    # Training
+    sample_path = '/home/master04/Desktop/Ply_files/_out_Town01_190402_1/pc/'
+    csv_path = '/home/master04/Desktop/Ply_files/_out_Town01_190402_1/Town01_190402_1.csv'
+    #map_path = '/home/annika_lundqvist144/maps/map_Town1_night_run/map.npy'
+    #minmax_path = '/home/annika_lundqvist144/maps/map_Town1_night_run/max_min.npy'
+    #grid_csv_path = '/home/annika_lundqvist144/pc_samples/csv_grids/Town01'
+    #sample_path = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/_out_Town02_190306_1/pc/'
+    #csv_path = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/_out_Town02_190306_1/Town02_190306_1.csv'
 
-    path_training_data = '/home/annika_lundqvist144/BEV_samples/res_01/fake_training_set' #input('Path to training data set folder: ')
-    path_validation_data = '/home/annika_lundqvist144/BEV_samples/res_01/fake_validation_set'
-    #path_training_data = '/home/master04/Desktop/Dataset/BEV_samples/res_01/fake_training_set'  # '/home/master04/Desktop/Dataset/fake_training_data_torch'#
-    #path_validation_data = '/home/master04/Desktop/Dataset/BEV_samples/res_01/fake_validation_set'
-    #path_training_data = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/fake_training_set'
-    #path_validation_data = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/fake_validation_set'
+    #sample_path = '/home/annika_lundqvist144/ply_files/_out_Town01_190402_1/pc/'
+    #csv_path = '/home/annika_lundqvist144/ply_files/_out_Town01_190402_1/Town01_190402_1.csv'
+
+    #training_data_set = DataSetMapData(sample_path, csv_path, map_path, minmax_path, translation, rotation)
+    training_data_set = DataSetFakeData(sample_path, csv_path, translation, rotation)
+
+    kwargs = {'pin_memory': True} if use_cuda else {}
+    workers_train = 0 #16
+    print('Number of workers: ', workers_train)
+    n_training_samples = 100 #len(training_data_set)
+    print('Number of training samples: ', n_training_samples)
+    train_sampler = SubsetRandomSampler(np.arange(n_training_samples, dtype=np.int64))
+    train_loader = torch.utils.data.DataLoader(training_data_set, batch_size=batch_size, sampler=train_sampler, num_workers=workers_train, **kwargs)
+
+    # validation
+    sample_path = '/home/master04/Desktop/Ply_files/validation_and_test/validation_set/pc/'
+    csv_path = '/home/master04/Desktop/Ply_files/validation_and_test/validation_set/validation_set.csv'
+    #map_path = '/home/annika_lundqvist144/maps/map_Town2_night_run/map.npy'
+    #minmax_path = '/home/annika_lundqvist144/maps/map_Town2_night_run/max_min.npy'
+    #sample_path = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/_out_Town02_190306_1/pc/'
+    #csv_path = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/_out_Town02_190306_1/Town02_190306_1.csv'
+
+    #sample_path = '/home/annika_lundqvist144/ply_files/validation_set/pc/'
+    #csv_path = '/home/annika_lundqvist144/ply_files/validation_set/validation_set.csv'
+    #grid_csv_path = '/home/annika_lundqvist144/pc_samples/csv_grids/validation/'
+    #val_data_set = DataSetMapData(sample_path, csv_path, map_path, minmax_path, translation, rotation)
+    val_data_set = DataSetFakeData(sample_path, csv_path, translation, rotation)
+
+    kwargs = {'pin_memory': True} if use_cuda else {}
+    n_val_samples = 100 #len(val_data_set)  # change so that this is 20% of all samples
+    print('Number of validation samples: ', n_val_samples)
+    val_sampler = SubsetRandomSampler(np.arange(n_val_samples, dtype=np.int64))
+    val_loader = torch.utils.data.DataLoader(val_data_set, batch_size=batch_size, sampler=val_sampler, num_workers=workers_train, **kwargs)
+
+    return train_loader, val_loader
+
+
+def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batch_size, load_weights, load_weights_path, translation, rotation):
 
     CNN = Duchess()
     print('=======> NETWORK NAME: =======> ', CNN.name())
@@ -66,9 +78,7 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
     print('Are model parameters on CUDA? ', next(CNN.parameters()).is_cuda)
     print(' ')
 
-    #translation, rotation = 1, 0
-    #train_loader, val_loader = get_loaders_new(batch_size, translation, rotation, use_cuda)
-    train_loader, val_loader = get_loaders(path_training_data, path_validation_data, batch_size, use_cuda)
+    train_loader, val_loader = get_loaders_new(batch_size, translation, rotation, use_cuda)
 
     # Load weights
     if load_weights:
@@ -103,7 +113,7 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
     # Time for printing
     training_start_time = time.time()
     train_loss_save = [len(train_loader)]  # append train loss for each mini batch later on, save this information to plot correctly
-    val_loss_save = [len(val_loader)]
+    val_loss_save = []  # [len(val_loader)]
 
     # Loop for n_epochs
     for epoch in range(n_epochs):
@@ -147,7 +157,7 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
 
             train_loss_save.append(loss_size.item())
 
-            if (i+1) % print_every == 0:
+            if True:#(i+1) % print_every == 0:
                 print('Epoch [{}/{}], Batch [{}/{}], Loss: {:.4f}, Time: '
                        .format(epoch+1, n_epochs, i, n_batches, running_loss/print_every), time.time()-time_epoch)
                 running_loss = 0.0
@@ -162,7 +172,7 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
         CNN = CNN.eval()
         val_time = time.time()
         with torch.no_grad():
-            for i, data in enumerate(val_loader, 1):
+            for i, data in tqdm(enumerate(val_loader, 1)):
                 sample = data['sample']
                 labels = data['labels']
 
@@ -179,16 +189,18 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
 
                 val_loss_save.append(val_loss_size.item())
 
-                if (i+1) % 5 == 0:
+                if False: #(i+1) % 10 == 0:
                     print('Validation: Batch [{}/{}], Time: '.format(i, val_batches), time.time()-val_time)
                     val_time = time.time()
 
                 del data, sample, labels, val_outputs, val_loss_size
 
+        print(' ')
         print("Training loss: {:.4f}".format(total_train_loss / len(train_loader)),
               ", Validation loss: {:.4f}".format(total_val_loss / len(val_loader)),
               ", Time: {:.2f}s".format(time.time() - start_time))
         print(' ')
+
         # save the loss for each epoch
         train_loss.append(total_train_loss / len(train_loader))
         val_loss.append(total_val_loss / len(val_loader))
@@ -207,4 +219,35 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
             break
 
     print("Training finished, took {:.2f}s".format(time.time() - training_start_time))
-    return train_loss, val_loss
+
+
+def main():
+    load_weights = False
+    load_weights_path = '/home/annika_lundqvist144/master_thesis/BEV_network/Duchess_190402_1/parameters/epoch_11_checkpoint.pt'
+
+    save_parameters_folder = input('Type name of new folder: ')
+    n_epochs = 50
+    learning_rate = 0.01
+    patience = 50
+    batch_size = 2  #45
+    translation, rotation = 1, 0
+
+    print(' ')
+    print('Number of GPUs available: ', torch.cuda.device_count())
+    use_cuda = torch.cuda.is_available()
+    print('CUDA available: ', use_cuda)
+
+    # create directory for model weights
+    current_path = os.getcwd()
+    save_parameters_path = os.path.join(current_path, save_parameters_folder)
+    os.mkdir(save_parameters_path)
+    parameter_path = os.path.join(save_parameters_path, 'parameters')
+    os.mkdir(parameter_path)
+
+    # train!
+    train_network(n_epochs, learning_rate, patience, parameter_path, use_cuda, batch_size, load_weights, load_weights_path,
+                  translation, rotation)
+
+
+if __name__ == '__main__':
+    main()

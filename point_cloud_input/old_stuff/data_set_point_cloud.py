@@ -5,7 +5,11 @@ import torch
 from torch.utils.data import Dataset
 from torch.utils.data.sampler import SubsetRandomSampler
 from lidar_processing_functions import *
-import matplotlib.pyplot as plt
+
+
+##########################################################################################################
+# This dataset returns a dict containing a sweep and a dense map and labels. Use this to create pillars. #
+##########################################################################################################
 
 
 def get_file_name_from_frame_number(frame_number_array):
@@ -119,7 +123,7 @@ class PointCloudDataSet(Dataset):
         sweep = trim_pointcloud(sweep)
 
         # load all the files in range of our sweep.
-        pc_super_array = np.zeros((1, 3))  # REMOVE THE ZEROS LATER?
+        pc_super_array = np.zeros((1, 3))  # zeros are removed later
         # get the neighbouring grids
         grids_to_load = get_neighbouring_grids(x_grid, y_grid)
         for grid in grids_to_load:
@@ -136,6 +140,7 @@ class PointCloudDataSet(Dataset):
                 pc = translate_pointcloud_to_global(pc, global_coordinates)
                 pc_super_array = np.concatenate((pc_super_array, pc))
 
+        pc_super_array = pc_super_array[1:,:]  # remove the first row of zeros
         # our initial guess in the map
         initial_guess = np.array((ply_coordinates[1]+self.labels[idx][0], -(ply_coordinates[2]+self.labels[idx][1]), 0))
         # translate all the points in the super_array such that the initial guess becomes the origin
@@ -145,20 +150,20 @@ class PointCloudDataSet(Dataset):
         del pc_super_array, initial_guess, pc
 
         #sample points so that all training samples are of the same size always
-        if len(sweep) > 3000:
-            selection_rule = np.random.choice(np.arange(len(sweep)), 3000)
+        max_num_points_sweep = 3000
+        if len(sweep) > max_num_points_sweep:
+            selection_rule = np.random.choice(np.arange(len(sweep)), max_num_points_sweep)
             sweep = sweep[selection_rule, :]
         else:
-            #np.pad(sweep, (3000-len(sweep), 0), 'constant', constant_values=(0,0))
-            zeros = np.zeros((3000-len(sweep), 3))
+            zeros = np.zeros((max_num_points_sweep-len(sweep), 3))
             sweep = np.concatenate((sweep, zeros), 0)
 
-        if len(map_cutout) > 30000:
-            selection_rule = np.random.choice(np.arange(len(map_cutout)), 30000)
+        max_num_points_map = 30000
+        if len(map_cutout) > max_num_points_map:
+            selection_rule = np.random.choice(np.arange(len(map_cutout)), max_num_points_map)
             map_cutout = map_cutout[selection_rule, :]
         else:
-            #np.pad(map_cutout, (300000-len(sweep), 0), 'constant', constant_values=(0,0))
-            zeros = np.zeros((30000-len(map_cutout), 3))
+            zeros = np.zeros((max_num_points_map-len(map_cutout), 3))
             map_cutout = np.concatenate((map_cutout, zeros), 0)
 
         training_sample = {'sweep': sweep, 'map': map_cutout, 'labels': self.labels[idx]}
@@ -183,9 +188,3 @@ def get_train_loader(batch_size, data_set_path, number_of_samples, kwargs):
     train_loader = torch.utils.data.DataLoader(training_data_set, batch_size=batch_size, sampler=train_sampler, **kwargs)
 
     return train_loader
-
-
-#def get_val_loader(data_set_path, csv_path, number_of_samples):
-
-
-#def get_test_loader(data_set_path, csv_path, number_of_samples):

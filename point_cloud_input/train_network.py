@@ -1,43 +1,38 @@
-import time
-from torch.autograd import Variable
 from torch.optim.lr_scheduler import StepLR
-import numpy as np
-import os
-# from early_stopping import EarlyStopping
-import torch
+from early_stopping import EarlyStopping
 from point_cloud_net import *
-from sabina_data_set import *
+from DataSetsGenerateOnTheGo import *
+
 
 def create_loss_and_optimizer(net, learning_rate=0.001):
-    # Loss function
-    # loss = torch.nn.CrossEntropyLoss()
-    # loss = torch.nn.MSELoss()
-    loss = torch.nn.SmoothL1Loss()
 
+    # Loss function
+    loss = torch.nn.SmoothL1Loss()
     # Optimizer
     optimizer = torch.optim.Adam(net.parameters(), lr=learning_rate, weight_decay=1e-5)
-    # optimizer = optim.Adagrad(net.parameters(), lr=learning_rate, lr_decay=1e-3)
-    # optimizer = optim.SGD(net.parameters(), lr=learning_rate)
 
     return loss, optimizer
 
 
 # def train_network(net, train_loader, val_loader, n_epochs, learning_rate, patience, folder_path, device, use_cuda):
 def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batch_size):
-    data_set_path = '/home/master04/Desktop/Dataset/point_cloud/pc_small_set'
-    #data_set_path = '/Users/sabinalinderoth/Documents/master_thesis/point_cloud_input/data_set_190321'
-    number_of_samples = 2 #int(input('Type number of samples: '))
 
+    #data_set_path = '/home/master04/Desktop/Ply_files/_out_Town01_190402_1/pc'
+    #csv_path = '/home/master04/Desktop/Ply_files/_out_Town01_190402_1/Town01_190402_1.csv'
+    data_set_path_train = '/home/annika_lundqvist144/ply_files/_out_Town01_190402_1/pc'
+    csv_path_train = '/home/annika_lundqvist144/ply_files/_out_Town01_190402_1/Town01_190402_1.csv'
+    translation, rotation = 1,1
+    data_set_path_val = '/home/annika_lundqvist144/ply_files/validation_set/pc'
+    csv_path_val = '/home/annika_lundqvist144/ply_files/validation_set/validation_set.csv'
 
-    scatter = PointPillarsScatter(batch_size)
-    net = PointPillars(batch_size)
-    #print('=======> NETWORK NAME: =======> ', net.name())
+    net = PointPillars(batch_size, use_cuda)
+    print('=======> NETWORK NAME: =======> ', net.name())
     if use_cuda:
         net.cuda()
     #print('Are model parameters on CUDA? ', next(net.parameters()).is_cuda)
     print(' ')
 
-    train_loader = get_train_loader_pc(batch_size, data_set_path, number_of_samples, {})
+    train_loader, val_loader = get_train_loader_pointpillars(batch_size, data_set_path_train, csv_path_train, data_set_path_val, csv_path_val, rotation, translation, {'num_workers': 8})
 
     '''# Load weights
     if load_weights:
@@ -58,11 +53,11 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
     train_loss = []
 
     # initialize the early_stopping object
-    # early_stopping = EarlyStopping(folder_path, patience, verbose=True)
+    early_stopping = EarlyStopping(folder_path, patience, verbose=True)
 
     # Get training data
     n_batches = len(train_loader)
-    # print('Number of batches: ', n_batches)
+    print('Number of batches: ', n_batches)
 
     # Create our loss and optimizer functions
     loss, optimizer = create_loss_and_optimizer(net, learning_rate)
@@ -70,7 +65,6 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
 
     # Time for printing
     training_start_time = time.time()
-    start_time = time.time()
 
     # Loop for n_epochs
     for epoch in range(n_epochs):
@@ -89,44 +83,68 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
         t1_get_data = time.time()
         for i, data in enumerate(train_loader, 1):
             t2_get_data = time.time()
-            # print('get data from loader: ', t2_get_data-t1_get_data)
+            #print('get data from loader: ', t2_get_data-t1_get_data)
 
+
+            # The training samples contains 5 things. 1. sweep features (xp,yp,z) 2. sweep coordinates (x,y,z)
+            # 3. map features (xp,yp,z) 4. map coordinates (x,y,z) 5. labels.
             sweep = data['sweep']
-            map = data['map']
+            sweep_coordinates = data['sweep_coordinates']
+            cutout = data['cutout']
+            cutout_coordinates = data['cutout_coordinates']
             labels = data['labels']
 
-            if use_cuda:
-                sweep, map, labels = sweep.cuda(async=True), map.cuda(async=True), labels.cuda(async=True)
-            sweep, map, labels = Variable(sweep), Variable(map), Variable(labels)
 
-            t1 = time.time()
+            if use_cuda:
+                sweep, sweep_coordinates, cutout, cutout_coordinates, labels = sweep.cuda(async=True), \
+                                                                               sweep_coordinates.cuda(async=True), \
+                                                                               cutout.cuda(async=True), \
+                                                                               cutout_coordinates.cuda(async=True), \
+                                                                               labels.cuda(async=True)
+
+            sweep, sweep_coordinates, cutout, cutout_coordinates, labels = Variable(sweep), Variable(sweep_coordinates), \
+                                                                     Variable(cutout), Variable(cutout_coordinates), \
+                                                                           Variable(labels)
+
+
             # Set the parameter gradients to zero
             optimizer.zero_grad()
             # Forward pass, backward pass, optimize
-            print('here we go')
-            outputs = net.forward(sweep.float(), map.float(), scatter)
-            print('done')
+            #t1 = time.time()
+            outputs = net.forward(sweep.float(), cutout.float(), sweep_coordinates.float(), cutout_coordinates.float())#, scatter)
+            #t2 = time.time()
+            #print('time for forward: ', t2 - t1)
+
+            #t1 = time.time()
             loss_size = loss(outputs, labels.float())
+            #t2 = time.time()
+            #print('time for get loss size: ', t2 - t1)
+
+            #t1 = time.time()
             loss_size.backward()
+            #t2 = time.time()
+            #print('time for backprop: ', t2-t1)
+
+            #t1 = time.time()
             optimizer.step()
-            t2 = time.time()
-            # print('time for forward, backprop, update: ', t2-t1)
+            #t2 = time.time()
+            #print('update: ', t2-t1)
 
             # Print statistics
             running_loss += loss_size.item()
             total_train_loss += loss_size.item()
 
-            if (i + 1) % print_every == 0:
+            if True:#(i + 1) % print_every == 0:
                 print('Epoch [{}/{}], Batch [{}/{}], Loss: {:.4f}, Time: '
                       .format(epoch + 1, n_epochs, i, n_batches, running_loss / print_every), time.time() - time_epoch)
                 running_loss = 0.0
                 time_epoch = time.time()
 
+            #t1_get_data = time.time()
+            del data, sweep, cutout, labels, outputs, loss_size
             t1_get_data = time.time()
-            del data, sweep, map, labels, outputs, loss_size
-
         # At the end of the epoch, do a pass on the validation set
-        '''
+
         total_val_loss = 0
         net = net.eval()
         with torch.no_grad():
@@ -163,7 +181,7 @@ def train_network(n_epochs, learning_rate, patience, folder_path, use_cuda, batc
         # If the validation has not improved in patience # of epochs the training loop will break.
         if early_stopping.early_stop:
             print("Early stopping")
-            break'''
+            break
 
     print("Training finished, took {:.2f}s".format(time.time() - training_start_time))
     return train_loss, val_loss

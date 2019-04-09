@@ -15,29 +15,13 @@ def get_file_name_from_frame_number(frame_number):
     return file_name
 
 
-def get_grid(x, y):
-    k = 0
-    for edge in x_edges:
-        if x > edge: # should it be >= ?
-            x_grid_number = k
-        k = k + 1
+# **********# change the rows marked with this # **********#
 
-    k = 0
-    for edge in y_edges:
-        if y > edge: # should it be >= ?
-            y_grid_number = k
-        k = k + 1
-
-    return x_grid_number, y_grid_number
-
-
-#**********# change the rows marked with this #**********#
-
-path_to_ply = '/Users/sabinalinderoth/Documents/master_thesis/ProcessingLiDARdata/_out_Town02_190306_1'#'/home/master04/Desktop/Ply_files/_out_Town03_190306_1'#**********#
-path_to_csv = os.path.join(path_to_ply, 'Town02_190306_1.csv')#**********#
+path_to_ply = '/home/master04/Desktop/Ply_files/new_lidar_data'  # **********#
+path_to_csv = os.path.join(path_to_ply, 'lidar_scans.csv')  # **********#
 path_to_pc = os.path.join(path_to_ply, 'pc')
 
-new_folder = '/Users/sabinalinderoth/Desktop/Ply_files/TEST_sorted_grid_ply' #'/home/master04/Desktop/Ply_files/Town03_sorted_grid_ply'#**********#
+new_folder = '/home/master04/Desktop/Dataset/ply_grids/Town01_sorted_grid_ply'  # **********#
 os.mkdir(new_folder)
 
 global_coordinates = pd.read_csv(path_to_csv)
@@ -52,27 +36,11 @@ max_y = np.max(global_coordinates['y'].values)
 grid_size = 15
 number_x_grids = int(np.ceil((max_x - min_x)/grid_size))
 number_of_x_edges = number_x_grids + 1
-x_edges = [min_x + x for x in np.arange(number_of_x_edges) * grid_size if x < max_x + grid_size] #creates list with all the edge values of the grids
-
-# Sabina's ploebel solution not tested properly but it seems to work for this case.
-#x_edges = []
-#x = min_x
-
-while x < max_x + grid_size:
-     x_edges.append(x)
-     x = x + grid_size
+x_edges = np.arange(number_of_x_edges)*grid_size+min_x
 
 number_y_grids = int(np.ceil((max_y - min_y)/grid_size))
-#number_of_y_edges = number_y_grids + 1
-#y_edges = [min_y + y for y in np.arange(number_of_y_edges) * grid_size if y < max_y + grid_size] #creates list with all the edge values of the grids
-
-# Sabina's ploebel solution not tested properly but it seems to work for this case.
-#y_edges = []
-#y = min_y
-
-#while y < max_y + grid_size:
-#    y_edges.append(y)
-#    y = y + grid_size
+number_of_y_edges = number_y_grids + 1
+y_edges = np.arange(number_of_y_edges)*grid_size+min_y
 
 csv_edges_path = os.path.join(new_folder, 'edges.npy')
 np.save(csv_edges_path, [x_edges, y_edges])
@@ -98,7 +66,8 @@ for row in tqdm(global_coordinates.values):
     file_name = get_file_name_from_frame_number(row[0])
 
     try:  # because we are out of bounds sometimes??
-        x_grid, y_grid = get_grid(row[1], row[2])
+        x_grid = int(np.floor((row[1]-min_x)/grid_size))
+        y_grid = int(np.floor((row[2]-min_y)/grid_size))
         grid_name = new_folder + '/grid_' + str(x_grid) + '_' + str(y_grid)
         source = os.path.join(path_to_pc, file_name)
         destination = os.path.join(grid_name, file_name)

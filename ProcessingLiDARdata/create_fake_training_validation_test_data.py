@@ -1,10 +1,12 @@
-from lidar_data_functions import *
+from functions_for_smaller_data import *
 import csv
 import random
 import os
+from tqdm import tqdm
 
 ###############################################################################
 # CREATE FAKE TRAINING SAMPLES (of one single sweep) WITHOUT A NEED FOR A MAP #
+# Creates all data sets; training, validation, test                           #
 ###############################################################################
 
 # The folders where the fake data is saved
@@ -12,7 +14,7 @@ input_folder_name = ['fake_training_set', 'fake_validation_set', 'fake_test_set'
 
 
 # fill in the paths to the training, validtation and test folder
-path_to_lidar_data_training = '/home/master04/Desktop/Ply_files/_out_Town01_190308_1'
+path_to_lidar_data_training = '/home/master04/Desktop/Ply_files/new_lidar_data'
 path_to_lidar_data_validation = '/home/master04/Desktop/Ply_files/validation_and_test/validation_set'
 path_to_lidar_data_test = '/home/master04/Desktop/Ply_files/validation_and_test/test_set'
 
@@ -22,7 +24,7 @@ path_to_lidar_data_test = '/home/master04/Desktop/Ply_files/validation_and_test/
 
 
 path_to_lidar_data_list = [path_to_lidar_data_training, path_to_lidar_data_validation, path_to_lidar_data_test]
-
+number_of_files_to_load_list = [2800, 800, 400]
 
 k = 0
 for foldername in input_folder_name:
@@ -50,7 +52,7 @@ for foldername in input_folder_name:
             path_to_csv = os.path.join(path_to_lidar_data, file)
 
     translation = float(1)
-    rotation = float(2.5)
+    rotation = float(0.0)
     number_of_files_to_load = number_of_files_to_load_list[k]
     print('number of files to load', number_of_files_to_load)
     ########################################################################################################
@@ -72,7 +74,7 @@ for foldername in input_folder_name:
         additional_files = np.random.choice(ply_files, number_additional_files)
         ply_files = np.concatenate((ply_files, additional_files))
 
-    for file_name in ply_files[:number_of_files_to_load]:
+    for file_name in tqdm(ply_files[:number_of_files_to_load]):
 
         # Load data:
         try:
@@ -80,9 +82,9 @@ for foldername in input_folder_name:
             path_to_ply = os.path.join(path_to_pc, file_name)
             pc, global_lidar_coordinates = load_data(path_to_ply, path_to_csv)
             i = i + 1
-            print('Creating training sample ', i, ' of ', number_of_files_to_load)
+            #print('Creating sample ', i, ' of ', number_of_files_to_load)
         except:
-            print('Failed to load file ', file_name, '. Moving on to next file.')
+            #print('Failed to load file ', file_name, '. Moving on to next file.')
             continue
 
         # create the sweep, transform a bit to create training sample
@@ -91,12 +93,13 @@ for foldername in input_folder_name:
         sweep = training_sample_rotation_translation(pc, rand_trans)
         sweep = trim_pointcloud(sweep)
         # discretize and pad sweep
-        sweep_image = discretize_pointcloud(sweep, array_size=300, trim_range=15, spatial_resolution=0.05, padding=True,
-                                            pad_size=75)
+        sweep_image = discretize_pointcloud(sweep, array_size=300, trim_range=15, spatial_resolution=0.1)
+        #sweep_image = discretize_pointcloud(sweep, array_size=600, trim_range=15, spatial_resolution=0.05)
 
         # fake a map cutout
-        cutout = trim_pointcloud(pc, range=1.5 * 15)
-        cutout_image = discretize_pointcloud(cutout, array_size=450, trim_range=1.5 * 15, padding=False)
+        cutout = trim_pointcloud(pc)
+        cutout_image = discretize_pointcloud(cutout, array_size=300, trim_range=15, spatial_resolution=0.1)
+        #cutout_image = discretize_pointcloud(cutout, array_size=600, trim_range=15, spatial_resolution=0.05)
 
         # concatenate the sweep and the cutout image into one image and save.
         sweep_and_cutout_image = np.concatenate((sweep_image, cutout_image))
