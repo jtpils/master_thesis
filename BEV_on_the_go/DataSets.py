@@ -111,12 +111,13 @@ def get_loaders(path_training, path_training_csv, path_validation, path_validati
     kwargs = {'pin_memory': True, 'num_workers': 16} if use_cuda else {'num_workers': 0}
 
     # USE MAP-CUTOUTS
-    '''
+
     map_train_path = '/home/annika_lundqvist144/maps/map_Town01/map.npy'
     map_minmax_train_path = '/home/annika_lundqvist144/maps/map_Town01/max_min.npy'
     '''
     map_train_path = '/home/master04/Desktop/Maps/map_Town01/map.npy'
     map_minmax_train_path = '/home/master04/Desktop/Maps/map_Town01/max_min.npy'
+    '''
     train_set = DataSetMapData(path_training, path_training_csv, map_train_path, map_minmax_train_path)
 
     # USE FAKA DATA
