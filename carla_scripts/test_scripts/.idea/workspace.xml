@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="94e53e5b-9ee4-4ec6-ab1e-21e05fc135f4" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/../../BEV_network/convert_npy_pt.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../BEV_network/h5py_dataset.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../BEV_network/new_dataset_h5py.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../BEV_network/new_networks.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../MNIST/train.py" beforeDir="false" afterPath="$PROJECT_DIR$/../../MNIST/train.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../ProcessingLiDARdata/_out_png_190212_1/_channel0.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../ProcessingLiDARdata/_out_png_190212_1/_channel1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../ProcessingLiDARdata/_out_png_190212_1/_channel2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../ProcessingLiDARdata/_out_png_190212_1/_channel3.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../ProcessingLiDARdata/data_test/cutouts/1.npy" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../ProcessingLiDARdata/data_test/cutouts/2.npy" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../ProcessingLiDARdata/data_test/cutouts/3.npy" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../ProcessingLiDARdata/data_test/cutouts/4.npy" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../ProcessingLiDARdata/data_test/cutouts/5.npy" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../ProcessingLiDARdata/data_test/cutouts/6.npy" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../ProcessingLiDARdata/data_test/cutouts/7.npy" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../ProcessingLiDARdata/data_test/cutouts/8.npy" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../ProcessingLiDARdata/data_test/cutouts/9.npy" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../ProcessingLiDARdata/data_test/sweeps/1.npy" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../ProcessingLiDARdata/data_test/sweeps/2.npy" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../ProcessingLiDARdata/data_test/sweeps/3.npy" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../ProcessingLiDARdata/data_test/sweeps/4.npy" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../ProcessingLiDARdata/data_test/sweeps/5.npy" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../ProcessingLiDARdata/data_test/sweeps/6.npy" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../ProcessingLiDARdata/data_test/sweeps/7.npy" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../ProcessingLiDARdata/data_test/sweeps/8.npy" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../ProcessingLiDARdata/data_test/sweeps/9.npy" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../ProcessingLiDARdata/map.npy" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../WORKING_CLEAN_CODE_MAP.m" beforeDir="false" afterPath="$PROJECT_DIR$/../WORKING_CLEAN_CODE_MAP.m" afterDir="false" />
+    </list>
+    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../.." />
+  </component>
+  <component name="ProjectFrameBounds" extendedState="6">
+    <option name="x" value="1680" />
+    <option name="y" value="-2" />
+    <option name="width" value="1680" />
+    <option name="height" value="1052" />
+  </component>
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectView">
+    <navigator proportions="" version="1">
+      <foldersAlwaysOnTop value="true" />
+    </navigator>
+    <panes>
+      <pane id="ProjectPane">
+        <subPane>
+          <expand>
+            <path>
+              <item name="test_scripts" type="b2602c69:ProjectViewProjectNode" />
+              <item name="test_scripts" type="462c0819:PsiDirectoryNode" />
+            </path>
+          </expand>
+          <select />
+        </subPane>
+      </pane>
+      <pane id="Course" />
+    </panes>
+  </component>
+  <component name="PropertiesComponent">
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../point_cloud_input" />
+    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
+  </component>
+  <component name="RunDashboard">
+    <option name="ruleStates">
+      <list>
+        <RuleState>
+          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
+        </RuleState>
+        <RuleState>
+          <option name="name" value="StatusDashboardGroupingRule" />
+        </RuleState>
+      </list>
+    </option>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="ToolWindowManager">
+    <frame x="1680" y="-2" width="1680" height="1052" extended-state="6" />
+    <layout>
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.24984913" />
+      <window_info id="Structure" order="1" weight="0.25" />
+      <window_info anchor="bottom" id="Educational.CheckDetails" />
+      <window_info anchor="bottom" id="Version Control" />
+      <window_info anchor="bottom" id="Terminal" />
+      <window_info anchor="bottom" id="Python Console" />
+      <window_info anchor="bottom" id="Message" order="0" />
+      <window_info anchor="bottom" id="Find" order="1" />
+      <window_info anchor="bottom" id="Run" order="2" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
+      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
+      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
+      <window_info anchor="bottom" id="TODO" order="6" />
+      <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
+      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
+      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
+    </layout>
+  </component>
+</project>
