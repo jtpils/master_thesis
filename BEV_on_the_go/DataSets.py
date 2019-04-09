@@ -129,12 +129,13 @@ def get_loaders(path_training, path_training_csv, path_validation, path_validati
     train_loader = torch.utils.data.DataLoader(train_set, batch_size=batch_size, sampler=train_sampler, **kwargs)
 
     # USE MAP-CUTOUTS
-    '''
+
     map_val_path = '/home/annika_lundqvist144/maps/map_Town02_validation/map.npy'
     map_minmax_val_path = '/home/annika_lundqvist144/maps/map_Town02_validation/max_min.npy'
     '''
     map_val_path = '/home/master04/Desktop/Maps/map_Town02_validation/map.npy'
     map_minmax_val_path = '//home/master04/Desktop/Maps/map_Town02_validation/max_min.npy'
+    '''
     val_set = DataSetMapData(path_validation, path_validation_csv, map_val_path, map_minmax_val_path)
 
     # USE FAKA DATA
