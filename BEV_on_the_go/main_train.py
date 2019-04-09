@@ -79,10 +79,12 @@ def main():
         val_loss_save = list()
 
         CNN = CNN.train()
+        get_data_1 = time.time()
         for i, data in enumerate(train_loader, 1):
             sample = data['sample']
             labels = data['label']
-
+            get_data_2 = time.time()
+            print('time to get data: ', get_data_2, get_data_1)
             if use_cuda:
                 sample, labels = sample.cuda(async=True), labels.cuda(async=True)
             sample, labels = Variable(sample), Variable(labels)
@@ -104,7 +106,7 @@ def main():
                        .format(epoch+1, n_epochs, i, n_batches, running_loss/print_every, time.time()-batch_time))
                 running_loss = 0.0
                 batch_time = time.time()
-
+            get_data_1 = time.time()
         del data, sample, labels, outputs, loss_size
 
         print('===== Validation =====')
@@ -152,6 +154,7 @@ def main():
         if early_stopping.early_stop:
             print("Early stopping")
             break
+
 
 
 if __name__ == '__main__':

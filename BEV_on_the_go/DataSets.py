@@ -235,7 +235,7 @@ class DataSetMapData_createMapOnTheGo(Dataset):
         origin = global_coords[:2] + rand_trans[:2]
         sweep_image = discretize_point_cloud(sweep, origin=origin,trim_range=15, spatial_resolution=0.1, image_size=300)
         t2 = time.time()
-        print('Time to create sweep image: ', t2-t1)
+        #print('Time to create sweep image: ', t2-t1)  # up to 0.5 seconds
 
         # map cut-out
         cut_out_coordinates = global_coords[:2]
@@ -256,7 +256,7 @@ class DataSetMapData_createMapOnTheGo(Dataset):
         # move all points such that the cut-out-coordinates become the origin
         cutout_image = discretize_point_cloud(cutout, origin=cut_out_coordinates[:2],trim_range=15, spatial_resolution=0.1, image_size=300)
         t3 = time.time()
-        print('Time to create cutout image: ', t3-t2)
+        #print('Time to create cutout image: ', t3-t2)  # up to 2 seconds
         # concatenate the sweep and the cutout image into one image and save.
         sweep_and_cutout_image = np.concatenate((sweep_image, cutout_image))
         sweep_and_cutout_image = normalize_sample(sweep_and_cutout_image)
