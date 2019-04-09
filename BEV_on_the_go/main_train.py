@@ -89,6 +89,7 @@ def main():
                 sample, labels = sample.cuda(async=True), labels.cuda(async=True)
             sample, labels = Variable(sample), Variable(labels)
 
+            t1 = time.time()
             # Set the parameter gradients to zero
             optimizer.zero_grad()
             # Forward pass, backward pass, optimize
@@ -96,6 +97,8 @@ def main():
             loss_size = loss(outputs, labels.float())
             loss_size.backward()
             optimizer.step()
+            t2 = time.time()
+            #print('pass though CNN + update weights: ', t2-t1)
 
             running_loss += loss_size.item()
             total_train_loss += loss_size.item()

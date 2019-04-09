@@ -182,7 +182,7 @@ class DataSetMapData_kSweeps(Dataset):
 class DataSetMapData_createMapOnTheGo(Dataset):
     """Lidar sample dataset."""
 
-    def __init__(self, sample_dir, csv_path, grid_csv_path, translation=1, rotation=0):
+    def __init__(self, sample_dir, csv_path, grid_csv_path, translation=1, rotation=0, occupancy_grid=False):
         """
         Args:
             sample_dir <string>: Directory with all ply-files.
@@ -193,10 +193,27 @@ class DataSetMapData_createMapOnTheGo(Dataset):
         self.rotation = rotation
         self.sweeps_file_names = sorted(os.listdir(sample_dir))
         self.num_sweeps = 5
+        self.grid_edges = np.load(os.path.join(grid_csv_path, 'edges.npy'))
+        self.occupancy_grid = occupancy_grid
 
         list_of_csv = os.listdir(grid_csv_path)
-        sweeps = []
+
+        # NEW IDEA
+        grid_dict = dict()
         print('loading all LiDAR detections...')
+        for file in tqdm(list_of_csv):
+            if 'grid' in file:
+                pc = pd.read_csv(os.path.join(grid_csv_path, file))
+                grid_dict[file] = pc
+                #sweeps.append(pc)
+        #self.lidar_points = pd.concat(sweeps)
+        self.grid_dict = grid_dict
+        print('Done loading detections.')
+        del grid_dict, pc
+        '''
+        # OLD IDEA
+        print('loading all LiDAR detections...')
+        sweeps = list()
         for file in tqdm(list_of_csv):
             if 'grid' in file:
                 pc = pd.read_csv(os.path.join(grid_csv_path, file))
@@ -204,6 +221,7 @@ class DataSetMapData_createMapOnTheGo(Dataset):
         self.lidar_points = pd.concat(sweeps)
         print('Done loading detections.')
         del sweeps, pc
+        '''
 
     def __len__(self):
         return len(self.sweeps_file_names) - (self.num_sweeps - 1)
@@ -226,23 +244,52 @@ class DataSetMapData_createMapOnTheGo(Dataset):
         # rotate and translate sweep
         rand_trans = random_rigid_transformation(self.translation, self.rotation)
         sweep = trim_point_cloud_range(pc_multiple_sweeps, origin=global_coords[:2], trim_range=20)
-
-        #sweep = trim_point_cloud_vehicle_ground(sweep,  origin=global_coords[:2], remove_vehicle=True, remove_ground=False)
         sweep = rotate_point_cloud(sweep, rand_trans[-1], to_global=False)
         sweep = translate_point_cloud(sweep, rand_trans[:2])
         sweep = trim_point_cloud_range(sweep, origin=global_coords[:2],  trim_range=15)
         #move our origin
         origin = global_coords[:2] + rand_trans[:2]
         sweep_image = discretize_point_cloud(sweep, origin=origin,trim_range=15, spatial_resolution=0.1, image_size=300)
+        if self.occupancy_grid:
+            sweep_image[sweep_image > 0] = 1
+
         t2 = time.time()
         #print('Time to create sweep image: ', t2-t1)  # up to 0.5 seconds
 
         # map cut-out
+        trim_range = 15
         cut_out_coordinates = global_coords[:2]
+
+        # NEW IDEA
+        grid_x = np.floor((cut_out_coordinates[0] - self.grid_edges[0][0])/trim_range).astype(int)
+        grid_y = np.floor((cut_out_coordinates[1] - self.grid_edges[1][0])/trim_range).astype(int)
+
+        #find all neighbouring grids, store the key names in a list
+        neighbouring_grids = list()
+        for x in [-1, 0, 1]:
+            for y in [-1, 0, 1]:
+                key = 'grid_' + str(grid_x + x) + '_' + str(grid_y + y) + '.csv' # key name in grid_dict
+                neighbouring_grids.append(key)
+
+        # try to read these dict-keys, some may not exist if there are no detections in that grid
+        cutout = list()
+        for key in neighbouring_grids:
+            try:
+                pc = self.grid_dict[key]
+                cutout.append(pc)
+            except:
+                continue
+        cutout = pd.concat(cutout)
+
+        '''
+        # OLD IDEA
         # we want all coordinates that in trim_range around cut_out_coordinates
         trim_range = 15
         # get all points around the sweep
-        cutout = self.lidar_points[self.lidar_points['x'] <= cut_out_coordinates[0]+trim_range]
+        cutout = self.lidar_points[self.lidar_points['x'] <= cut_out_coordinates[0]+trim_range]  # OLD IDEA'''
+
+        cutout = cutout[cutout['x'] <= cut_out_coordinates[0]+trim_range] # NEW IDEA
+
         cutout = cutout[cutout['x'] >= cut_out_coordinates[0]-trim_range]
         cutout = cutout[cutout['y'] <= cut_out_coordinates[1]+trim_range]
         cutout = cutout[cutout['y'] >= cut_out_coordinates[1]-trim_range]
@@ -252,9 +299,11 @@ class DataSetMapData_createMapOnTheGo(Dataset):
         points_to_keep = np.random.choice(len(cutout), num_points_to_keep)
         cutout = cutout[points_to_keep,:]
 
-        # if we want to use occupancy grid, sample points first
         # move all points such that the cut-out-coordinates become the origin
         cutout_image = discretize_point_cloud(cutout, origin=cut_out_coordinates[:2],trim_range=15, spatial_resolution=0.1, image_size=300)
+        if self.occupancy_grid:
+            cutout_image[cutout_image > 0] = 1
+
         t3 = time.time()
         #print('Time to create cutout image: ', t3-t2)  # up to 2 seconds
         # concatenate the sweep and the cutout image into one image and save.
@@ -270,7 +319,7 @@ class DataSetMapData_createMapOnTheGo(Dataset):
 
 
 def get_loaders(path_training, path_training_csv, path_validation, path_validation_csv, batch_size, use_cuda):
-    kwargs = {'pin_memory': True, 'num_workers': 8} if use_cuda else {'num_workers': 4}
+    kwargs = {'pin_memory': True, 'num_workers': 16} if use_cuda else {'num_workers': 8}
 
     # USE MAP-CUTOUTS
     '''
