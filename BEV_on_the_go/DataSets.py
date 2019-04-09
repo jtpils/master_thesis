@@ -268,7 +268,7 @@ class DataSetMapData_createMapOnTheGo(Dataset):
 
 
 def get_loaders(path_training, path_training_csv, path_validation, path_validation_csv, batch_size, use_cuda):
-    kwargs = {'pin_memory': True, 'num_workers': 8} if use_cuda else {'num_workers': 4}
+    kwargs = {'pin_memory': True, 'num_workers': 16} if use_cuda else {'num_workers': 4}
 
     # USE MAP-CUTOUTS
     '''
