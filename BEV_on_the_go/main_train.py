@@ -84,7 +84,7 @@ def main():
             sample = data['sample']
             labels = data['label']
             get_data_2 = time.time()
-            print('time to get data: ', get_data_2-get_data_1)
+            #print('time to get data: ', get_data_2-get_data_1)
             if use_cuda:
                 sample, labels = sample.cuda(async=True), labels.cuda(async=True)
             sample, labels = Variable(sample), Variable(labels)
