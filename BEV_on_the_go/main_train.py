@@ -143,7 +143,7 @@ def main():
         print("Training batch loss: {:.4f}".format(total_train_loss / len(train_loader)),
               ", Total training loss: {:.4f}".format(total_train_loss))
         print("Validation batch loss: {:.4f}".format(total_val_loss / len(val_loader)),
-              ", Total training loss: {:.4f}".format(total_val_loss))
+              ", Total validation loss: {:.4f}".format(total_val_loss))
         print("Epoch time: {:.2f}s".format(time.time() - start_time))
         print(' ')
 
