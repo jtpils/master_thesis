@@ -101,7 +101,7 @@ def discretize_point_cloud(point_cloud, origin, trim_range=15, spatial_resolutio
     x_grids = np.floor((point_cloud[:,0] + trim_range)/spatial_resolution).astype(int)
     y_grids = np.floor((point_cloud[:,1] + trim_range)/spatial_resolution).astype(int)
 
-    image = np.zeros((1,image_size+10, image_size+10))
+    image = np.zeros((1,image_size+20, image_size+20))
     for i in np.arange(len(point_cloud)):
         image[:,x_grids[i],y_grids[i]] = image[:,x_grids[i],y_grids[i]] + 1
 
