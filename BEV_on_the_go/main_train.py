@@ -74,6 +74,7 @@ def main():
     scheduler = ReduceLROnPlateau(optimizer, mode='min', factor=0.1, patience=5, verbose=True, threshold=0.0001,
                                   threshold_mode='rel', cooldown=0, min_lr=0, eps=1e-08)
 
+
     for epoch in range(n_epochs):
         #scheduler.step()
         params = optimizer.state_dict()['param_groups']
@@ -85,7 +86,7 @@ def main():
         start_time = time.time()
         batch_time = time.time()
         total_train_loss = 0.0
-        val_loss_save = list()
+
 
         CNN = CNN.train()
         get_data_1 = time.time()
