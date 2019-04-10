@@ -297,7 +297,7 @@ class DataSetMapData_createMapOnTheGo(Dataset):
         cutout = cutout[cutout['y'] >= cut_out_coordinates[1]-trim_range]
 
         cutout = cutout.values
-        num_points_to_keep = len(sweep)
+        num_points_to_keep = len(sweep)*2
         points_to_keep = np.random.choice(len(cutout), num_points_to_keep)
         cutout = cutout[points_to_keep,:]
 
