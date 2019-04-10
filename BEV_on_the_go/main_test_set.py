@@ -15,7 +15,7 @@ from torch.utils.data.sampler import SubsetRandomSampler
 
 load_weights = True
 path = '/home/master04/Desktop/network_parameters/Duchess_190410_6/'
-load_weights_path = path + 'parameters/epoch_7_checkpoint.pt'
+load_weights_path = path + 'parameters/epoch_12_checkpoint.pt'
 batch_size = 4
 
 print('Number of GPUs available: ', torch.cuda.device_count())
