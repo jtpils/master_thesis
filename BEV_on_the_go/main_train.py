@@ -1,7 +1,7 @@
 import torch
 from networks import *
 from DataSets import *
-from torch.optim.lr_scheduler import StepLR
+from torch.optim.lr_scheduler import StepLR, ReduceLROnPlateau
 import time
 from torch.autograd import Variable
 from early_stopping import EarlyStopping
@@ -61,7 +61,7 @@ def main():
     # initialize the early_stopping object
     early_stopping = EarlyStopping(parameter_path, patience, verbose=True)
 
-    split_loss = False
+    split_loss = True
 
     if split_loss:
         loss_trans = torch.nn.MSELoss()
@@ -70,10 +70,12 @@ def main():
         loss = torch.nn.MSELoss()
 
     optimizer = torch.optim.Adam(CNN.parameters(), lr=learning_rate)
-    scheduler = StepLR(optimizer, step_size=10, gamma=0.1)
+    #scheduler = StepLR(optimizer, step_size=10, gamma=0.1)
+    scheduler = ReduceLROnPlateau(optimizer, mode='min', factor=0.1, patience=5, verbose=True, threshold=0.0001,
+                                  threshold_mode='rel', cooldown=0, min_lr=0, eps=1e-08)
 
     for epoch in range(n_epochs):
-        scheduler.step()
+        #scheduler.step()
         params = optimizer.state_dict()['param_groups']
         print(' ')
         print('learning rate: ', params[0]['lr'])
@@ -106,7 +108,7 @@ def main():
                 loss_trans_size = loss_trans(outputs[:,0:2], labels[:,0:2].float())
                 loss_rot_size = loss_rot(outputs[:,-1].reshape((batch_size,1)), labels[:,-1].reshape((batch_size,1)).float())
 
-                alpha = 1
+                alpha = 0.9
                 beta = 1-alpha
                 loss_size = alpha*loss_trans_size + beta*loss_rot_size
             else:
@@ -162,6 +164,8 @@ def main():
                 val_loss_save.append(val_loss_size.item())
 
                 del data, sample, labels, val_outputs, val_loss_size
+
+        scheduler.step(total_val_loss)
 
         # save the loss for each epoch
         train_path = os.path.join(save_parameters_path, 'train_loss.npy')
