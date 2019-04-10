@@ -182,7 +182,7 @@ class DataSetMapData_kSweeps(Dataset):
 class DataSetMapData_createMapOnTheGo(Dataset):
     """Lidar sample dataset."""
 
-    def __init__(self, sample_dir, csv_path, grid_csv_path, translation=4, rotation=0, occupancy_grid=True):
+    def __init__(self, sample_dir, csv_path, grid_csv_path, translation=1, rotation=0, occupancy_grid=False):
         """
         Args:
             sample_dir <string>: Directory with all ply-files.
