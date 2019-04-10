@@ -169,6 +169,24 @@ def visualize_detections(discretized_point_cloud, fig_num=1):
     #new_img.show()
 
 
+def plot_sample(sweep_image, cutout_image):
+    plt.subplot(1,2,1)
+    plt.imshow(sweep_image[0,:,:], cmap='gray')
+    plt.title('sweep')
+    plt.subplot(1,2,2)
+    plt.imshow(cutout_image[0,:,:], cmap='gray')
+    plt.show()
+    plt.subplot(1,2,1)
+    plt.imshow(sweep_image[0,:,:], cmap='gray')
+    plt.title('sweep')
+    plt.subplot(1,2,2)
+    plt.imshow(cutout_image[0,:,:], cmap='gray')
+    plt.title('map cut-out')
+    plt.show()
+
+
+
+
 
 def discretize_map(point_cloud, spatial_resolution=0.1):
     x_min, x_max = np.min(point_cloud[:,0]), np.max(point_cloud[:,0])

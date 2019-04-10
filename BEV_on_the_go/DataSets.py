@@ -182,7 +182,7 @@ class DataSetMapData_kSweeps(Dataset):
 class DataSetMapData_createMapOnTheGo(Dataset):
     """Lidar sample dataset."""
 
-    def __init__(self, sample_dir, csv_path, grid_csv_path, translation=1, rotation=0, occupancy_grid=False):
+    def __init__(self, sample_dir, csv_path, grid_csv_path, translation=4, rotation=0, occupancy_grid=True):
         """
         Args:
             sample_dir <string>: Directory with all ply-files.
@@ -319,7 +319,7 @@ class DataSetMapData_createMapOnTheGo(Dataset):
 
 
 def get_loaders(path_training, path_training_csv, path_validation, path_validation_csv, batch_size, use_cuda):
-    kwargs = {'pin_memory': True, 'num_workers': 16} if use_cuda else {'num_workers': 0}
+    kwargs = {'pin_memory': True, 'num_workers': 16} if use_cuda else {'num_workers': 8}
 
     # USE MAP-CUTOUTS
     '''
