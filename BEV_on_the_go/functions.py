@@ -123,20 +123,25 @@ def random_rigid_transformation(bound_translation_meter, bound_rotation_degrees)
     return rigid_transformation
 
 
-def rotate_point_cloud(point_cloud, rotation_angle, to_global):
+def rotate_point_cloud(point_cloud, origin, rotation_angle, to_global):
     rotation = np.deg2rad(rotation_angle)
+
+    translation = np.array((origin[0], origin[1], 0))
+    point_cloud = point_cloud - translation # translate origin to the middle of the point cloud, else we rotate around something else
 
     # rotate:
     c, s = np.cos(rotation), np.sin(rotation)
     Rz = np.array(((c, -s, 0), (s, c, 0), (0, 0, 1))) # Rotation matrix
 
-    rotated_point_cloud = Rz @ np.transpose(point_cloud) # rotate each vector with coordinates, transpose to get dimensions correctly
-    rotated_point_cloud = np.transpose(rotated_point_cloud)
+    point_cloud = Rz @ np.transpose(point_cloud) # rotate each vector with coordinates, transpose to get dimensions correctly
+    point_cloud = np.transpose(point_cloud)
 
     if to_global:
-        rotated_point_cloud[:, 1] = -rotated_point_cloud[:,1]
+        point_cloud[:, 1] = -point_cloud[:,1]
 
-    return rotated_point_cloud
+    point_cloud = point_cloud + translation
+
+    return point_cloud
 
 
 def translate_point_cloud(point_cloud, translation):
@@ -181,13 +186,12 @@ def plot_sample(sweep_image, cutout_image):
     plt.subplot(1,2,1)
     plt.imshow(sweep_image[0,:,:], cmap='gray')
     plt.title('sweep')
+    plt.axis('off')
     plt.subplot(1,2,2)
     plt.imshow(cutout_image[0,:,:], cmap='gray')
     plt.title('map cut-out')
+    plt.axis('off')
     plt.show()
-
-
-
 
 
 def discretize_map(point_cloud, spatial_resolution=0.1):

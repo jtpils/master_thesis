@@ -245,7 +245,7 @@ class DataSetMapData_createMapOnTheGo(Dataset):
         # rotate and translate sweep
         rand_trans = random_rigid_transformation(self.translation, self.rotation)
         sweep = trim_point_cloud_range(pc_multiple_sweeps, origin=global_coords[:2], trim_range=45)
-        sweep = rotate_point_cloud(sweep, rand_trans[-1], to_global=False)
+        sweep = rotate_point_cloud(sweep, global_coords[:2], rand_trans[-1], to_global=False)
         sweep = translate_point_cloud(sweep, rand_trans[:2])
         sweep = trim_point_cloud_range(sweep, origin=global_coords[:2],  trim_range=15) # trim around our new origin # or add  + rand_trans[:2] to origin?
         #move our origin
