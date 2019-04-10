@@ -15,7 +15,7 @@ def main():
     use_cuda = torch.cuda.is_available()
     print('CUDA available: ', use_cuda)
     if use_cuda:
-        batch_size = 32 #45
+        batch_size = 45
     else:
         batch_size = 2
 
