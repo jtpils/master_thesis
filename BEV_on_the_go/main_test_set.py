@@ -9,14 +9,14 @@ import os
 import torch
 from torch.autograd import Variable
 import time
-from DataSets import DataSetMapData
+from DataSets import DataSetMapData_createMapOnTheGo
 from torch.utils.data.sampler import SubsetRandomSampler
 
 
 load_weights = True
-path = '/home/master04/Desktop/network_parameters/Duchess_190409_1/'
-load_weights_path = path + 'parameters/epoch_6_checkpoint.pt'
-batch_size = 2
+path = '/home/master04/Desktop/network_parameters/Duchess_190410_6/'
+load_weights_path = path + 'parameters/epoch_7_checkpoint.pt'
+batch_size = 4
 
 print('Number of GPUs available: ', torch.cuda.device_count())
 use_cuda = torch.cuda.is_available()
@@ -40,18 +40,19 @@ if load_weights:
 sample_path = '/home/master04/Desktop/Ply_files/validation_and_test/test_set/pc/'
 csv_path = '/home/master04/Desktop/Ply_files/validation_and_test/test_set/test_set.csv'
 
-kwargs = {'pin_memory': True, 'num_workers': 16} if use_cuda else {'num_workers': 4}
+kwargs = {'pin_memory': True, 'num_workers': 16} if use_cuda else {'num_workers': 8}
 
 # USE MAP-CUTOUTS
 '''
 map_train_path = '/home/annika_lundqvist144/maps/map_Town01/map.npy'
 map_minmax_train_path = '/home/annika_lundqvist144/maps/map_Town01/max_min.npy'
 '''
-map_path = '/home/master04/Desktop/Maps/map_Town02_test/map.npy'
-minmax_path = '/home/master04/Desktop/Maps/map_Town02_test/max_min.npy'
+#map_path = '/home/master04/Desktop/Maps/map_Town_test/map.npy'
+#minmax_path = '/home/master04/Desktop/Maps/map_Town_test/max_min.npy'
+grid_csv_path = '/home/master04/Desktop/Dataset/ply_grids/csv_grids_190409/csv_grids_test'
 
-test_set = DataSetMapData(sample_path, csv_path, map_path, minmax_path)
-n_test_samples = 10 #len(test_set)
+test_set = DataSetMapData_createMapOnTheGo(sample_path, csv_path, grid_csv_path)
+n_test_samples = len(test_set)
 
 print('Number of test samples: ', n_test_samples)
 test_sampler = SubsetRandomSampler(np.arange(n_test_samples, dtype=np.int64))
@@ -59,10 +60,19 @@ test_loader = torch.utils.data.DataLoader(test_set, batch_size=batch_size, sampl
 
 CNN.eval()
 
-predictions_list = list()
-labels_list = list()
+#predictions_list = list()
+#labels_list = list()
+predictions_array = np.zeros((1,3))
+labels_array = np.zeros((1,3))
 
-loss = torch.nn.SmoothL1Loss()
+split_loss = True
+
+if split_loss:
+    loss_trans = torch.nn.MSELoss()
+    loss_rot = torch.nn.SmoothL1Loss()
+else:
+    loss = torch.nn.MSELoss()
+
 total_test_loss = 0
 CNN = CNN.eval()
 with torch.no_grad():
@@ -76,21 +86,38 @@ with torch.no_grad():
         sample, labels = Variable(sample), Variable(labels)
 
         # Forward pass
-        output = CNN.forward(sample)
+        outputs = CNN.forward(sample)
+        output_size = outputs.size()[0]
 
-        test_loss_size = loss(output, labels.float())
+        if split_loss:
+            loss_trans_size = loss_trans(outputs[:,0:2], labels[:,0:2].float())
+            loss_rot_size = loss_rot(outputs[:,-1].reshape((output_size,1)), labels[:,-1].reshape((output_size,1)).float())
+
+            alpha = 0.9
+            beta = 1-alpha
+            test_loss_size = alpha*loss_trans_size + beta*loss_rot_size
+        else:
+            test_loss_size = loss(outputs, labels.float())
+
         total_test_loss += test_loss_size.item()
 
-        predictions_list.append(output.data.tolist())
-        labels_list.append(labels.data.tolist())
+        pred = outputs.data.numpy()
+        predictions_array = np.concatenate((predictions_array, pred), axis=0)
+        lab = labels.data.numpy()
+        labels_array = np.concatenate((labels_array, lab), axis=0)
+
+        #predictions_list.append(outputs.data.tolist())
+        #labels_list.append(labels.data.tolist())
 
         if i%10 == 0:
             print('Batch ', i, ' of ', len(test_loader))
 
-predictions = np.array(predictions_list)  # shape: (minibatch, batch_size, 3)
-labels = np.array(labels_list)
-predictions = predictions.reshape((n_test_samples, 3))  # shape (samples, 3)
-labels = labels.reshape((n_test_samples, 3))
+predictions = predictions_array[1:,:]
+labels = labels_array[1:,:]
+#predictions = np.array(predictions_list)  # shape: (minibatch, batch_size, 3)
+#labels = np.array(labels_list)
+#predictions = predictions.reshape((n_test_samples, 3))  # shape (samples, 3)
+#labels = labels.reshape((n_test_samples, 3))
 diff = labels - predictions
 error_distances = np.hypot(diff[:,0], diff[:,1])
 
@@ -153,7 +180,7 @@ def visualize_detections(discretized_point_cloud, layer=0, fig_num=1):
 
 
 def plot_loss():
-    model_dict = torch.load(load_weights_path, map_location='cpu')
+    #model_dict = torch.load(load_weights_path, map_location='cpu')
     train = np.load(path + 'train_loss.npy')
     val = np.load(path + 'val_loss.npy')
 
