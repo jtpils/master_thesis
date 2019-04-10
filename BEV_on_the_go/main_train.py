@@ -61,7 +61,14 @@ def main():
     # initialize the early_stopping object
     early_stopping = EarlyStopping(parameter_path, patience, verbose=True)
 
-    loss = torch.nn.MSELoss()
+    split_loss = False
+
+    if split_loss:
+        loss_trans = torch.nn.MSELoss()
+        loss_rot = torch.nn.SmoothL1Loss()
+    else:
+        loss = torch.nn.MSELoss()
+
     optimizer = torch.optim.Adam(CNN.parameters(), lr=learning_rate)
     scheduler = StepLR(optimizer, step_size=10, gamma=0.1)
 
@@ -94,7 +101,17 @@ def main():
             optimizer.zero_grad()
             # Forward pass, backward pass, optimize
             outputs = CNN.forward(sample)
-            loss_size = loss(outputs, labels.float())
+
+            if split_loss:
+                loss_trans_size = loss_trans(outputs[:,0:2], labels[:,0:2].float())
+                loss_rot_size = loss_rot(outputs[:,-1].reshape((batch_size,1)), labels[:,-1].reshape((batch_size,1)).float())
+
+                alpha = 1
+                beta = 1-alpha
+                loss_size = alpha*loss_trans_size + beta*loss_rot_size
+            else:
+                loss_size = loss(outputs, labels.float())
+
             loss_size.backward()
             optimizer.step()
             t2 = time.time()
@@ -104,7 +121,7 @@ def main():
             total_train_loss += loss_size.item()
             train_loss_save.append(loss_size.item())
 
-            if (i+1) % print_every == 0:
+            if True: #(i+1) % print_every == 0:
                 print('Epoch [{}/{}], Batch [{}/{}], Loss: {:.4f}, Time: {:.2f}s'
                        .format(epoch+1, n_epochs, i, n_batches, running_loss/print_every, time.time()-batch_time))
                 running_loss = 0.0
@@ -130,7 +147,17 @@ def main():
                 # Forward pass
                 val_outputs = CNN.forward(sample)
 
-                val_loss_size = loss(val_outputs, labels.float())
+
+                if split_loss:
+                    loss_trans_size = loss_trans(val_outputs[:,0:2], labels[:,0:2].float())
+                    loss_rot_size = loss_rot(val_outputs[:,-1].reshape((batch_size,1)), labels[:,-1].reshape((batch_size,1)).float())
+
+                    alpha = 1
+                    beta = 1-alpha
+                    val_loss_size = alpha*loss_trans_size + beta*loss_rot_size
+                else:
+                    val_loss_size = loss(val_outputs, labels.float())
+
                 total_val_loss += val_loss_size.item()
                 val_loss_save.append(val_loss_size.item())
 
