@@ -99,13 +99,18 @@ def discretize_point_cloud(point_cloud, origin, trim_range=15, spatial_resolutio
     point_cloud = point_cloud - translation
 
     x_grids = np.floor((point_cloud[:,0] + trim_range)/spatial_resolution).astype(int)
+    x_grids[x_grids>299] = 299
+    x_grids[x_grids<0] = 0
+
     y_grids = np.floor((point_cloud[:,1] + trim_range)/spatial_resolution).astype(int)
+    y_grids[y_grids>299] = 299
+    y_grids[y_grids<0] = 0
 
     image = np.zeros((1,image_size, image_size))
     for i in np.arange(len(point_cloud)):
         image[:,x_grids[i],y_grids[i]] = image[:,x_grids[i],y_grids[i]] + 1
 
-    image = image[:,:300,:300]
+    #image = image[:,:300,:300]
     return image
 
 
@@ -170,12 +175,9 @@ def visualize_detections(discretized_point_cloud, fig_num=1):
 
 
 def plot_sample(sweep_image, cutout_image):
-    plt.subplot(1,2,1)
-    plt.imshow(sweep_image[0,:,:], cmap='gray')
-    plt.title('sweep')
-    plt.subplot(1,2,2)
-    plt.imshow(cutout_image[0,:,:], cmap='gray')
-    plt.show()
+
+    sweep_image[sweep_image > 0] = 255
+    cutout_image[cutout_image > 0] = 255
     plt.subplot(1,2,1)
     plt.imshow(sweep_image[0,:,:], cmap='gray')
     plt.title('sweep')

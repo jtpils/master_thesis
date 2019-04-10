@@ -244,13 +244,13 @@ class DataSetMapData_createMapOnTheGo(Dataset):
         #print('==================================time to load sweep: ', t3-t1)
         # rotate and translate sweep
         rand_trans = random_rigid_transformation(self.translation, self.rotation)
-        sweep = trim_point_cloud_range(pc_multiple_sweeps, origin=global_coords[:2], trim_range=20)
+        sweep = trim_point_cloud_range(pc_multiple_sweeps, origin=global_coords[:2], trim_range=45)
         sweep = rotate_point_cloud(sweep, rand_trans[-1], to_global=False)
         sweep = translate_point_cloud(sweep, rand_trans[:2])
-        sweep = trim_point_cloud_range(sweep, origin=global_coords[:2] + rand_trans[:2],  trim_range=15) # trim around our new origin
+        sweep = trim_point_cloud_range(sweep, origin=global_coords[:2],  trim_range=15) # trim around our new origin # or add  + rand_trans[:2] to origin?
         #move our origin
-        origin = global_coords[:2] + rand_trans[:2]
-        sweep_image = discretize_point_cloud(sweep, origin=origin,trim_range=15, spatial_resolution=0.1, image_size=300)
+        origin = global_coords[:2]# + rand_trans[:2]  #?????
+        sweep_image = discretize_point_cloud(sweep, origin=origin, trim_range=15, spatial_resolution=0.1, image_size=300)
         if self.occupancy_grid:
             sweep_image[sweep_image > 0] = 1
 
@@ -302,7 +302,7 @@ class DataSetMapData_createMapOnTheGo(Dataset):
         cutout = cutout[points_to_keep,:]
 
         # move all points such that the cut-out-coordinates become the origin
-        cutout_image = discretize_point_cloud(cutout, origin=cut_out_coordinates[:2],trim_range=15, spatial_resolution=0.1, image_size=300)
+        cutout_image = discretize_point_cloud(cutout, origin=cut_out_coordinates[:2], trim_range=15, spatial_resolution=0.1, image_size=300)
         if self.occupancy_grid:
             cutout_image[cutout_image > 0] = 1
 
