@@ -104,9 +104,11 @@ def main():
             # Forward pass, backward pass, optimize
             outputs = CNN.forward(sample)
 
+            output_size = outputs.size()[0]
+
             if split_loss:
                 loss_trans_size = loss_trans(outputs[:,0:2], labels[:,0:2].float())
-                loss_rot_size = loss_rot(outputs[:,-1].reshape((batch_size,1)), labels[:,-1].reshape((batch_size,1)).float())
+                loss_rot_size = loss_rot(outputs[:,-1].reshape((output_size,1)), labels[:,-1].reshape((output_size,1)).float())
 
                 alpha = 0.9
                 beta = 1-alpha
@@ -148,11 +150,11 @@ def main():
 
                 # Forward pass
                 val_outputs = CNN.forward(sample)
-
+                output_size = val_outputs.size()[0]
 
                 if split_loss:
                     loss_trans_size = loss_trans(val_outputs[:,0:2], labels[:,0:2].float())
-                    loss_rot_size = loss_rot(val_outputs[:,-1].reshape((batch_size,1)), labels[:,-1].reshape((batch_size,1)).float())
+                    loss_rot_size = loss_rot(val_outputs[:,-1].reshape((output_size,1)), labels[:,-1].reshape((output_size,1)).float())
 
                     alpha = 1
                     beta = 1-alpha
