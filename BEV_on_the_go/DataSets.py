@@ -240,7 +240,8 @@ class DataSetMapData_createMapOnTheGo(Dataset):
             if i==0:
                 global_coords = global_coords_temp
         pc_multiple_sweeps = pc_multiple_sweeps[1:,:]
-
+        t3 = time.time()
+        #print('==================================time to load sweep: ', t3-t1)
         # rotate and translate sweep
         rand_trans = random_rigid_transformation(self.translation, self.rotation)
         sweep = trim_point_cloud_range(pc_multiple_sweeps, origin=global_coords[:2], trim_range=20)
@@ -254,7 +255,8 @@ class DataSetMapData_createMapOnTheGo(Dataset):
             sweep_image[sweep_image > 0] = 1
 
         t2 = time.time()
-        #print('Time to create sweep image: ', t2-t1)  # up to 0.5 seconds
+        #print('Time to create sweep image after the loading is done: ', t2-t3)
+        #print(' ')
 
         # map cut-out
         trim_range = 15
@@ -277,7 +279,7 @@ class DataSetMapData_createMapOnTheGo(Dataset):
             try:
                 pc = self.grid_dict[key]
                 cutout.append(pc)
-            except:
+            except: # not all neighbouring grids exixst as a csv-file because there were no detections there. skip those.
                 continue
         cutout = pd.concat(cutout)
 
@@ -288,8 +290,8 @@ class DataSetMapData_createMapOnTheGo(Dataset):
         # get all points around the sweep
         cutout = self.lidar_points[self.lidar_points['x'] <= cut_out_coordinates[0]+trim_range]  # OLD IDEA'''
 
+        # try using numpy arrays directly instead, might be faster?
         cutout = cutout[cutout['x'] <= cut_out_coordinates[0]+trim_range] # NEW IDEA
-
         cutout = cutout[cutout['x'] >= cut_out_coordinates[0]-trim_range]
         cutout = cutout[cutout['y'] <= cut_out_coordinates[1]+trim_range]
         cutout = cutout[cutout['y'] >= cut_out_coordinates[1]-trim_range]
@@ -316,10 +318,8 @@ class DataSetMapData_createMapOnTheGo(Dataset):
         return training_sample
 
 
-
-
 def get_loaders(path_training, path_training_csv, path_validation, path_validation_csv, batch_size, use_cuda):
-    kwargs = {'pin_memory': True, 'num_workers': 16} if use_cuda else {'num_workers': 8}
+    kwargs = {'pin_memory': True, 'num_workers': 16} if use_cuda else {'num_workers': 0}
 
     # USE MAP-CUTOUTS
     '''
@@ -373,4 +373,3 @@ def get_loaders(path_training, path_training_csv, path_validation, path_validati
     val_loader = torch.utils.data.DataLoader(val_set, batch_size=batch_size, sampler=val_sampler, **kwargs)
 
     return train_loader, val_loader
-
