@@ -43,7 +43,7 @@ def main():
         path_validation = '/home/master04/Desktop/Ply_files/validation_and_test/validation_set/pc/'
         path_validation_csv = '/home/master04/Desktop/Ply_files/validation_and_test/validation_set/validation_set.csv'
 
-    CNN = Duchess()
+    CNN = Gustav()
     print('=======> NETWORK NAME: =======> ', CNN.name())
     if use_cuda:
         CNN.cuda()
@@ -51,7 +51,7 @@ def main():
     print(' ')
 
     # Load weights
-    load_weights = True
+    load_weights = False
     load_weights_path = '/home/annika_lundqvist144/master_thesis/BEV_on_the_go/Duchess_190411_1/parameters/epoch_5_checkpoint.pt'
     if load_weights:
         print('Loading parameters...')
