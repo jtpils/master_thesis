@@ -112,7 +112,7 @@ class DataSetMapData(Dataset):
 class DataSetMapData_kSweeps(Dataset):
     """Generate "real" data on the go, eg sweep+map-cut-out, using the map.npy file. The sweep is made up by multiple ply-files."""
 
-    def __init__(self, sample_path, csv_path, map_path, minmax_path, translation=1, rotation=0):
+    def __init__(self, sample_path, csv_path, map_path, minmax_path, translation=1, rotation=1):
         """
         Args:
             sample_path (string): Directory with all the sweeps.
@@ -182,11 +182,13 @@ class DataSetMapData_kSweeps(Dataset):
 class DataSetMapData_createMapOnTheGo(Dataset):
     """Lidar sample dataset."""
 
-    def __init__(self, sample_dir, csv_path, grid_csv_path, translation=1, rotation=0, occupancy_grid=False):
+    def __init__(self, sample_dir, csv_path, grid_csv_path, translation=1, rotation=1, occupancy_grid=False):
         """
         Args:
             sample_dir <string>: Directory with all ply-files.
         """
+        print('translation: ', translation)
+        print('rotation: ', rotation)
         self.sample_dir = sample_dir
         self.csv_path = csv_path
         self.translation = translation

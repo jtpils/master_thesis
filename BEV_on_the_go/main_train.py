@@ -44,6 +44,8 @@ def main():
         path_validation_csv = '/home/master04/Desktop/Ply_files/validation_and_test/validation_set/validation_set.csv'
 
     CNN = Gustav()
+    if CNN.name() == 'Gustav':
+        batch_size = 32
     print('=======> NETWORK NAME: =======> ', CNN.name())
     if use_cuda:
         CNN.cuda()
