@@ -46,6 +46,7 @@ def main():
     CNN = Gustav()
     if CNN.name() == 'Gustav':
         batch_size = 32
+        print('batch_size', batch_size)
     print('=======> NETWORK NAME: =======> ', CNN.name())
     if use_cuda:
         CNN.cuda()
