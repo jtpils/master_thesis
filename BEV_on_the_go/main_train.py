@@ -9,7 +9,7 @@ from early_stopping import EarlyStopping
 
 def main():
     n_epochs = 50 #int(input('Number of epochs: '))
-    learning_rate = 0.01 #float(input('Learning rate: '))
+    learning_rate = float(input('Learning rate: '))
     patience = 15 #int(input('Input patience for EarlyStopping: ')) # Threshold for early stopping. Number of epochs that we will wait until brake
 
     use_cuda = torch.cuda.is_available()
@@ -49,6 +49,14 @@ def main():
         CNN.cuda()
     print('Are model parameters on CUDA? ', next(CNN.parameters()).is_cuda)
     print(' ')
+
+    # Load weights
+    load_weights = True
+    load_weights_path = '/home/annika_lundqvist144/master_thesis/BEV_on_the_go/Duchess_190410_6/parameters/epoch_19_checkpoint.pt'
+    if load_weights:
+        print('Loading parameters...')
+        network_param = torch.load(load_weights_path)
+        CNN.load_state_dict(network_param['model_state_dict'])
 
     # get data loaders
     train_loader, val_loader = get_loaders(path_training, path_training_csv, path_validation, path_validation_csv, batch_size, use_cuda)
