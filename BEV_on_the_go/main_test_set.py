@@ -14,9 +14,9 @@ from torch.utils.data.sampler import SubsetRandomSampler
 
 
 load_weights = True
-path = '/home/master04/Desktop/network_parameters/Duchess_190410_6/'
-load_weights_path = path + 'parameters/epoch_12_checkpoint.pt'
-batch_size = 4
+path = '/home/master04/Desktop/network_parameters/Duchess_190410_7/'
+load_weights_path = path + 'parameters/epoch_23_checkpoint.pt'
+batch_size = 8
 
 print('Number of GPUs available: ', torch.cuda.device_count())
 use_cuda = torch.cuda.is_available()
@@ -152,9 +152,13 @@ def visualize_samples():
         print('Label distance ', np.hypot(labels[idx,0], labels[idx,1]))
         print(' ')
 
-        visualize_detections(data['sample'],layer=0, fig_num=1)
-        visualize_detections(data['sample'],layer=1, fig_num=2)
-        plt.show()
+        sample = data['sample']
+        plot_sample(sample[0,:,:], sample[1,:,:])
+
+        # visualize_detections
+        #visualize_detections(data['sample'],layer=0, fig_num=1)
+        #visualize_detections(data['sample'],layer=1, fig_num=2)
+        #plt.show()
 
     print('==== Maximum error ====')
     for idx in sorted[-3:   ]:
@@ -165,18 +169,35 @@ def visualize_samples():
         print('Label distance ', np.hypot(labels[idx,0], labels[idx,1]))
         print(' ')
 
-        visualize_detections(data['sample'],layer=0, fig_num=1)
-        visualize_detections(data['sample'],layer=1, fig_num=2)
+        sample = data['sample']
+        plot_sample(sample[0,:,:], sample[1,:,:])
 
-        plt.show()
+        #visualize_detections(data['sample'],layer=0, fig_num=1)
+        #visualize_detections(data['sample'],layer=1, fig_num=2)
+        #plt.show()
 
-
+'''
 def visualize_detections(discretized_point_cloud, layer=0, fig_num=1):
     detection_layer = discretized_point_cloud[layer, :, :]
     detection_layer[detection_layer > 0] = 255
 
     plt.figure(fig_num)
     plt.imshow(detection_layer, cmap='gray')
+'''
+
+def plot_sample(sweep_image, cutout_image):
+
+    sweep_image[sweep_image > 0] = 255
+    cutout_image[cutout_image > 0] = 255
+    plt.subplot(1,2,1)
+    plt.imshow(sweep_image, cmap='gray')
+    plt.title('sweep')
+    plt.axis('off')
+    plt.subplot(1,2,2)
+    plt.imshow(cutout_image, cmap='gray')
+    plt.title('map cut-out')
+    plt.axis('off')
+    plt.show()
 
 
 def plot_loss():
@@ -219,12 +240,18 @@ def plot_labels():
     plt.show()
 
 
+def error_metrics():
+    error_distances
+    print('Error mean distance: ', np.mean(error_distances))
+    print('Error median distance: ', np.median(error_distances))
+
 def main():
 
     plot_labels()
     plot_histograms()
     visualize_samples()
     plot_loss()
+    error_metrics()
 
 
 if __name__ == '__main__':
