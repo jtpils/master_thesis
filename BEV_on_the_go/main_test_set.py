@@ -14,8 +14,8 @@ from torch.utils.data.sampler import SubsetRandomSampler
 
 
 load_weights = True
-path = '/home/master04/Desktop/network_parameters/Duchess_190410_7/'
-load_weights_path = path + 'parameters/epoch_23_checkpoint.pt'
+path = '/home/master04/Desktop/network_parameters/Duchess_190411_2/'
+load_weights_path = path + 'parameters/epoch_15_checkpoint.pt'
 batch_size = 8
 
 print('Number of GPUs available: ', torch.cuda.device_count())
@@ -37,22 +37,22 @@ if load_weights:
         network_param = torch.load(load_weights_path, map_location='cpu')
         CNN.load_state_dict(network_param['model_state_dict'])
 
-sample_path = '/home/master04/Desktop/Ply_files/validation_and_test/test_set/pc/'
-csv_path = '/home/master04/Desktop/Ply_files/validation_and_test/test_set/test_set.csv'
+# ====== TEST SET =====
+#sample_path = '/home/master04/Desktop/Ply_files/validation_and_test/test_set/pc/'
+#csv_path = '/home/master04/Desktop/Ply_files/validation_and_test/test_set/test_set.csv'
+#grid_csv_path = '/home/master04/Desktop/Dataset/ply_grids/csv_grids_190409/csv_grids_test'
+
+
+# ===== VALIDATION SET ======
+sample_path = '/home/master04/Desktop/Ply_files/validation_and_test/validation_set/pc/'
+csv_path = '/home/master04/Desktop/Ply_files/validation_and_test/validation_set/validation_set.csv'
+grid_csv_path = '/home/master04/Desktop/Dataset/ply_grids/csv_grids_190409/csv_grids_validation'
 
 kwargs = {'pin_memory': True, 'num_workers': 16} if use_cuda else {'num_workers': 8}
 
-# USE MAP-CUTOUTS
-'''
-map_train_path = '/home/annika_lundqvist144/maps/map_Town01/map.npy'
-map_minmax_train_path = '/home/annika_lundqvist144/maps/map_Town01/max_min.npy'
-'''
-#map_path = '/home/master04/Desktop/Maps/map_Town_test/map.npy'
-#minmax_path = '/home/master04/Desktop/Maps/map_Town_test/max_min.npy'
-grid_csv_path = '/home/master04/Desktop/Dataset/ply_grids/csv_grids_190409/csv_grids_test'
 
 test_set = DataSetMapData_createMapOnTheGo(sample_path, csv_path, grid_csv_path)
-n_test_samples = len(test_set)
+n_test_samples = 1000 #len(test_set)
 
 print('Number of test samples: ', n_test_samples)
 test_sampler = SubsetRandomSampler(np.arange(n_test_samples, dtype=np.int64))
