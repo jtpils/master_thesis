@@ -52,7 +52,7 @@ def main():
 
     # Load weights
     load_weights = True
-    load_weights_path = '/home/annika_lundqvist144/master_thesis/BEV_on_the_go/Duchess_190410_6/parameters/epoch_19_checkpoint.pt'
+    load_weights_path = '/home/annika_lundqvist144/master_thesis/BEV_on_the_go/Duchess_190410_7/parameters/epoch_23_checkpoint.pt'
     if load_weights:
         print('Loading parameters...')
         network_param = torch.load(load_weights_path)
