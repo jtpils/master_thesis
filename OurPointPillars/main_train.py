@@ -11,7 +11,6 @@ model_name = input('Type name of new folder: ')
 n_epochs = 20
 learning_rate = 0.01
 patience = 10
-batch_size = 4
 translation = 1 # float(input('Enter translation in metres: '))
 rotation = 1 # float(input('Enter rotation in degrees: '))
 
@@ -19,6 +18,11 @@ print(' ')
 print('Number of GPUs available: ', torch.cuda.device_count())
 use_cuda = torch.cuda.is_available()
 print('CUDA available: ', use_cuda)
+if use_cuda:
+    batch_size = 4
+else:
+    batch_size = 2
+
 
 # create directory for model weights
 current_path = os.getcwd()
@@ -46,12 +50,15 @@ kwargs = {'num_workers': 8, 'pin_memory':True} if use_cuda else {'num_workers': 
 train_loader, val_loader = get_train_loader(batch_size, data_set_path_train, csv_path_train, grid_csv_path_train, data_set_path_val,
                      csv_path_val, grid_csv_path_val, translation, rotation, kwargs)
 
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 net = OurPointPillars(batch_size, use_cuda)
 print('=======> NETWORK NAME: =======> ', net.name())
-if use_cuda:
-    net.cuda()
-else:
-    batch_size = 2
+if torch.cuda.device_count() > 1:
+        print("Let's use", torch.cuda.device_count(), "GPUs!")
+        net = torch.nn.DataParallel(net)
+
+net.to(device)
+
 
 split_loss = True
 if split_loss:
