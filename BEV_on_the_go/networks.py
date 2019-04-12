@@ -114,14 +114,14 @@ class Gustav(torch.nn.Module):
         self.conv3_bn_input1 = torch.nn.BatchNorm2d(64)
 
         # OBS I FLOWNET HAR DE INTE OLIKA CONV-LAGER FOR 2 INPUTS
-        '''
+
         self.conv1_input2 = torch.nn.Conv2d(1, 32, kernel_size=3, stride=1, padding=1)
         self.conv2_input2 = torch.nn.Conv2d(32, 32, kernel_size=3, stride=1, padding=1)
         self.conv1_bn_input2 = torch.nn.BatchNorm2d(32)
         self.conv2_bn_input2 = torch.nn.BatchNorm2d(32)
         self.conv3_input2 = torch.nn.Conv2d(32, 64, kernel_size=3, stride=1, padding=1)
         self.conv3_bn_input2 = torch.nn.BatchNorm2d(64)
-        '''
+
 
         self.dropout_2d = torch.nn.Dropout2d(p=0.2)
         self.pool = torch.nn.MaxPool2d(kernel_size=2, stride=2, padding=0)
@@ -174,18 +174,19 @@ class Gustav(torch.nn.Module):
         sweep = F.relu(self.conv2_bn_input1(self.conv2_input1(sweep)))  # 32,300,300
         sweep = self.pool(sweep)  # 32,150,150
         sweep = F.relu(self.conv3_bn_input1(self.conv3_input1(sweep)))  # 64,150,150
-        # using the same network for both sweep and cutout
+
+        '''# using the same network for both sweep and cutout
         cutout = F.relu(self.conv1_bn_input1(self.conv1_input1(cutout)))  # 32,300,300
         cutout = F.relu(self.conv2_bn_input1(self.conv2_input1(cutout)))  # 32,300,300
         cutout = self.pool(cutout)  # 32,150,150
-        cutout = F.relu(self.conv3_bn_input1(self.conv3_input1(cutout)))  # 64,150,150
+        cutout = F.relu(self.conv3_bn_input1(self.conv3_input1(cutout)))  # 64,150,150'''
 
-        '''
+
         # using different networks for sweep and cutout
         cutout = F.relu(self.conv1_bn_input2(self.conv1_input2(cutout)))  # 32,300,300
         cutout = F.relu(self.conv2_bn_input2(self.conv2_input2(cutout)))  # 32,300,300
         cutout = self.pool(cutout)  # 32,150,150
-        cutout = F.relu(self.conv3_bn_input2(self.conv3_input2(cutout)))  # 64,150,150'''
+        cutout = F.relu(self.conv3_bn_input2(self.conv3_input2(cutout)))  # 64,150,150
 
         if use_cuda:
             x = torch.zeros((batch_size, 2*64, 150, 150)).cuda()
