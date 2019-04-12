@@ -103,7 +103,8 @@ class Backbone(nn.Module):
         # Block 3:
         # 2 fully connected with drop out.
 
-        self.fc1 = torch.nn.Linear( 8 * 59 * 59, 32)
+        #self.fc1 = torch.nn.Linear( 8 * 59 * 59, 32)
+        self.fc1 = torch.nn.Linear( 256, 32)
         self.fc1_bn = torch.nn.BatchNorm1d(32)
         self.fc_out = torch.nn.Linear(32, 3)
 
@@ -124,7 +125,7 @@ class Backbone(nn.Module):
         x = F.relu(self.bn10(self.conv10(x)))
 
         # Block 3:
-        x = x.view(-1, 8 * 59 * 59)
+        x = x.view(-1, 256)
         x = torch.tanh(self.fc1_bn(self.fc1(x)))
         x = self.fc_out(x)
 
@@ -150,7 +151,7 @@ class OurPointPillars(torch.nn.Module):
         print('shape sweep coords', np.shape(sweep_coordinates))
         sweep_outputs = self.PFNlayer_sweep.forward(sweep)
         map_outputs = self.PFNlayer_map.forward(map)
-        sweep_canvas = ScatterPseudoImage(sweep_coordinates, sweep_outputs, self.batch_size, self.use_cuda)
+        sweep_canvas = ScatterPseudoImage(sweep_coordinates, sweep_outputs, self.batch_size, self.use_cuda) # batchsize is not used anymore
         map_canvas = ScatterPseudoImage(map_coordinates, map_outputs, self.batch_size, self.use_cuda)
         zipped_canvas = list(zip(sweep_canvas,map_canvas))
         concatenated_canvas = torch.zeros(batch_size, 128, 60, 60) # originally self.batch_size
