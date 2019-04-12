@@ -152,7 +152,7 @@ for epoch in range(n_epochs):
     total_train_loss += loss_size.item()
     train_loss_save.append(loss_size.item())
 
-    if (i+1) % print_every == 0:
+    if True: #(i+1) % print_every == 0:
         print('Epoch [{}/{}], Batch [{}/{}], Loss: {:.4f}, Time: {:.2f}s'
                .format(epoch+1, n_epochs, i, n_batches, running_loss/print_every, time.time()-batch_time))
         running_loss = 0.0
