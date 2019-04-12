@@ -35,10 +35,6 @@ def main():
     use_cuda = torch.cuda.is_available()
     print('CUDA available: ', use_cuda)
     print(' ')
-    if use_cuda:
-        batch_size = 65
-    else:
-        batch_size = 2
 
 
     # path to ply-files for town01 and validation
@@ -68,7 +64,15 @@ def main():
     CNN = Aslan()
     if CNN.name() == 'Gustav':
         if use_cuda:
-            batch_size = 32
+            batch_size = 32*2
+            print('batch_size', batch_size)
+    if CNN.name() == 'Duchess':
+        if use_cuda:
+            batch_size = 45*2
+            print('batch_size', batch_size)
+    if CNN.name() == 'Aslan':
+        if use_cuda:
+            batch_size = 65
             print('batch_size', batch_size)
     print('=======> NETWORK NAME: =======> ', CNN.name())
     #if use_cuda:
