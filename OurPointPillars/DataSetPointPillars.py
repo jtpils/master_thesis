@@ -38,7 +38,6 @@ class DataSetPointPillars(Dataset):
         return len(self.sweeps_file_names) - (self.num_sweeps - 1)
 
     def __getitem__(self, idx):
-        print('getting an item')
         # load ply-file
         indices = [x-(self.num_sweeps //2) for x in np.arange(self.num_sweeps)]
 
@@ -64,7 +63,6 @@ class DataSetPointPillars(Dataset):
 
         sweep_pillars, sweep_coordinates = create_pillars(sweep, origin=global_coords[:2])
         sweep_features , sweep_coordinates = get_feature_tensor(sweep_pillars, sweep_coordinates)
-        print('done with the sweep')
         # map cut-out
         trim_range = 15
         cut_out_coordinates = global_coords[:2]
@@ -97,7 +95,6 @@ class DataSetPointPillars(Dataset):
 
         cutout_pillars, cutout_coordinates = create_pillars(cutout, origin=global_coords[:2])
         cutout_features , cutout_coordinates = get_feature_tensor(cutout_pillars, cutout_coordinates)
-        print('done with the cutout')
         training_sample = {'sweep': torch.from_numpy(sweep_features).float(),
                            'sweep_coordinates': sweep_coordinates,
                            'cutout': torch.from_numpy(cutout_features).float(),
