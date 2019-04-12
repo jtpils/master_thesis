@@ -122,7 +122,7 @@ def main():
                 loss_trans_size = loss_trans(outputs[:,0:2], labels[:,0:2].float())
                 loss_rot_size = loss_rot(outputs[:,-1].reshape((output_size,1)), labels[:,-1].reshape((output_size,1)).float())
 
-                alpha = 0.5
+                alpha = 0.9
                 beta = 1-alpha
                 loss_size = alpha*loss_trans_size + beta*loss_rot_size
             else:
