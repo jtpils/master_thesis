@@ -72,7 +72,7 @@ def main():
             print('batch_size', batch_size)
     if CNN.name() == 'Aslan':
         if use_cuda:
-            batch_size = 93
+            batch_size = 85
             print('batch_size', batch_size)
     print('=======> NETWORK NAME: =======> ', CNN.name())
     #if use_cuda:
