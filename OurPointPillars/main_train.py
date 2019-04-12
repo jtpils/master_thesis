@@ -11,8 +11,8 @@ model_name = input('Type name of new folder: ')
 n_epochs = 20
 learning_rate = 0.01
 patience = 10
-translation = 1 # float(input('Enter translation in metres: '))
-rotation = 1 # float(input('Enter rotation in degrees: '))
+translation = float(input('Enter translation in metres: '))
+rotation = float(input('Enter rotation in degrees: '))
 
 print(' ')
 print('Number of GPUs available: ', torch.cuda.device_count())
