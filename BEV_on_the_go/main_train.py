@@ -36,7 +36,7 @@ def main():
     print('CUDA available: ', use_cuda)
     print(' ')
     if use_cuda:
-        batch_size = 45
+        batch_size = 65
     else:
         batch_size = 2
 
