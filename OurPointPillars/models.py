@@ -103,8 +103,7 @@ class Backbone(nn.Module):
         # Block 3:
         # 2 fully connected with drop out.
 
-        #self.fc1 = torch.nn.Linear( 8 * 59 * 59, 32)
-        self.fc1 = torch.nn.Linear( 256, 32)
+        self.fc1 = torch.nn.Linear( 8 * 59 * 59, 32)
         self.fc1_bn = torch.nn.BatchNorm1d(32)
         self.fc_out = torch.nn.Linear(32, 3)
 
@@ -125,7 +124,7 @@ class Backbone(nn.Module):
         x = F.relu(self.bn10(self.conv10(x)))
 
         # Block 3:
-        x = x.view(-1, 256)
+        x = x.view(-1, 8 * 59 * 59)
         x = torch.tanh(self.fc1_bn(self.fc1(x)))
         x = self.fc_out(x)
 
