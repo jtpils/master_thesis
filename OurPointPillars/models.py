@@ -145,7 +145,8 @@ class OurPointPillars(torch.nn.Module):
         self.use_cuda = use_cuda
 
     def forward(self, sweep, map, sweep_coordinates, map_coordinates):
-
+        print('shape sweep', np.shape(sweep))
+        print('shape sweep coords', np.shape(sweep_coordinates))
         sweep_outputs = self.PFNlayer_sweep.forward(sweep)
         map_outputs = self.PFNlayer_map.forward(map)
         sweep_canvas = ScatterPseudoImage(sweep_coordinates, sweep_outputs, self.batch_size, self.use_cuda)
