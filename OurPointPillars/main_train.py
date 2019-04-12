@@ -19,7 +19,7 @@ print('Number of GPUs available: ', torch.cuda.device_count())
 use_cuda = torch.cuda.is_available()
 print('CUDA available: ', use_cuda)
 if use_cuda:
-    batch_size = 4
+    batch_size = 2
 else:
     batch_size = 2
 
@@ -30,6 +30,16 @@ model_path = os.path.join(current_path, model_name)
 os.mkdir(model_path)
 parameter_path = os.path.join(model_path, 'parameters')
 os.mkdir(parameter_path)
+
+split_loss = True
+if split_loss:
+    alpha = float(input('Enter weight for alpha in custom loss: '))
+    beta = 1-alpha
+    loss_trans = torch.nn.MSELoss()
+    loss_rot = torch.nn.SmoothL1Loss()
+else:
+    loss = torch.nn.MSELoss()
+
 
 if use_cuda:
     data_set_path_train = '/home/annika_lundqvist144/ply_files/_out_Town01_190402_1/pc'
@@ -46,7 +56,7 @@ else:
     csv_path_val = '/home/annika_lundqvist144/ply_files/validation_set/validation_set.csv'
     grid_csv_path_val = '/home/master04/Desktop/Dataset/ply_grids/csv_grids_190409/csv_grids_validation'
 
-kwargs = {'num_workers': 8, 'pin_memory':True} if use_cuda else {'num_workers': 0}
+kwargs = {'num_workers': 0, 'pin_memory':True} if use_cuda else {'num_workers': 0}
 train_loader, val_loader = get_train_loader(batch_size, data_set_path_train, csv_path_train, grid_csv_path_train, data_set_path_val,
                      csv_path_val, grid_csv_path_val, translation, rotation, kwargs)
 
@@ -55,19 +65,13 @@ net = OurPointPillars(batch_size, use_cuda)
 print('=======> NETWORK NAME: =======> ', net.name())
 if torch.cuda.device_count() > 1:
         print("Let's use", torch.cuda.device_count(), "GPUs!")
+        print(' ')
         net = torch.nn.DataParallel(net)
 
 net.to(device)
 
 
-split_loss = True
-if split_loss:
-    alpha = float(input('Enter weight for alpha in custom loss: '))
-    beta = 1-alpha
-    loss_trans = torch.nn.MSELoss()
-    loss_rot = torch.nn.SmoothL1Loss()
-else:
-    loss = torch.nn.MSELoss()
+
 
 
 # Print all of the hyperparameters of the training iteration:
