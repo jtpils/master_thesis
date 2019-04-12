@@ -182,9 +182,6 @@ def main():
                 if split_loss:
                     loss_trans_size = loss_trans(val_outputs[:,0:2], labels[:,0:2].float())
                     loss_rot_size = loss_rot(val_outputs[:,-1].reshape((output_size,1)), labels[:,-1].reshape((output_size,1)).float())
-
-                    alpha = 1
-                    beta = 1-alpha
                     val_loss_size = alpha*loss_trans_size + beta*loss_rot_size
                 else:
                     val_loss_size = loss(val_outputs, labels.float())

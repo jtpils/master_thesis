@@ -14,8 +14,8 @@ from torch.utils.data.sampler import SubsetRandomSampler
 
 
 load_weights = True
-path = '/home/master04/Desktop/network_parameters/Gustav_190411_1'
-load_weights_path = os.path.join(path, 'parameters/epoch_9_checkpoint.pt')
+path = '/home/master04/Desktop/network_parameters/Gustav_190412_1'
+load_weights_path = os.path.join(path, 'parameters/epoch_27_checkpoint.pt')
 batch_size = 8
 translation = float(input('enter translation: '))
 rotation = float(input('enter rotation: '))
@@ -73,6 +73,8 @@ labels_array = np.zeros((1,3))
 split_loss = True
 
 if split_loss:
+    alpha = float(input('Enter weight for alpha in custom loss: '))
+    beta = 1-alpha
     loss_trans = torch.nn.MSELoss()
     loss_rot = torch.nn.SmoothL1Loss()
 else:
@@ -97,9 +99,6 @@ with torch.no_grad():
         if split_loss:
             loss_trans_size = loss_trans(outputs[:,0:2], labels[:,0:2].float())
             loss_rot_size = loss_rot(outputs[:,-1].reshape((output_size,1)), labels[:,-1].reshape((output_size,1)).float())
-
-            alpha = 0.9
-            beta = 1-alpha
             test_loss_size = alpha*loss_trans_size + beta*loss_rot_size
         else:
             test_loss_size = loss(outputs, labels.float())
