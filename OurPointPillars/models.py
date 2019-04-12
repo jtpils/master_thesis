@@ -145,6 +145,7 @@ class OurPointPillars(torch.nn.Module):
         self.use_cuda = use_cuda
 
     def forward(self, sweep, map, sweep_coordinates, map_coordinates):
+        batch_size = np.shape(sweep_coordinates)[0]
         print('shape sweep', np.shape(sweep))
         print('shape sweep coords', np.shape(sweep_coordinates))
         sweep_outputs = self.PFNlayer_sweep.forward(sweep)
@@ -152,10 +153,10 @@ class OurPointPillars(torch.nn.Module):
         sweep_canvas = ScatterPseudoImage(sweep_coordinates, sweep_outputs, self.batch_size, self.use_cuda)
         map_canvas = ScatterPseudoImage(map_coordinates, map_outputs, self.batch_size, self.use_cuda)
         zipped_canvas = list(zip(sweep_canvas,map_canvas))
-        concatenated_canvas = torch.zeros(self.batch_size, 128, 60, 60)
+        concatenated_canvas = torch.zeros(batch_size, 128, 60, 60) # originally self.batch_size
 
-        batch_size = np.shape(sweep_coordinates)[0]
-        for i in np.arange(self.batch_size):
+
+        for i in np.arange(batch_size):# originally self.batch_size
             sweep_layers = zipped_canvas[i][0]
             map_layers = zipped_canvas[i][1]
             concatenated_layers = torch.cat((sweep_layers , map_layers ), 0)
