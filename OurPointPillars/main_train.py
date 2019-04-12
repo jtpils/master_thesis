@@ -121,58 +121,6 @@ for epoch in range(n_epochs):
         cutout = data['cutout']
         cutout_coordinates = data['cutout_coordinates']
         label = data['label']
-    if use_cuda:
-        sweep, sweep_coordinates, cutout, cutout_coordinates, label = sweep.cuda(async=True), \
-                                                                       sweep_coordinates.cuda(async=True), \
-                                                                       cutout.cuda(async=True), \
-                                                                       cutout_coordinates.cuda(async=True), \
-                                                                       label.cuda(async=True)
-
-    sweep, sweep_coordinates, cutout, cutout_coordinates, label = Variable(sweep), Variable(sweep_coordinates), \
-                                                             Variable(cutout), Variable(cutout_coordinates), \
-                                                                   Variable(label)
-    print('time for backprop')
-    # Set the parameter gradients to zero
-    optimizer.zero_grad()
-    # Forward pass, backward pass, optimize
-    outputs = net.forward(sweep.float(), cutout.float(), sweep_coordinates.float(), cutout_coordinates.float())
-
-    output_size = outputs.size()[0]
-
-    if split_loss:
-        loss_trans_size = loss_trans(outputs[:,0:2], label[:,0:2].float())
-        loss_rot_size = loss_rot(outputs[:,-1].reshape((output_size,1)), label[:,-1].reshape((output_size,1)).float())
-        loss_size = alpha*loss_trans_size + beta*loss_rot_size
-    else:
-        loss_size = loss(outputs, label.float())
-
-    loss_size.backward()
-    optimizer.step()
-
-    running_loss += loss_size.item()
-    total_train_loss += loss_size.item()
-    train_loss_save.append(loss_size.item())
-
-    if True: #(i+1) % print_every == 0:
-        print('Epoch [{}/{}], Batch [{}/{}], Loss: {:.4f}, Time: {:.2f}s'
-               .format(epoch+1, n_epochs, i, n_batches, running_loss/print_every, time.time()-batch_time))
-        running_loss = 0.0
-        batch_time = time.time()
-    get_data_1 = time.time()
-    del data, sweep, cutout, outputs, loss_size
-
-    print('===== Validation =====')
-    total_val_loss = 0
-    net = net.eval()
-    val_time = time.time()
-    with torch.no_grad():
-        print('number of iterations: ', val_batches)
-        for i, data in tqdm(enumerate(val_loader, 1)):
-            sweep = data['sweep']
-            sweep_coordinates = data['sweep_coordinates']
-            cutout = data['cutout']
-            cutout_coordinates = data['cutout_coordinates']
-            label = data['label']
         if use_cuda:
             sweep, sweep_coordinates, cutout, cutout_coordinates, label = sweep.cuda(async=True), \
                                                                            sweep_coordinates.cuda(async=True), \
@@ -182,46 +130,98 @@ for epoch in range(n_epochs):
 
         sweep, sweep_coordinates, cutout, cutout_coordinates, label = Variable(sweep), Variable(sweep_coordinates), \
                                                                  Variable(cutout), Variable(cutout_coordinates), \
-                                                                   Variable(label)
+                                                                       Variable(label)
+        print('time for backprop')
+        # Set the parameter gradients to zero
+        optimizer.zero_grad()
+        # Forward pass, backward pass, optimize
+        outputs = net.forward(sweep.float(), cutout.float(), sweep_coordinates.float(), cutout_coordinates.float())
 
-        # Forward pass
-        val_outputs = net.forward(sweep.float(), cutout.float(), sweep_coordinates.float(), cutout_coordinates.float())
-        output_size = val_outputs.size()[0]
+        output_size = outputs.size()[0]
 
         if split_loss:
-            loss_trans_size = loss_trans(val_outputs[:,0:2], label[:,0:2].float())
-            loss_rot_size = loss_rot(val_outputs[:,-1].reshape((output_size,1)), label[:,-1].reshape((output_size,1)).float())
-            val_loss_size = alpha*loss_trans_size + beta*loss_rot_size
+            loss_trans_size = loss_trans(outputs[:,0:2], label[:,0:2].float())
+            loss_rot_size = loss_rot(outputs[:,-1].reshape((output_size,1)), label[:,-1].reshape((output_size,1)).float())
+            loss_size = alpha*loss_trans_size + beta*loss_rot_size
         else:
-            val_loss_size = loss(val_outputs, label.float())
+            loss_size = loss(outputs, label.float())
 
-        total_val_loss += val_loss_size.item()
-        val_loss_save.append(val_loss_size.item())
+        loss_size.backward()
+        optimizer.step()
 
-        del data, sweep, cutout, label, val_outputs, val_loss_size
+        running_loss += loss_size.item()
+        total_train_loss += loss_size.item()
+        train_loss_save.append(loss_size.item())
 
-    scheduler.step(total_val_loss)
+        if True: #(i+1) % print_every == 0:
+            print('Epoch [{}/{}], Batch [{}/{}], Loss: {:.4f}, Time: {:.2f}s'
+                   .format(epoch+1, n_epochs, i, n_batches, running_loss/print_every, time.time()-batch_time))
+            running_loss = 0.0
+            batch_time = time.time()
+        get_data_1 = time.time()
+        del data, sweep, cutout, outputs, loss_size
 
-    # save the loss for each epoch
-    train_path = os.path.join(model_path, 'train_loss.npy')
-    val_path = os.path.join(model_path, 'val_loss.npy')
-    np.save(train_path, train_loss_save)
-    np.save(val_path, val_loss_save)
+        print('===== Validation =====')
+        total_val_loss = 0
+        net = net.eval()
+        val_time = time.time()
+        with torch.no_grad():
+            print('number of iterations: ', val_batches)
+            for i, data in tqdm(enumerate(val_loader, 1)):
+                sweep = data['sweep']
+                sweep_coordinates = data['sweep_coordinates']
+                cutout = data['cutout']
+                cutout_coordinates = data['cutout_coordinates']
+                label = data['label']
+            if use_cuda:
+                sweep, sweep_coordinates, cutout, cutout_coordinates, label = sweep.cuda(async=True), \
+                                                                               sweep_coordinates.cuda(async=True), \
+                                                                               cutout.cuda(async=True), \
+                                                                               cutout_coordinates.cuda(async=True), \
+                                                                               label.cuda(async=True)
 
-    print(' ')
-    print("Training batch loss: {:.4f}".format(total_train_loss / len(train_loader)),
-          ", Total training loss: {:.4f}".format(total_train_loss))
-    print("Validation batch loss: {:.4f}".format(total_val_loss / len(val_loader)),
-          ", Total validation loss: {:.4f}".format(total_val_loss))
-    print("Epoch time: {:.2f}s".format(time.time() - start_time))
-    print(' ')
+            sweep, sweep_coordinates, cutout, cutout_coordinates, label = Variable(sweep), Variable(sweep_coordinates), \
+                                                                     Variable(cutout), Variable(cutout_coordinates), \
+                                                                       Variable(label)
 
-    # see if validation loss has decreased, if it has a checkpoint will be saved of the current model.
-    early_stopping(epoch, total_train_loss, total_val_loss, net, optimizer)
+            # Forward pass
+            val_outputs = net.forward(sweep.float(), cutout.float(), sweep_coordinates.float(), cutout_coordinates.float())
+            output_size = val_outputs.size()[0]
 
-    # If the validation has not improved in patience # of epochs the training loop will break.
-    if early_stopping.early_stop:
-        print("Early stopping")
-        break
+            if split_loss:
+                loss_trans_size = loss_trans(val_outputs[:,0:2], label[:,0:2].float())
+                loss_rot_size = loss_rot(val_outputs[:,-1].reshape((output_size,1)), label[:,-1].reshape((output_size,1)).float())
+                val_loss_size = alpha*loss_trans_size + beta*loss_rot_size
+            else:
+                val_loss_size = loss(val_outputs, label.float())
+
+            total_val_loss += val_loss_size.item()
+            val_loss_save.append(val_loss_size.item())
+
+            del data, sweep, cutout, label, val_outputs, val_loss_size
+
+        scheduler.step(total_val_loss)
+
+        # save the loss for each epoch
+        train_path = os.path.join(model_path, 'train_loss.npy')
+        val_path = os.path.join(model_path, 'val_loss.npy')
+        np.save(train_path, train_loss_save)
+        np.save(val_path, val_loss_save)
+
+        print(' ')
+        print("Training batch loss: {:.4f}".format(total_train_loss / len(train_loader)),
+              ", Total training loss: {:.4f}".format(total_train_loss))
+        print("Validation batch loss: {:.4f}".format(total_val_loss / len(val_loader)),
+              ", Total validation loss: {:.4f}".format(total_val_loss))
+        print("Epoch time: {:.2f}s".format(time.time() - start_time))
+        print(' ')
+
+        # see if validation loss has decreased, if it has a checkpoint will be saved of the current model.
+        early_stopping(epoch, total_train_loss, total_val_loss, net, optimizer)
+
+        # If the validation has not improved in patience # of epochs the training loop will break.
+        if early_stopping.early_stop:
+            print("Early stopping")
+            break
 
 
