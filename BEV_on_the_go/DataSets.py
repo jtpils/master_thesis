@@ -320,23 +320,8 @@ class DataSetMapData_createMapOnTheGo(Dataset):
 
 
 def get_loaders(path_training, path_training_csv, path_validation, path_validation_csv, batch_size, use_cuda, translation, rotation):
-    kwargs = {'pin_memory': True, 'num_workers': 16} if use_cuda else {'num_workers': 4}
+    kwargs = {'pin_memory': True, 'num_workers': 16} if use_cuda else {'num_workers': 0}
 
-    # USE MAP-CUTOUTS
-    '''
-    if use_cuda:
-        map_train_path = '/home/annika_lundqvist144/maps/map_Town_training/map.npy'
-        map_minmax_train_path = '/home/annika_lundqvist144/maps/map_Town_training/max_min.npy'
-    else:
-        map_train_path = '/home/master04/Desktop/Maps/map_Town_training/map.npy'
-        map_minmax_train_path = '/home/master04/Desktop/Maps/map_Town_training/max_min.npy'
-
-    train_set = DataSetMapData_kSweeps(path_training, path_training_csv, map_train_path, map_minmax_train_path)
-    '''
-    # USE FAKA DATA
-    #train_set = DataSetFakeData(path_training, path_training_csv)
-
-    # CREATE MAP ON THE GO
     if use_cuda:
         path_training_grids = '/home/annika_lundqvist144/csv_grids_190409/csv_grids_training/'
     else:
@@ -348,20 +333,6 @@ def get_loaders(path_training, path_training_csv, path_validation, path_validati
     train_sampler = SubsetRandomSampler(np.arange(n_training_samples, dtype=np.int64))
     train_loader = torch.utils.data.DataLoader(train_set, batch_size=batch_size, sampler=train_sampler, **kwargs)
 
-    # USE MAP-CUTOUTS
-    '''if use_cuda:
-        map_val_path = '/home/annika_lundqvist144/maps/map_Town_validation/map.npy'
-        map_minmax_val_path = '/home/annika_lundqvist144/maps/map_Town_validation/max_min.npy'
-    else:
-        map_val_path = '/home/master04/Desktop/Maps/map_Town_validation/map.npy'
-        map_minmax_val_path = '/home/master04/Desktop/Maps/map_Town_validation/max_min.npy'
-    '''
-    #val_set = DataSetMapData_kSweeps(path_validation, path_validation_csv, map_val_path, map_minmax_val_path)
-
-    # USE FAKA DATA
-    #val_set = DataSetFakeData(path_validation, path_validation_csv)
-
-    # CREATE MAP ON THE GO
     if use_cuda:
         path_validation_grids = '/home/annika_lundqvist144/csv_grids_190409/csv_grids_validation/'
     else:

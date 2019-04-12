@@ -65,7 +65,7 @@ def main():
 
 
 
-    CNN = Gustav()
+    CNN = Aslan()
     if CNN.name() == 'Gustav':
         if use_cuda:
             batch_size = 32
