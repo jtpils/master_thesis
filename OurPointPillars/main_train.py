@@ -115,6 +115,7 @@ for epoch in range(n_epochs):
     net = net.train()
     get_data_1 = time.time()
     for i, data in enumerate(train_loader, 1):
+        print('i got data')
         sweep = data['sweep']
         sweep_coordinates = data['sweep_coordinates']
         cutout = data['cutout']
@@ -130,7 +131,7 @@ for epoch in range(n_epochs):
     sweep, sweep_coordinates, cutout, cutout_coordinates, label = Variable(sweep), Variable(sweep_coordinates), \
                                                              Variable(cutout), Variable(cutout_coordinates), \
                                                                    Variable(label)
-
+    print('time for backprop')
     # Set the parameter gradients to zero
     optimizer.zero_grad()
     # Forward pass, backward pass, optimize
