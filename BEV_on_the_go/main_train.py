@@ -8,16 +8,7 @@ from early_stopping import EarlyStopping
 
 
 def main():
-    n_epochs = 50 #int(input('Number of epochs: '))
-    learning_rate = float(input('Learning rate: '))
-    patience = 15 #int(input('Input patience for EarlyStopping: ')) # Threshold for early stopping. Number of epochs that we will wait until brake
 
-    use_cuda = torch.cuda.is_available()
-    print('CUDA available: ', use_cuda)
-    if use_cuda:
-        batch_size = 45
-    else:
-        batch_size = 2
 
     # create directory for model weights
     save_parameters_folder = input('Enter name for directory to save weights and losses: ')
@@ -30,6 +21,25 @@ def main():
         print('Created new directories.')
     except:
         print('Failed to create new directories.')
+    print('')
+
+    n_epochs = 50 #int(input('Number of epochs: '))
+    learning_rate = float(input('Learning rate: '))
+    patience = 15 #int(input('Input patience for EarlyStopping: ')) # Threshold for early stopping. Number of epochs that we will wait until brake
+    translation = float(input('enter translation: '))
+    rotation = float(input('enter rotation: '))
+
+
+
+
+    use_cuda = torch.cuda.is_available()
+    print('CUDA available: ', use_cuda)
+    print(' ')
+    if use_cuda:
+        batch_size = 45
+    else:
+        batch_size = 2
+
 
     # path to ply-files for town01 and validation
     if use_cuda:
@@ -43,10 +53,23 @@ def main():
         path_validation = '/home/master04/Desktop/Ply_files/validation_and_test/validation_set/pc/'
         path_validation_csv = '/home/master04/Desktop/Ply_files/validation_and_test/validation_set/validation_set.csv'
 
+    split_loss = True
+    if split_loss:
+        alpha = float(input('Enter weight for alpha in custom loss: '))
+        beta = 1-alpha
+        loss_trans = torch.nn.MSELoss()
+        loss_rot = torch.nn.SmoothL1Loss()
+    else:
+        loss = torch.nn.MSELoss()
+
+
+
+
     CNN = Gustav()
     if CNN.name() == 'Gustav':
-        batch_size = 32
-        print('batch_size', batch_size)
+        if use_cuda:
+            batch_size = 32
+            print('batch_size', batch_size)
     print('=======> NETWORK NAME: =======> ', CNN.name())
     if use_cuda:
         CNN.cuda()
@@ -62,7 +85,7 @@ def main():
         CNN.load_state_dict(network_param['model_state_dict'])
 
     # get data loaders
-    train_loader, val_loader = get_loaders(path_training, path_training_csv, path_validation, path_validation_csv, batch_size, use_cuda)
+    train_loader, val_loader = get_loaders(path_training, path_training_csv, path_validation, path_validation_csv, batch_size, use_cuda, translation, rotation)
     n_batches = len(train_loader)
     val_batches = len(val_loader)
     train_loss_save = [len(train_loader)]  # append train loss for each mini batch later on, save this information to plot correctly
@@ -71,14 +94,6 @@ def main():
 
     # initialize the early_stopping object
     early_stopping = EarlyStopping(parameter_path, patience, verbose=True)
-
-    split_loss = True
-
-    if split_loss:
-        loss_trans = torch.nn.MSELoss()
-        loss_rot = torch.nn.SmoothL1Loss()
-    else:
-        loss = torch.nn.MSELoss()
 
     optimizer = torch.optim.Adam(CNN.parameters(), lr=learning_rate)
     #scheduler = StepLR(optimizer, step_size=10, gamma=0.1)
@@ -122,8 +137,8 @@ def main():
                 loss_trans_size = loss_trans(outputs[:,0:2], labels[:,0:2].float())
                 loss_rot_size = loss_rot(outputs[:,-1].reshape((output_size,1)), labels[:,-1].reshape((output_size,1)).float())
 
-                alpha = 0.9
-                beta = 1-alpha
+                #alpha = 0.9  # given as input
+                #beta = 1-alpha
                 loss_size = alpha*loss_trans_size + beta*loss_rot_size
             else:
                 loss_size = loss(outputs, labels.float())

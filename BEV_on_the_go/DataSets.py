@@ -319,7 +319,7 @@ class DataSetMapData_createMapOnTheGo(Dataset):
         return training_sample
 
 
-def get_loaders(path_training, path_training_csv, path_validation, path_validation_csv, batch_size, use_cuda):
+def get_loaders(path_training, path_training_csv, path_validation, path_validation_csv, batch_size, use_cuda, translation, rotation):
     kwargs = {'pin_memory': True, 'num_workers': 16} if use_cuda else {'num_workers': 4}
 
     # USE MAP-CUTOUTS
@@ -341,7 +341,7 @@ def get_loaders(path_training, path_training_csv, path_validation, path_validati
         path_training_grids = '/home/annika_lundqvist144/csv_grids_190409/csv_grids_training/'
     else:
         path_training_grids = '/home/master04/Desktop/Dataset/ply_grids/csv_grids_190409/csv_grids_training'
-    train_set = DataSetMapData_createMapOnTheGo(path_training, path_training_csv, path_training_grids)
+    train_set = DataSetMapData_createMapOnTheGo(path_training, path_training_csv, path_training_grids, translation=translation, rotation=rotation)
 
     n_training_samples = len(train_set)
     print('Number of training samples: ', n_training_samples)
@@ -366,7 +366,7 @@ def get_loaders(path_training, path_training_csv, path_validation, path_validati
         path_validation_grids = '/home/annika_lundqvist144/csv_grids_190409/csv_grids_validation/'
     else:
         path_validation_grids = '/home/master04/Desktop/Dataset/ply_grids/csv_grids_190409/csv_grids_validation/'
-    val_set = DataSetMapData_createMapOnTheGo(path_validation, path_validation_csv, path_validation_grids)
+    val_set = DataSetMapData_createMapOnTheGo(path_validation, path_validation_csv, path_validation_grids, translation=translation, rotation=rotation)
 
     n_val_samples = len(val_set)
     print('Number of validation samples: ', n_val_samples)
