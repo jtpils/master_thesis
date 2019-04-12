@@ -64,17 +64,22 @@ def main():
 
 
 
-
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     CNN = Aslan()
     if CNN.name() == 'Gustav':
         if use_cuda:
             batch_size = 32
             print('batch_size', batch_size)
     print('=======> NETWORK NAME: =======> ', CNN.name())
-    if use_cuda:
-        CNN.cuda()
-    print('Are model parameters on CUDA? ', next(CNN.parameters()).is_cuda)
-    print(' ')
+    #if use_cuda:
+    #    CNN.cuda()
+    #print('Are model parameters on CUDA? ', next(CNN.parameters()).is_cuda)
+        #print(' ')
+    if torch.cuda.device_count() > 1:
+        print("Let's use", torch.cuda.device_count(), "GPUs!")
+        CNN = torch.nn.DataParallel(CNN)
+
+    CNN.to(device)
 
     # Load weights
     load_weights = False
