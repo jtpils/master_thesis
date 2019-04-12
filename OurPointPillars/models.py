@@ -16,7 +16,7 @@ def ScatterPseudoImage(coordinates, PFN_output,  batch_size, use_cuda):
     width = 60
     pillar_size = 0.5
     range = 15
-
+    batch_size = np.shape(coordinates)[0]
     batch_canvas = []
     for batch in np.arange(batch_size):
         # Find all nonzero elements in the coordinate tensor
