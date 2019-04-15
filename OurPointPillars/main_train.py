@@ -60,6 +60,7 @@ train_loader, val_loader = get_train_loader(batch_size, data_set_path_train, csv
                      csv_path_val, grid_csv_path_val, translation, rotation, kwargs)
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+use_cuda = False
 net = OurPointPillars(batch_size, use_cuda)
 
 
@@ -78,6 +79,9 @@ if load_weights:
     network_param = torch.load(load_weights_path)
     net.load_state_dict(network_param['model_state_dict'])
     print(' ')
+
+device = 'cpu'
+use_cuda = False
 
 net.to(device)
 

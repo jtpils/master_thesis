@@ -52,14 +52,15 @@ class PFNLayer(torch.nn.Module):
 
         # Linear Layer:  The linear layer can be formulated as a 1*1 convolution layer across the tensor
         # Changed the input to 3 channels
-        self.conv1 = torch.nn.Conv2d(3, 64, kernel_size=1, stride=1, padding=0)
+        # input tensor: 3,1260,900
+        self.conv1 = torch.nn.Conv2d(3, 64, kernel_size=1, stride=1, padding=0) # output 64, 1260,900
         # Batch Norm
         self.conv1_bn = torch.nn.BatchNorm2d(64)
 
     def forward(self, inputs):
 
-        x = F.relu(self.conv1_bn(self.conv1(inputs))) # shape (1,64,1200,100)
-        x = torch.max(x, dim=3, keepdim=True)[0]  # shape (1,64,1200,1)
+        x = F.relu(self.conv1_bn(self.conv1(inputs))) # shape (batch,64,1260,900)
+        x = torch.max(x, dim=3, keepdim=True)[0]  # shape (batch,64,1260,1)
         x = x.view(np.shape(x)[:3])
         return x
 
