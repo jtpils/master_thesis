@@ -11,7 +11,7 @@ def get_train_loader(batch_size, data_set_path_train, csv_path_train, grid_csv_p
     train_loader = torch.utils.data.DataLoader(training_data_set, batch_size=batch_size, sampler=train_sampler, drop_last = True, **kwargs)
 
     validation_data_set = DataSetPointPillars(data_set_path_val, csv_path_val, grid_csv_path_val, translation=translation, rotation=rotation)
-    num_val_samples = 923
+    num_val_samples = int(0.2*(len(training_data_set)/0.8))
     print('Number of validation samples: ', num_val_samples)
     val_sampler = SubsetRandomSampler(np.arange(num_val_samples, dtype=np.int64))
     val_loader = torch.utils.data.DataLoader(validation_data_set, batch_size=batch_size, sampler=val_sampler, drop_last = True, **kwargs)
