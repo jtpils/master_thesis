@@ -28,7 +28,7 @@ print('Number of GPUs available: ', torch.cuda.device_count())
 use_cuda = torch.cuda.is_available()
 print('CUDA available: ', use_cuda)
 if use_cuda:
-    batch_size = 16
+    batch_size = 8
 else:
     batch_size = 2
 
