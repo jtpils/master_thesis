@@ -55,7 +55,7 @@ else:
     csv_path_val = '/home/annika_lundqvist144/ply_files/validation_set/validation_set.csv'
     grid_csv_path_val = '/home/master04/Desktop/Dataset/ply_grids/csv_grids_190409/csv_grids_validation'
 
-kwargs = {'num_workers': 8, 'pin_memory':True} if use_cuda else {'num_workers': 0}
+kwargs = {'num_workers': 16, 'pin_memory':True} if use_cuda else {'num_workers': 0}
 train_loader, val_loader = get_train_loader(batch_size, data_set_path_train, csv_path_train, grid_csv_path_train, data_set_path_val,
                      csv_path_val, grid_csv_path_val, translation, rotation, kwargs)
 
