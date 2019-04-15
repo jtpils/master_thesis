@@ -58,11 +58,10 @@ class DataSetPointPillars(Dataset):
         sweep = translate_point_cloud(sweep, rand_trans[:2])
         sweep = trim_point_cloud_range(sweep, origin=global_coords[:2],  trim_range=15)
 
-        # do stuff with pillars and tensors
-        # TODO: check if we need to think about the origin of the pc when creating the pillars
-
         sweep_pillars, sweep_coordinates = create_pillars(sweep, origin=global_coords[:2])
         sweep_features , sweep_coordinates = get_feature_tensor(sweep_pillars, sweep_coordinates)
+
+
         # map cut-out
         trim_range = 15
         cut_out_coordinates = global_coords[:2]

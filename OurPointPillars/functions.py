@@ -246,3 +246,99 @@ def get_feature_tensor(pillar_dict, coordinate_dict, max_number_of_pillars=1260,
         pillar += 1
 
     return feature_tensor, coordinate_tensor
+
+
+
+
+
+
+# new function /A
+def both_pillar_tensor_FAST(point_cloud, origin, pillar_size=0.5, trim_range=15, max_number_of_pillars=1260,
+         max_number_of_points_per_pillar=900, dimension=3):
+    '''
+    Function that creates a dict containing the 8 features for each pillar in a point cloud. Each pillar is grid_size large.
+    :param point_cloud: <nd.array> [nx3] nd array containing the x, y, z coordinates of a point cloud
+    :param pillar_size: <float> The size of the pillar.
+    :return: pillar_feature_dict: <dict> A dict containing the features for each pillar
+    '''
+
+    # if we shuffle the points first, can we just fill a pillar in a dict and when we reach max_num-points in that
+    # pillar, we discard the rest? is that the same as sampling points if we have to many?
+    shuffle_index = np.random.permutation(len(point_cloud))
+    point_cloud = point_cloud[shuffle_index, :]
+
+    x_edges = np.arange(-trim_range, trim_range, pillar_size)
+    y_edges = np.arange(-trim_range, trim_range, pillar_size)
+
+    # translate point cloud such that the center of the cloud is the origin
+    point_cloud = point_cloud - np.array((origin[0], origin[1], 0))
+
+    # compute pillar for each point
+    x_grids = np.floor((point_cloud[:,0] + trim_range)/pillar_size).astype(int)
+    y_grids = np.floor((point_cloud[:,1] + trim_range)/pillar_size).astype(int)
+    grid_pairs = list(zip(x_grids, y_grids))
+    unique_grid_pairs = list(set(grid_pairs))
+
+    # we can sample 1260 pillars here already, before computing features that may be thrown away later
+    # good idea, but we still have to sort all points? so well loop through all points anyway
+    '''if len(unique_grid_pairs) > max_num_pillars:
+        unique_grid_pairs = np.array(list(set(grid_pairs)))
+        random_index = random.sample(list(np.arange(len(unique_grid_pairs))), max_num_pillars)
+        unique_grid_pairs = unique_grid_pairs[random_index]
+        unique_grid_pairs = [tuple(pair) for pair in unique_grid_pairs]
+        # update grids accordingly??'''
+
+    # calculate features for all points
+    # get center of each pillar for each point
+    x_offset = x_edges[x_grids] + pillar_size / 2
+    y_offset = y_edges[y_grids] + pillar_size / 2
+    xp = point_cloud[:, 0] - x_offset
+    yp = point_cloud[:, 1] - y_offset
+    z = point_cloud[:, 2]
+    features = np.vstack((xp.T, yp.T, z.T)).T
+
+    pillar_feature_dict = dict.fromkeys(unique_grid_pairs)
+    coordinate_dict = {}
+    for row in range(len(point_cloud[:, 0])):
+
+        key = (x_grids[row], y_grids[row])
+
+        if pillar_feature_dict[key] is not None: # if the pillar already has at least one point
+            if len(pillar_feature_dict[key]) < 100:
+                cell_value = pillar_feature_dict[key]
+
+                new_feature = features[row, :]
+                cell_value = np.vstack((cell_value, new_feature))
+
+                pillar_feature_dict.update({key: cell_value})
+
+        else:
+            new_feature = features[row, :]
+            pillar_feature_dict.update({key: new_feature})
+
+        coordinate_dict.update({key: point_cloud[row, :]})
+
+
+    # CREATE TENSOR
+    # Initialize feature tensor
+    feature_tensor = np.zeros((dimension, max_number_of_pillars, max_number_of_points_per_pillar))
+    coordinate_tensor = np.zeros((max_number_of_pillars,3))
+    # 1. Check how many keys in the dict. If more than max number of pillars pick random max_numer_of_pillars
+    number_of_pillars = len(pillar_feature_dict.keys())
+    if number_of_pillars > max_number_of_pillars:
+        key_list = random.sample(list(pillar_feature_dict), max_number_of_pillars)
+    else:
+        key_list = list(pillar_feature_dict)
+
+    pillar = 0
+    for key in key_list:
+        # Get value from dict
+        key_value = pillar_feature_dict[key]
+        if len(np.shape(key_value)) == 1:
+            key_value = np.expand_dims(pillar_feature_dict[key], axis=0)
+        number_of_points = np.shape(key_value)[0]
+        feature_tensor[:, pillar, :number_of_points] = key_value.T
+        coordinate_tensor[pillar, :] = coordinate_dict[key]
+        pillar += 1
+
+    return feature_tensor, coordinate_tensor
