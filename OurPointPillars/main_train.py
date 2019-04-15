@@ -28,7 +28,7 @@ print('Number of GPUs available: ', torch.cuda.device_count())
 use_cuda = torch.cuda.is_available()
 print('CUDA available: ', use_cuda)
 if use_cuda:
-    batch_size = 10
+    batch_size = 20
 else:
     batch_size = 2
 
@@ -55,7 +55,7 @@ else:
     csv_path_val = '/home/annika_lundqvist144/ply_files/validation_set/validation_set.csv'
     grid_csv_path_val = '/home/master04/Desktop/Dataset/ply_grids/csv_grids_190409/csv_grids_validation'
 
-kwargs = {'num_workers': 6, 'pin_memory':True} if use_cuda else {'num_workers': 0}
+kwargs = {'num_workers': 8, 'pin_memory':True} if use_cuda else {'num_workers': 0}
 train_loader, val_loader = get_train_loader(batch_size, data_set_path_train, csv_path_train, grid_csv_path_train, data_set_path_val,
                      csv_path_val, grid_csv_path_val, translation, rotation, kwargs)
 
@@ -72,7 +72,7 @@ if torch.cuda.device_count() > 1:
 
 # Load weights
 load_weights = True
-load_weights_path = '/home/annika_lundqvist144/master_thesis/OurPointPillars/pc_190415_2/parameters/epoch_0_checkpoint.pt'
+load_weights_path = '/home/annika_lundqvist144/master_thesis/OurPointPillars/pc_190415_3/parameters/epoch_0_checkpoint.pt'
 if load_weights:
     print('Loading parameters...')
     network_param = torch.load(load_weights_path)
