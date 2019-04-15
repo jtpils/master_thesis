@@ -20,9 +20,6 @@ def ScatterPseudoImage(coordinates, PFN_output,  batch_size, use_cuda):
     batch_canvas = []
     for batch in np.arange(batch_size):
         # Find all nonzero elements in the coordinate tensor
-        print('coordinates: ', np.shape(coordinates))
-        print('batch ', batch)
-        print('batch size ', batch_size)
         pillar_list = np.nonzero(coordinates[batch, :, 0])
 
         x_coords = coordinates[batch, pillar_list, 0]
@@ -152,8 +149,6 @@ class OurPointPillars(torch.nn.Module):
 
     def forward(self, sweep, map, sweep_coordinates, map_coordinates):
         batch_size = np.shape(sweep_coordinates)[0]
-        print('shape sweep', np.shape(sweep))
-        print('shape sweep coords', np.shape(sweep_coordinates))
         sweep_outputs = self.PFNlayer_sweep.forward(sweep)
         map_outputs = self.PFNlayer_map.forward(map)
         sweep_canvas = ScatterPseudoImage(sweep_coordinates, sweep_outputs, self.batch_size, self.use_cuda) # batchsize is not used anymore

@@ -58,9 +58,9 @@ class DataSetPointPillars(Dataset):
         sweep = translate_point_cloud(sweep, rand_trans[:2])
         sweep = trim_point_cloud_range(sweep, origin=global_coords[:2],  trim_range=15)
 
-        sweep_pillars, sweep_coordinates = create_pillars(sweep, origin=global_coords[:2])
-        sweep_features , sweep_coordinates = get_feature_tensor(sweep_pillars, sweep_coordinates)
-
+        #sweep_pillars, sweep_coordinates = create_pillars(sweep, origin=global_coords[:2])
+        #sweep_features , sweep_coordinates = get_feature_tensor(sweep_pillars, sweep_coordinates)
+        sweep_features , sweep_coordinates = both_pillar_tensor_FAST(sweep,origin=global_coords[:2])
 
         # map cut-out
         trim_range = 15
@@ -92,8 +92,9 @@ class DataSetPointPillars(Dataset):
         cutout = cutout[cutout['y'] >= cut_out_coordinates[1]-trim_range]
         cutout = cutout.values
 
-        cutout_pillars, cutout_coordinates = create_pillars(cutout, origin=global_coords[:2])
-        cutout_features , cutout_coordinates = get_feature_tensor(cutout_pillars, cutout_coordinates)
+        #cutout_pillars, cutout_coordinates = create_pillars(cutout, origin=global_coords[:2])
+        #cutout_features , cutout_coordinates = get_feature_tensor(cutout_pillars, cutout_coordinates)
+        cutout_features , cutout_coordinates = both_pillar_tensor_FAST(cutout,origin=global_coords[:2])
         training_sample = {'sweep': torch.from_numpy(sweep_features).float(),
                            'sweep_coordinates': sweep_coordinates,
                            'cutout': torch.from_numpy(cutout_features).float(),
