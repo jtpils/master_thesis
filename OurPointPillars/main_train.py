@@ -73,7 +73,7 @@ if torch.cuda.device_count() > 1:
 
 # Load weights
 load_weights = True
-load_weights_path = '/home/annika_lundqvist144/master_thesis/OurPointPillars/pc_190415_3/parameters/epoch_0_checkpoint.pt'
+load_weights_path = '/home/annika_lundqvist144/master_thesis/OurPointPillars/pc_190415_3/parameters/epoch_2_checkpoint.pt'
 if load_weights:
     print('Loading parameters...')
     network_param = torch.load(load_weights_path)
