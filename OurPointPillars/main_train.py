@@ -28,7 +28,7 @@ print('Number of GPUs available: ', torch.cuda.device_count())
 use_cuda = torch.cuda.is_available()
 print('CUDA available: ', use_cuda)
 if use_cuda:
-    batch_size = 8
+    batch_size = 12
 else:
     batch_size = 2
 
@@ -61,6 +61,16 @@ train_loader, val_loader = get_train_loader(batch_size, data_set_path_train, csv
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 net = OurPointPillars(batch_size, use_cuda)
+
+# Load weights
+load_weights = True
+load_weights_path = '/home/annika_lundqvist144/master_thesis/OurPointPillars/parameters/epoch_0_checkpoint.pt'
+if load_weights:
+    print('Loading parameters...')
+    network_param = torch.load(load_weights_path)
+    net.load_state_dict(network_param['model_state_dict'])
+    print(' ')
+
 print('=======> NETWORK NAME: =======> ', net.name())
 if torch.cuda.device_count() > 1:
         print("Let's use", torch.cuda.device_count(), "GPUs!")
