@@ -153,44 +153,44 @@ for epoch in range(n_epochs):
         get_data_1 = time.time()
         del data, sweep, cutout, outputs, loss_size
 
-        print('===== Validation =====')
-        total_val_loss = 0
-        net = net.eval()
-        val_time = time.time()
-        with torch.no_grad():
-            print('number of iterations: ', val_batches)
-            for i, data in tqdm(enumerate(val_loader, 1)):
-                sweep = data['sweep']
-                sweep_coordinates = data['sweep_coordinates']
-                cutout = data['cutout']
-                cutout_coordinates = data['cutout_coordinates']
-                label = data['label']
-                if use_cuda:
-                    sweep, sweep_coordinates, cutout, cutout_coordinates, label = sweep.cuda(async=True), \
-                                                                                   sweep_coordinates.cuda(async=True), \
-                                                                                   cutout.cuda(async=True), \
-                                                                                   cutout_coordinates.cuda(async=True), \
-                                                                                   label.cuda(async=True)
+    print('===== Validation =====')
+    total_val_loss = 0
+    net = net.eval()
+    val_time = time.time()
+    with torch.no_grad():
+        print('number of iterations: ', val_batches)
+        for i, data in tqdm(enumerate(val_loader, 1)):
+            sweep = data['sweep']
+            sweep_coordinates = data['sweep_coordinates']
+            cutout = data['cutout']
+            cutout_coordinates = data['cutout_coordinates']
+            label = data['label']
+            if use_cuda:
+                sweep, sweep_coordinates, cutout, cutout_coordinates, label = sweep.cuda(async=True), \
+                                                                               sweep_coordinates.cuda(async=True), \
+                                                                               cutout.cuda(async=True), \
+                                                                               cutout_coordinates.cuda(async=True), \
+                                                                               label.cuda(async=True)
 
-                sweep, sweep_coordinates, cutout, cutout_coordinates, label = Variable(sweep), Variable(sweep_coordinates), \
-                                                                         Variable(cutout), Variable(cutout_coordinates), \
-                                                                           Variable(label)
+            sweep, sweep_coordinates, cutout, cutout_coordinates, label = Variable(sweep), Variable(sweep_coordinates), \
+                                                                     Variable(cutout), Variable(cutout_coordinates), \
+                                                                       Variable(label)
 
-                # Forward pass
-                val_outputs = net.forward(sweep.float(), cutout.float(), sweep_coordinates.float(), cutout_coordinates.float())
-                output_size = val_outputs.size()[0]
+            # Forward pass
+            val_outputs = net.forward(sweep.float(), cutout.float(), sweep_coordinates.float(), cutout_coordinates.float())
+            output_size = val_outputs.size()[0]
 
-                if split_loss:
-                    loss_trans_size = loss_trans(val_outputs[:,0:2], label[:,0:2].float())
-                    loss_rot_size = loss_rot(val_outputs[:,-1].reshape((output_size,1)), label[:,-1].reshape((output_size,1)).float())
-                    val_loss_size = alpha*loss_trans_size + beta*loss_rot_size
-                else:
-                    val_loss_size = loss(val_outputs, label.float())
+            if split_loss:
+                loss_trans_size = loss_trans(val_outputs[:,0:2], label[:,0:2].float())
+                loss_rot_size = loss_rot(val_outputs[:,-1].reshape((output_size,1)), label[:,-1].reshape((output_size,1)).float())
+                val_loss_size = alpha*loss_trans_size + beta*loss_rot_size
+            else:
+                val_loss_size = loss(val_outputs, label.float())
 
-                total_val_loss += val_loss_size.item()
-                val_loss_save.append(val_loss_size.item())
+            total_val_loss += val_loss_size.item()
+            val_loss_save.append(val_loss_size.item())
 
-                del data, sweep, cutout, label, val_outputs, val_loss_size
+            del data, sweep, cutout, label, val_outputs, val_loss_size
 
         scheduler.step(total_val_loss)
 
