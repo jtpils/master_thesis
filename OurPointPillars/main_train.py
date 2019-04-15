@@ -64,7 +64,7 @@ net = OurPointPillars(batch_size, use_cuda)
 
 # Load weights
 load_weights = True
-load_weights_path = '/home/annika_lundqvist144/master_thesis/OurPointPillars/parameters/epoch_0_checkpoint.pt'
+load_weights_path = '/home/annika_lundqvist144/master_thesis/OurPointPillars/pc_190415_1/parameters/epoch_0_checkpoint.pt'
 if load_weights:
     print('Loading parameters...')
     network_param = torch.load(load_weights_path)
