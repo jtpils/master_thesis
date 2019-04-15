@@ -14,6 +14,15 @@ patience = 10
 translation = float(input('Enter translation in metres: '))
 rotation = float(input('Enter rotation in degrees: '))
 
+split_loss = True
+if split_loss:
+    alpha = float(input('Enter weight for alpha in custom loss: '))
+    beta = 1-alpha
+    loss_trans = torch.nn.MSELoss()
+    loss_rot = torch.nn.SmoothL1Loss()
+else:
+    loss = torch.nn.MSELoss()
+
 print(' ')
 print('Number of GPUs available: ', torch.cuda.device_count())
 use_cuda = torch.cuda.is_available()
@@ -31,16 +40,6 @@ os.mkdir(model_path)
 parameter_path = os.path.join(model_path, 'parameters')
 os.mkdir(parameter_path)
 
-split_loss = True
-if split_loss:
-    alpha = float(input('Enter weight for alpha in custom loss: '))
-    beta = 1-alpha
-    loss_trans = torch.nn.MSELoss()
-    loss_rot = torch.nn.SmoothL1Loss()
-else:
-    loss = torch.nn.MSELoss()
-
-
 if use_cuda:
     data_set_path_train = '/home/annika_lundqvist144/ply_files/_out_Town01_190402_1/pc'
     csv_path_train = '/home/annika_lundqvist144/ply_files/_out_Town01_190402_1/Town01_190402_1.csv'
@@ -56,7 +55,7 @@ else:
     csv_path_val = '/home/annika_lundqvist144/ply_files/validation_set/validation_set.csv'
     grid_csv_path_val = '/home/master04/Desktop/Dataset/ply_grids/csv_grids_190409/csv_grids_validation'
 
-kwargs = {'num_workers': 0, 'pin_memory':True} if use_cuda else {'num_workers': 0}
+kwargs = {'num_workers': 8, 'pin_memory':True} if use_cuda else {'num_workers': 0}
 train_loader, val_loader = get_train_loader(batch_size, data_set_path_train, csv_path_train, grid_csv_path_train, data_set_path_val,
                      csv_path_val, grid_csv_path_val, translation, rotation, kwargs)
 
@@ -70,10 +69,6 @@ if torch.cuda.device_count() > 1:
 
 net.to(device)
 
-
-
-
-
 # Print all of the hyperparameters of the training iteration:
 print("===== HYPERPARAMETERS =====")
 print("batch_size =", batch_size)
@@ -81,7 +76,6 @@ print("epochs =", n_epochs)
 print("initial learning_rate =", learning_rate)
 print('patience:', patience)
 print("=" * 27)
-
 
 # declare variables for storing validation and training loss to return
 val_loss = []
@@ -171,32 +165,32 @@ for epoch in range(n_epochs):
                 cutout = data['cutout']
                 cutout_coordinates = data['cutout_coordinates']
                 label = data['label']
-            if use_cuda:
-                sweep, sweep_coordinates, cutout, cutout_coordinates, label = sweep.cuda(async=True), \
-                                                                               sweep_coordinates.cuda(async=True), \
-                                                                               cutout.cuda(async=True), \
-                                                                               cutout_coordinates.cuda(async=True), \
-                                                                               label.cuda(async=True)
+                if use_cuda:
+                    sweep, sweep_coordinates, cutout, cutout_coordinates, label = sweep.cuda(async=True), \
+                                                                                   sweep_coordinates.cuda(async=True), \
+                                                                                   cutout.cuda(async=True), \
+                                                                                   cutout_coordinates.cuda(async=True), \
+                                                                                   label.cuda(async=True)
 
-            sweep, sweep_coordinates, cutout, cutout_coordinates, label = Variable(sweep), Variable(sweep_coordinates), \
-                                                                     Variable(cutout), Variable(cutout_coordinates), \
-                                                                       Variable(label)
+                sweep, sweep_coordinates, cutout, cutout_coordinates, label = Variable(sweep), Variable(sweep_coordinates), \
+                                                                         Variable(cutout), Variable(cutout_coordinates), \
+                                                                           Variable(label)
 
-            # Forward pass
-            val_outputs = net.forward(sweep.float(), cutout.float(), sweep_coordinates.float(), cutout_coordinates.float())
-            output_size = val_outputs.size()[0]
+                # Forward pass
+                val_outputs = net.forward(sweep.float(), cutout.float(), sweep_coordinates.float(), cutout_coordinates.float())
+                output_size = val_outputs.size()[0]
 
-            if split_loss:
-                loss_trans_size = loss_trans(val_outputs[:,0:2], label[:,0:2].float())
-                loss_rot_size = loss_rot(val_outputs[:,-1].reshape((output_size,1)), label[:,-1].reshape((output_size,1)).float())
-                val_loss_size = alpha*loss_trans_size + beta*loss_rot_size
-            else:
-                val_loss_size = loss(val_outputs, label.float())
+                if split_loss:
+                    loss_trans_size = loss_trans(val_outputs[:,0:2], label[:,0:2].float())
+                    loss_rot_size = loss_rot(val_outputs[:,-1].reshape((output_size,1)), label[:,-1].reshape((output_size,1)).float())
+                    val_loss_size = alpha*loss_trans_size + beta*loss_rot_size
+                else:
+                    val_loss_size = loss(val_outputs, label.float())
 
-            total_val_loss += val_loss_size.item()
-            val_loss_save.append(val_loss_size.item())
+                total_val_loss += val_loss_size.item()
+                val_loss_save.append(val_loss_size.item())
 
-            del data, sweep, cutout, label, val_outputs, val_loss_size
+                del data, sweep, cutout, label, val_outputs, val_loss_size
 
         scheduler.step(total_val_loss)
 
