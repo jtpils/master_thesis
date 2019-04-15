@@ -70,14 +70,14 @@ class PFNLayer(torch.nn.Module):
 class Backbone(nn.Module):
     def __init__(self):
         """
-        Backbone. outputs a rigid transformation.
+        Backbone. outputs a rigid transformation. 128, 60, 60
         """
         super(Backbone, self).__init__()
 
-        self.conv1 = torch.nn.Conv2d(128, 64, kernel_size=3, stride=1, padding=0)
-        self.conv2 = torch.nn.Conv2d(64, 64, kernel_size=3, stride=1, padding=0)
-        self.conv3 = torch.nn.Conv2d(64, 64, kernel_size=3, stride=1, padding=0)
-        self.conv4 = torch.nn.Conv2d(64, 64, kernel_size=3, stride=1, padding=0)
+        self.conv1 = torch.nn.Conv2d(128, 64, kernel_size=3, stride=1, padding=0) # 64,58,58
+        self.conv2 = torch.nn.Conv2d(64, 64, kernel_size=3, stride=1, padding=0)  # 64,56,56
+        self.conv3 = torch.nn.Conv2d(64, 64, kernel_size=3, stride=1, padding=0)  # 64,54,54
+        self.conv4 = torch.nn.Conv2d(64, 64, kernel_size=3, stride=1, padding=0)  # 64,52,52
 
         self.bn1 = torch.nn.BatchNorm2d(64)
         self.bn2 = torch.nn.BatchNorm2d(64)
@@ -86,12 +86,12 @@ class Backbone(nn.Module):
 
         # Block 2:
         # relu + 6 conv + stride 2 + bn
-        self.conv5 = torch.nn.Conv2d(64, 128, kernel_size=3, stride=2, padding=0)
-        self.conv6 = torch.nn.Conv2d(128, 128, kernel_size=3, stride=2, padding=0)
-        self.conv7 = torch.nn.Conv2d(128, 64, kernel_size=3, stride=1, padding=0)
-        self.conv8 = torch.nn.Conv2d(64, 32, kernel_size=3, stride=1, padding=0)
-        self.conv9 = torch.nn.Conv2d(32, 16, kernel_size=3, stride=1, padding=0)
-        self.conv10 = torch.nn.Conv2d(16, 8, kernel_size=3, stride=1, padding=0)
+        self.conv5 = torch.nn.Conv2d(64, 128, kernel_size=3, stride=1, padding=0) # 128,50,50
+        self.conv6 = torch.nn.Conv2d(128, 128, kernel_size=3, stride=1, padding=0)  # 128,48,48
+        self.conv7 = torch.nn.Conv2d(128, 64, kernel_size=3, stride=1, padding=0)  # 64,46,46
+        self.conv8 = torch.nn.Conv2d(64, 32, kernel_size=3, stride=1, padding=0)  # 32,44,44
+        self.conv9 = torch.nn.Conv2d(32, 16, kernel_size=3, stride=1, padding=0)  # 16,42,42
+        self.conv10 = torch.nn.Conv2d(16, 8, kernel_size=3, stride=1, padding=0)  # 8,40,40
 
         self.bn5 = torch.nn.BatchNorm2d(128)
         self.bn6 = torch.nn.BatchNorm2d(128)
@@ -100,11 +100,14 @@ class Backbone(nn.Module):
         self.bn9 = torch.nn.BatchNorm2d(16)
         self.bn10 = torch.nn.BatchNorm2d(8)
 
+        self.pool = torch.nn.MaxPool2d(kernel_size=2, stride=2)
         # Block 3:
         # 2 fully connected with drop out.
 
-        self.fc1 = torch.nn.Linear( 8 * 59 * 59, 32)
-        self.fc1_bn = torch.nn.BatchNorm1d(32)
+        self.fc1 = torch.nn.Linear( 8 * 20 * 20 , 512)
+        self.fc2 = torch.nn.Linear( 512 , 32)
+        self.fc1_bn = torch.nn.BatchNorm1d(512)
+        self.fc2_bn = torch.nn.BatchNorm1d(32)
         self.fc_out = torch.nn.Linear(32, 3)
 
     def forward(self, x):
@@ -123,9 +126,12 @@ class Backbone(nn.Module):
         x = F.relu(self.bn9(self.conv9(x)))
         x = F.relu(self.bn10(self.conv10(x)))
 
+        x = self.pool(x)  # 8, 20, 20
+
         # Block 3:
-        x = x.view(-1, 8 * 59 * 59)
+        x = x.view(-1, 8 * 20 * 20)
         x = torch.tanh(self.fc1_bn(self.fc1(x)))
+        x = torch.tanh(self.fc2_bn(self.fc2(x)))
         x = self.fc_out(x)
 
         return x
